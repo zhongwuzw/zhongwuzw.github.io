@@ -95,7 +95,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/ZhihuDaily/master/images/demo3.gif">
 <meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/ZhihuDaily/master/images/demo4.gif">
 <meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/ZhihuDaily/master/images/demo5.gif">
-<meta property="og:updated_time" content="2016-08-18T11:07:57.000Z">
+<meta property="og:updated_time" content="2016-08-19T02:01:21.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="知乎日报iOS">
 <meta name="twitter:description" content="Disclaimer - 声明Zhihu is a trademark of Zhihu. Inc. This app is not created nor endorsed by Zhihu Inc. All the information and content accessible through Zhihu Daily Purify are subject to Zhihu’s copyr">
@@ -120,7 +120,7 @@
   <title> 知乎日报iOS | 钟武的技术博客 </title>
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
   
 
@@ -175,7 +175,27 @@
             
               <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
             
-            Startseite
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
           </a>
         </li>
       
@@ -185,7 +205,7 @@
             
               <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
             
-            Archiv
+            归档
           </a>
         </li>
       
@@ -195,7 +215,17 @@
             
               <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
             
-            Tags
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
           </a>
         </li>
       
@@ -248,7 +278,7 @@
             <span class="post-meta-item-icon">
               <i class="fa fa-calendar-o"></i>
             </span>
-            <span class="post-meta-item-text">Veröffentlicht am</span>
+            <span class="post-meta-item-text">发表于</span>
             <time itemprop="dateCreated" datetime="2016-08-18T17:31:02+08:00" content="2016-08-18">
               2016-08-18
             </time>
@@ -257,6 +287,13 @@
           
 
           
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/08/18/知乎日报iOS/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/18/知乎日报iOS/" itemprop="commentsCount"></span>
+                </a>
+              </span>
             
           
 
@@ -282,22 +319,13 @@
 <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>最近工作工作不是很忙，所以准备开发项目练练手，之前发现了这个<em><a href="https://github.com/izzyleung/ZhihuDailyPurify/" target="_blank" rel="external">知乎日报API</a></em>,其提供了知乎日报的API地址，所以决定开发知乎日报。先上<em><a href="https://github.com/zhongwuzw/ZhihuDaily" target="_blank" rel="external">Github地址</a></em>，欢迎<em>Star、Issues、Pull Request</em>。</p>
 <h1 id="展示"><a href="#展示" class="headerlink" title="展示"></a>展示</h1><h2 id="1-应用主页部分："><a href="#1-应用主页部分：" class="headerlink" title="1.应用主页部分："></a>1.应用主页部分：</h2><p><img src="https://raw.githubusercontent.com/zhongwuzw/ZhihuDaily/master/images/demo1.gif" alt=""></p>
 <ul>
-<li><p>主页中最上方的滚动条实现思路：该无限滚动条有很多实现方式，包括使用UIScrollView，添加3个子视图用于管理，每次滑动后都进行3个子视图内容的重新赋值。之前，我采用过这种思路，所以又想了另外一种方法，直接使用UICollectionView来实现，在第一个和最后一个数据源中添加最后一个、第一个数据，在scrollViewDidScroll中处理到达左右两边后的跳转即可，代码如下：</p>
-<p>  -(void)scrollViewDidScroll:(UIScrollView *)scrollView{<br>  [self scrollCollectionViewToCorrectIndexPath];<br>}</p>
-</li>
+<li>主页中最上方的滚动条实现思路：该无限滚动条有很多实现方式，包括使用UIScrollView，添加3个子视图用于管理，每次滑动后都进行3个子视图内容的重新赋值。之前，我采用过这种思路，所以又想了另外一种方法，直接使用UICollectionView来实现，在第一个和最后一个数据源中添加最后一个、第一个数据，在scrollViewDidScroll中处理到达左右两边后的跳转即可，代码如下：</li>
 </ul>
-<p>-(void)scrollCollectionViewToCorrectIndexPath{<br>    float contentOffsetWhenFullyScrolledRight = self.frame.size.width * ([self.dataArray count] -1);</p>
-<pre><code>if (self.collectionView.contentOffset.x == contentOffsetWhenFullyScrolledRight) {
-    NSIndexPath *newIndexPath = [NSIndexPath indexPathForItem:1 inSection:0];
-
-    [self.collectionView scrollToItemAtIndexPath:newIndexPath atScrollPosition:UICollectionViewScrollPositionLeft animated:NO];
-
-} else if (self.collectionView.contentOffset.x == 0)  {
-    NSIndexPath *newIndexPath = [NSIndexPath indexPathForItem:([self.dataArray count] -2) inSection:0];
-
-    [self.collectionView scrollToItemAtIndexPath:newIndexPath atScrollPosition:UICollectionViewScrollPositionLeft animated:NO];
-}
-</code></pre><p>}</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">-(<span class="keyword">void</span>)scrollViewDidScroll:(<span class="built_in">UIScrollView</span> *)scrollView&#123;</div><div class="line">	[<span class="keyword">self</span> scrollCollectionViewToCorrectIndexPath];</div><div class="line">&#125;</div><div class="line"></div><div class="line">-(<span class="keyword">void</span>)scrollCollectionViewToCorrectIndexPath&#123;</div><div class="line">	<span class="keyword">float</span> contentOffsetWhenFullyScrolledRight = <span class="keyword">self</span>.frame.size.width * ([<span class="keyword">self</span>.dataArray count] <span class="number">-1</span>);</div><div class="line">	<span class="keyword">if</span> (<span class="keyword">self</span>.collectionView.contentOffset.x == contentOffsetWhenFullyScrolledRight) 	&#123;</div><div class="line">        <span class="built_in">NSIndexPath</span> *newIndexPath = [<span class="built_in">NSIndexPath</span> indexPathForItem:<span class="number">1</span> inSection:<span class="number">0</span>];</div><div class="line">        </div><div class="line">        [<span class="keyword">self</span>.collectionView scrollToItemAtIndexPath:newIndexPath atScrollPosition:<span class="built_in">UICollectionViewScrollPositionLeft</span> animated:<span class="literal">NO</span>];</div><div class="line">        </div><div class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">self</span>.collectionView.contentOffset.x == <span class="number">0</span>)  &#123;</div><div class="line">        <span class="built_in">NSIndexPath</span> *newIndexPath = [<span class="built_in">NSIndexPath</span> indexPathForItem:([<span class="keyword">self</span>.dataArray count] <span class="number">-2</span>) inSection:<span class="number">0</span>];</div><div class="line">        </div><div class="line">        [<span class="keyword">self</span>.collectionView scrollToItemAtIndexPath:newIndexPath atScrollPosition:<span class="built_in">UICollectionViewScrollPositionLeft</span> animated:<span class="literal">NO</span>];</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>由于主页上方的无限滚动条是有UICollectionView来实现的，所以为了实现主页新闻页滑动时的动态放缩，直接在setFrame中invalidate collectionView的layout即可：</li>
+</ul>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="selector-tag">-</span>(void)<span class="selector-tag">setFrame</span><span class="selector-pseudo">:(CGRect)frame</span>&#123;</div><div class="line">    <span class="selector-tag">if</span> (self.height != frame.size.height) &#123;</div><div class="line">        <span class="selector-attr">[self.collectionView.collectionViewLayout invalidateLayout]</span>;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="selector-attr">[super setFrame:frame]</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <h2 id="2-新闻详细页部分："><a href="#2-新闻详细页部分：" class="headerlink" title="2.新闻详细页部分："></a>2.新闻详细页部分：</h2><p><img src="https://raw.githubusercontent.com/zhongwuzw/ZhihuDaily/master/images/demo2.gif" alt=""><br><img src="https://raw.githubusercontent.com/zhongwuzw/ZhihuDaily/master/images/demo3.gif" alt=""></p>
 <h2 id="3-主题日报部分："><a href="#3-主题日报部分：" class="headerlink" title="3.主题日报部分："></a>3.主题日报部分：</h2><p><img src="https://raw.githubusercontent.com/zhongwuzw/ZhihuDaily/master/images/demo4.gif" alt=""></p>
 <h2 id="4-夜间部分："><a href="#4-夜间部分：" class="headerlink" title="4.夜间部分："></a>4.夜间部分：</h2><p><img src="https://raw.githubusercontent.com/zhongwuzw/ZhihuDaily/master/images/demo5.gif" alt=""></p>
@@ -364,6 +392,10 @@
           
   <div class="comments" id="comments">
     
+      <div class="ds-thread" data-thread-key="2016/08/18/知乎日报iOS/"
+           data-title="知乎日报iOS" data-url="http://yoursite.com/2016/08/18/知乎日报iOS/">
+      </div>
+    
   </div>
 
 
@@ -387,10 +419,10 @@
       
         <ul class="sidebar-nav motion-element">
           <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
-            Inhaltsverzeichnis
+            文章目录
           </li>
           <li class="sidebar-nav-overview" data-target="site-overview">
-            Übersicht
+            站点概览
           </li>
         </ul>
       
@@ -407,7 +439,7 @@
           <div class="site-state-item site-state-posts">
             <a href="/archives">
               <span class="site-state-item-count">2</span>
-              <span class="site-state-item-name">Artikel</span>
+              <span class="site-state-item-name">日志</span>
             </a>
           </div>
 
@@ -485,11 +517,11 @@
 </div>
 
 <div class="powered-by">
-  Erstellt mit  <a class="theme-link" href="http://hexo.io">Hexo</a>
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
 </div>
 
 <div class="theme-info">
-  Theme -
+  主题 -
   <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
     NexT.Muse
   </a>
@@ -572,9 +604,32 @@
 
   
 
+  
+    
+  
 
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"zhongwuzw"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
 
   
+    
+      
+      <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+      <script src="/js/src/hook-duoshuo.js"></script>
+    
+  
+
+
 
 
 
