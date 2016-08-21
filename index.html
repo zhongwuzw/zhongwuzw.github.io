@@ -359,8 +359,7 @@
 
       
         
-          
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在Swift中，为了确保类的存储属性都能有一个初始值，提供了几种初始化的方法，接下来将讨论一下Desinated(指定)、Convenience（便捷）初始化器。</p>
+          <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在Swift中，为了确保类的存储属性都能有一个初始值，提供了几种初始化的方法，接下来将讨论一下Desinated(指定)、Convenience（便捷）初始化器。</p>
 <h1 id="Designated（指定）初始化器"><a href="#Designated（指定）初始化器" class="headerlink" title="Designated（指定）初始化器"></a>Designated（指定）初始化器</h1><ul>
 <li><p>之前使用过Objective-C的应该比较了解指定初始化器，很多类都提供了指定初始化器，如UIViewController的为：<code>- (instancetype)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle</code>,UIView的<code>- (instancetype)initWithFrame:(CGRect)aRect</code>，其作用是该类或者其子类在初始化的过程中都会调用指定初始化器。</p>
 </li>
@@ -371,25 +370,11 @@
 <ul>
 <li>每一个类都必须至少有一个指定初始化器。</li>
 </ul>
-<h1 id="Convenience（便捷）初始化器"><a href="#Convenience（便捷）初始化器" class="headerlink" title="Convenience（便捷）初始化器"></a>Convenience（便捷）初始化器</h1><ul>
-<li>便捷初始化器需要带一个convenience修饰符，如下代码,在便捷初始化器的定义中，<strong>必须先调用其他的初始化器之后，再赋类的存储属性值</strong>。</li>
-</ul>
-<figure class="highlight less"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="selector-tag">convenience</span> <span class="selector-tag">init</span>(parameters) &#123;</div><div class="line">    statements</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li><p>便捷初始化器如果重载了父类的指定初始化器，则必须使用override修饰符。</p>
-</li>
-<li><p>如果子类提供了其父类的<strong>所有</strong>（注意：必须是所有的）指定初始化器的实现，实现有两种，一种是子类的存储属性都提供了默认值，且没有定义指定初始化器，则会自动集成父类的指定初始化器；另一种是在子类中重新定义，子类中重新定义的方法可以是便捷初始化器，既子类中的便捷初始化器可以重载父类的指定初始化器。这样子类就会自动继承父类的便捷初始化器。</p>
-</li>
-</ul>
-<h1 id="指定初始化器和便捷初始化器之间的关系"><a href="#指定初始化器和便捷初始化器之间的关系" class="headerlink" title="指定初始化器和便捷初始化器之间的关系"></a>指定初始化器和便捷初始化器之间的关系</h1><p>指定初始化器和便捷初始化器之间的3个法则：</p>
-<ol>
-<li>指定初始化器必须调用其<strong><em>直接</em></strong>父类的指定初始化器。</li>
-<li>便捷初始化器必须调用该类中其他的初始化器，其初始化器的类型不限。</li>
-<li>在便捷初始化器的调用链中最后必须调用一个指定初始化器。</li>
-</ol>
-<p>最后，直接上官方文档的图示就会对上面的3个规则有比较清晰的认识：<br> <img src="http://oc54pu02q.bkt.clouddn.com/QQ20160819-0@2x.png" width="500" height="254" alt="" align="center"></p>
-
-          
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/08/19/Swift的Designated和Convenience初始化器/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
