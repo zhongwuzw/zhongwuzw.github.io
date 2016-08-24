@@ -1,0 +1,736 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="iOS,Swift," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="Swift调用Objective-C的Runtime
+首先，我们来测试一下使用Swift代码来调用Objective-C Runtime的方法，首先创建两个类，用来做对比，一个是纯的Swift类，另一个继承自NSObject：
+123456789101112131415161718192021222324252627//纯Swift类class SwiftClass &amp;#123;    var a">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Swift中使用Objective-C的Runtime">
+<meta property="og:url" content="http://yoursite.com/2016/08/23/Swift中使用Objective-C的Runtime/index.html">
+<meta property="og:site_name" content="钟武的技术博客">
+<meta property="og:description" content="Swift调用Objective-C的Runtime
+首先，我们来测试一下使用Swift代码来调用Objective-C Runtime的方法，首先创建两个类，用来做对比，一个是纯的Swift类，另一个继承自NSObject：
+123456789101112131415161718192021222324252627//纯Swift类class SwiftClass &amp;#123;    var a">
+<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/QQ20160824-0@2x.png">
+<meta property="og:updated_time" content="2016-08-24T09:04:01.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Swift中使用Objective-C的Runtime">
+<meta name="twitter:description" content="Swift调用Objective-C的Runtime
+首先，我们来测试一下使用Swift代码来调用Objective-C Runtime的方法，首先创建两个类，用来做对比，一个是纯的Swift类，另一个继承自NSObject：
+123456789101112131415161718192021222324252627//纯Swift类class SwiftClass &amp;#123;    var a">
+<meta name="twitter:image" content="http://oc54pu02q.bkt.clouddn.com/QQ20160824-0@2x.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6318342119949862000,
+      author: '主编大人'
+    }
+  };
+</script>
+
+  <title> Swift中使用Objective-C的Runtime | 钟武的技术博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">钟武的技术博客</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'YGK5yTgHPMjDTB4ucwmx','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Swift中使用Objective-C的Runtime
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-08-23T15:41:47+08:00" content="2016-08-23">
+              2016-08-23
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/08/23/Swift中使用Objective-C的Runtime/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/23/Swift中使用Objective-C的Runtime/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Swift调用Objective-C的Runtime"><a href="#Swift调用Objective-C的Runtime" class="headerlink" title="Swift调用Objective-C的Runtime"></a>Swift调用Objective-C的Runtime</h1><hr>
+<p>首先，我们来测试一下使用Swift代码来调用Objective-C Runtime的方法，首先创建两个类，用来做对比，一个是纯的Swift类，另一个继承自NSObject：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//纯Swift类</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">SwiftClass</span> </span>&#123;</div><div class="line">    <span class="keyword">var</span> aBool = <span class="literal">true</span></div><div class="line">    <span class="keyword">var</span> aInt = <span class="number">3</span></div><div class="line">    <span class="keyword">var</span> aStrig = <span class="string">"sss"</span></div><div class="line">    <span class="keyword">var</span> aObject :<span class="type">AnyObject</span>?</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">func</span> <span class="title">swiftTest</span><span class="params">()</span></span> &#123;</div><div class="line">        </div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//继承自NSObject的类</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">SwiftWithOCClass</span> :<span class="title">NSObject</span></span>&#123;</div><div class="line">    <span class="keyword">var</span> aBool = <span class="literal">true</span></div><div class="line">    <span class="keyword">var</span> aInt = <span class="number">3</span></div><div class="line">    <span class="keyword">var</span> aStrig = <span class="string">"sss"</span></div><div class="line">    <span class="keyword">var</span> aObject :<span class="type">AnyObject</span>?</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">func</span> <span class="title">swiftTest</span><span class="params">(aCharacter:Character)</span></span> &#123;</div><div class="line">        </div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">func</span> <span class="title">justTest</span><span class="params">()</span></span> &#123;</div><div class="line">        </div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<a id="more"></a>
+<p>接下来，我们来创建一个方法，用来获取Class的方法和属性，代码如下：</p>
+<figure class="highlight julia"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">func getMethodListAndProperties(cls:AnyClass) -&gt; <span class="built_in">Void</span> &#123;</div><div class="line">    var methodCount:<span class="built_in">UInt32</span> = <span class="number">0</span></div><div class="line">    <span class="keyword">let</span> methodList = class_copyMethodList(cls, &amp;methodCount)</div><div class="line">    </div><div class="line">    //打印方法</div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="number">0.</span>.&lt;<span class="built_in">Int</span>(methodCount) &#123;</div><div class="line">        <span class="keyword">let</span> method = methodList[i]</div><div class="line">        print(<span class="built_in">String</span>(<span class="built_in">UTF8String</span>:method_getTypeEncoding(method)))</div><div class="line">        print(<span class="built_in">String</span>(_sel:method_getName(method)))</div><div class="line">    &#125;</div><div class="line">    free(methodList)</div><div class="line">    </div><div class="line">    var propertiesCount:<span class="built_in">UInt32</span> = <span class="number">0</span></div><div class="line">    <span class="keyword">let</span> propertiesList = class_copyPropertyList(cls, &amp;propertiesCount)</div><div class="line">    </div><div class="line">    //打印属性</div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="number">0.</span>.&lt;<span class="built_in">Int</span>(propertiesCount) &#123;</div><div class="line">        <span class="keyword">let</span> property = propertiesList[i]</div><div class="line">        print(<span class="built_in">String</span>(<span class="built_in">UTF8String</span>:property_getName(property)))</div><div class="line">        print(<span class="built_in">String</span>(<span class="built_in">UTF8String</span>:property_getAttributes(property)))</div><div class="line">    &#125;</div><div class="line">    free(propertiesList)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>当调用<code>getMethodListAndProperties(SwiftWithOCClass)</code>方法时，其打印结果如下：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//打印的方法</span></div><div class="line"><span class="function"><span class="title">Optional</span><span class="params">(<span class="string">"B16@0:8"</span>)</span></span></div><div class="line">aBool</div><div class="line"><span class="function"><span class="title">Optional</span><span class="params">(<span class="string">"v20@0:8B16"</span>)</span></span></div><div class="line">setABool:</div><div class="line"><span class="function"><span class="title">Optional</span><span class="params">(<span class="string">"q16@0:8"</span>)</span></span></div><div class="line">aInt</div><div class="line"><span class="function"><span class="title">Optional</span><span class="params">(<span class="string">"v24@0:8q16"</span>)</span></span></div><div class="line">setAInt:</div><div class="line"><span class="function"><span class="title">Optional</span><span class="params">(<span class="string">"@16@0:8"</span>)</span></span></div><div class="line">aStrig</div><div class="line"><span class="function"><span class="title">Optional</span><span class="params">(<span class="string">"v24@0:8@16"</span>)</span></span></div><div class="line">setAStrig:</div><div class="line"><span class="function"><span class="title">Optional</span><span class="params">(<span class="string">"@16@0:8"</span>)</span></span></div><div class="line">aObject</div><div class="line"><span class="function"><span class="title">Optional</span><span class="params">(<span class="string">"v24@0:8@16"</span>)</span></span></div><div class="line">setAObject:</div><div class="line"><span class="function"><span class="title">Optional</span><span class="params">(<span class="string">"v16@0:8"</span>)</span></span></div><div class="line">justTest</div><div class="line"><span class="function"><span class="title">Optional</span><span class="params">(<span class="string">"@?"</span>)</span></span></div><div class="line"><span class="selector-class">.cxx_destruct</span></div><div class="line"><span class="function"><span class="title">Optional</span><span class="params">(<span class="string">"@16@0:8"</span>)</span></span></div><div class="line">init</div><div class="line"></div><div class="line"><span class="comment">//打印的属性</span></div><div class="line"><span class="function"><span class="title">Optional</span><span class="params">(<span class="string">"aBool"</span>)</span></span></div><div class="line"><span class="function"><span class="title">Optional</span><span class="params">(<span class="string">"TB,N,VaBool"</span>)</span></span></div><div class="line"><span class="function"><span class="title">Optional</span><span class="params">(<span class="string">"aInt"</span>)</span></span></div><div class="line"><span class="function"><span class="title">Optional</span><span class="params">(<span class="string">"Tq,N,VaInt"</span>)</span></span></div><div class="line"><span class="function"><span class="title">Optional</span><span class="params">(<span class="string">"aStrig"</span>)</span></span></div><div class="line"><span class="function"><span class="title">Optional</span><span class="params">(<span class="string">"T@\"NSString\",N,C,VaStrig"</span>)</span></span></div><div class="line"><span class="function"><span class="title">Optional</span><span class="params">(<span class="string">"aObject"</span>)</span></span></div><div class="line"><span class="function"><span class="title">Optional</span><span class="params">(<span class="string">"T@,N,&amp;,VaObject"</span>)</span></span></div></pre></td></tr></table></figure>
+<ul>
+<li><p>当调用<code>getMethodListAndProperties(SwiftClass)</code>方法时，我们发现并没有打印结果，既没有获取到纯Swift类的属性和方法；而继承自<code>NSObject</code>的类SwiftWithOCClass则能够获取到属性和方法，翻阅官方文档（如下图），我们就能找到原因，通过继承<code>NSObject</code>，对象可以拥有运行时且可以被看成Objective-C对象。<br><img src="http://oc54pu02q.bkt.clouddn.com/QQ20160824-0@2x.png" width="500" height="" alt="" align="center"></p>
+</li>
+<li><p>我们不禁要问，对于纯Swift类，难道就没有办法使用Objective-C运行时了么？答案是否定的，我们可以使用<code>dynamic</code>修饰符，实验一下，在纯Swift类的属性aBool中加入<code>dynamic</code>修饰符，代码如下,我们发现，可以通过运行时找到aBool属性的两个访问器方法以及属性名。</p>
+</li>
+</ul>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">SwiftClass</span> </span>&#123;</div><div class="line">    <span class="keyword">dynamic</span> <span class="keyword">var</span> aBool = <span class="literal">true</span></div><div class="line">    <span class="keyword">var</span> aInt = <span class="number">3</span></div><div class="line">    <span class="keyword">var</span> aStrig = <span class="string">"sss"</span></div><div class="line">    <span class="keyword">var</span> aObject :<span class="type">AnyObject</span>?</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">func</span> <span class="title">swiftTest</span><span class="params">()</span></span> &#123;</div><div class="line">        </div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//打印结果</span></div><div class="line"><span class="type">Optional</span>(<span class="string">"B16@0:8"</span>)</div><div class="line">aBool</div><div class="line"><span class="type">Optional</span>(<span class="string">"v20@0:8B16"</span>)</div><div class="line">setABool:</div><div class="line"><span class="type">Optional</span>(<span class="string">"aBool"</span>)</div><div class="line"><span class="type">Optional</span>(<span class="string">"TB,N,VaBool"</span>)</div></pre></td></tr></table></figure>
+<ul>
+<li>而当调用<code>getMethodListAndProperties(SwiftWithOCClass)</code>时，大多数方法都打印出来了，但有一个方法没获取到，为<code>func swiftTest(aCharacter:Character)</code>，原因是该方法的参数是Character类型，它是Swift特有的，无法转化为OC的类型，所以无法通过运行时获取到该方法。</li>
+</ul>
+<h1 id="load方法"><a href="#load方法" class="headerlink" title="load方法"></a>load方法</h1><hr>
+<p>在使用Objective-C的Runtime时，经常会用到Method Swizzling技术，该技术通常在<code>load</code>方法中实现。而在Swift中不允许定义<code>load</code>方法，否则编译器会报错，所以，如果要实现Method Swizzling，有几种解决方案：</p>
+<ul>
+<li>在<code>initialize</code>中来实现，但是需要注意的是<code>initialize</code>可能会被调用多次，所以需要在<code>initialize</code>实现中做一些判断，比如判断是否是当前类，而不是子类，使用<code>dispatch_once</code>来进行操作。 </li>
+<li>在App Delegate中实现Method Swizzling：在AppDelegate的<code>application(_:didFinishLaunchingWithOptions:)</code>方法中进行Method Swizzling。</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag">#iOS</a>
+          
+            <a href="/tags/Swift/" rel="tag">#Swift</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/08/19/Swift的Designated和Convenience初始化器/" rel="next" title="Swift的Designated和Convenience初始化器">
+                <i class="fa fa-chevron-left"></i> Swift的Designated和Convenience初始化器
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/08/23/Swift中使用Objective-C的Runtime/"
+           data-title="Swift中使用Objective-C的Runtime" data-url="http://yoursite.com/2016/08/23/Swift中使用Objective-C的Runtime/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.JPG"
+               alt="钟武" />
+          <p class="site-author-name" itemprop="name">钟武</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">4</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/zhongwuzw" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/zhongwuzw" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.douban.com/people/zhongwu/" target="_blank" title="豆瓣">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  豆瓣
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Swift调用Objective-C的Runtime"><span class="nav-number">1.</span> <span class="nav-text">Swift调用Objective-C的Runtime</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#load方法"><span class="nav-number">2.</span> <span class="nav-text">load方法</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">钟武</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"zhongwuzw"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+      
+      <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+      <script src="/js/src/hook-duoshuo.js"></script>
+    
+  
+
+
+
+
+
+  
+  
+  
+
+  
+
+  
+
+</body>
+</html>
