@@ -95,7 +95,7 @@
 首先，我们来测试一下使用Swift代码来调用Objective-C Runtime的方法，首先创建两个类，用来做对比，一个是纯的Swift类，另一个继承自NSObject：
 123456789101112131415161718192021222324252627//纯Swift类class SwiftClass &amp;#123;    var a">
 <meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/QQ20160824-0@2x.png">
-<meta property="og:updated_time" content="2016-08-24T09:04:01.000Z">
+<meta property="og:updated_time" content="2016-08-24T15:24:26.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Swift中使用Objective-C的Runtime">
 <meta name="twitter:description" content="Swift调用Objective-C的Runtime
@@ -381,7 +381,7 @@
 </ul>
 <figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">SwiftClass</span> </span>&#123;</div><div class="line">    <span class="keyword">dynamic</span> <span class="keyword">var</span> aBool = <span class="literal">true</span></div><div class="line">    <span class="keyword">var</span> aInt = <span class="number">3</span></div><div class="line">    <span class="keyword">var</span> aStrig = <span class="string">"sss"</span></div><div class="line">    <span class="keyword">var</span> aObject :<span class="type">AnyObject</span>?</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">func</span> <span class="title">swiftTest</span><span class="params">()</span></span> &#123;</div><div class="line">        </div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//打印结果</span></div><div class="line"><span class="type">Optional</span>(<span class="string">"B16@0:8"</span>)</div><div class="line">aBool</div><div class="line"><span class="type">Optional</span>(<span class="string">"v20@0:8B16"</span>)</div><div class="line">setABool:</div><div class="line"><span class="type">Optional</span>(<span class="string">"aBool"</span>)</div><div class="line"><span class="type">Optional</span>(<span class="string">"TB,N,VaBool"</span>)</div></pre></td></tr></table></figure>
 <ul>
-<li>而当调用<code>getMethodListAndProperties(SwiftWithOCClass)</code>时，大多数方法都打印出来了，但有一个方法没获取到，为<code>func swiftTest(aCharacter:Character)</code>，原因是该方法的参数是Character类型，它是Swift特有的，无法转化为OC的类型，所以无法通过运行时获取到该方法。</li>
+<li>而当调用<code>getMethodListAndProperties(SwiftWithOCClass)</code>时，大多数方法都打印出来了，但有一个方法没获取到，为<code>func swiftTest(aCharacter:Character)</code>，原因是该方法的参数是Character类型，它是Swift特有的，无法转化(Bridge)为OC的类型，所以无法通过运行时获取到该方法。</li>
 </ul>
 <h1 id="load方法"><a href="#load方法" class="headerlink" title="load方法"></a>load方法</h1><hr>
 <p>在使用Objective-C的Runtime时，经常会用到Method Swizzling技术，该技术通常在<code>load</code>方法中实现。而在Swift中不允许定义<code>load</code>方法，否则编译器会报错，所以，如果要实现Method Swizzling，有几种解决方案：</p>
@@ -429,6 +429,10 @@
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2016/08/24/Swift之通过减少动态派发来提升性能/" rel="prev" title="Swift之通过减少动态派发来提升性能">
+                Swift之通过减少动态派发来提升性能 <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -442,12 +446,34 @@
 
     <div class="post-spread">
       
+        <div class="ds-share flat" data-thread-key="2016/08/23/Swift中使用Objective-C的Runtime/"
+     data-title="Swift中使用Objective-C的Runtime"
+     data-content=""
+     data-url="http://yoursite.com/2016/08/23/Swift中使用Objective-C的Runtime/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
     </div>
   </div>
 
 
           </div>
           
+
+  <p>热评文章</p>
+  <div class="ds-top-threads" data-range="weekly" data-num-items="4"></div>
 
 
           
@@ -499,7 +525,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">4</span>
+              <span class="site-state-item-count">5</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
