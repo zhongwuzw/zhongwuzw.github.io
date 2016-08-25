@@ -95,7 +95,7 @@
 考虑下面的例子：
 123456789101">
 <meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/QQ20160825-0@2x.png">
-<meta property="og:updated_time" content="2016-08-25T03:28:53.000Z">
+<meta property="og:updated_time" content="2016-08-25T03:30:30.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Swift之通过减少动态派发来提升性能">
 <meta name="twitter:description" content="Swift是OO（面向对象）的语言，所以少不了方法和属性的重载等特性，程序只能在运行时来确定具体的方法或属性来间接调用或间接访问，这就叫做动态派发。从性能上考虑，对于动态派发的方法，会有常量时间的运行时开销。接下来将介绍三种方法来移除这样的动态性，final，private，全模块优化（Whole Module Optimization），以此提升性能。
@@ -377,6 +377,7 @@
 </ol>
 <p>由于<code>ParticleModel</code>可以被子类，所以其方法和属性就能被重载，这就不可避免的需要使用动态调用。</p>
 <p>在Swift中，动态调用是通过在一个方法表中找到方法然后执行间接的调用（类似于C++的虚函数表），对于这种先查找再调用的过程，其效率是要低于方法的直接调用，而且间接调用会阻止许多编译器优化，这将加重间接调用的开销。接下来将列举一些技巧来禁用动态派发的行为，以达到提升性能的目的。</p>
+<a id="more"></a>
 <h2 id="当属性、方法、或类不需要被重载时，可在其声明的地方加上final关键字"><a href="#当属性、方法、或类不需要被重载时，可在其声明的地方加上final关键字" class="headerlink" title="当属性、方法、或类不需要被重载时，可在其声明的地方加上final关键字"></a>当属性、方法、或类不需要被重载时，可在其声明的地方加上<code>final</code>关键字</h2><p>在属性，方法或类声明时加上<code>final</code>关键字，表示其不能被重载，这将允许编译器安全的移除动态派发。如下代码所示，<code>point</code>和<code>velocity</code>将直接从对象的存储属性中加载，<code>updatePoint()</code>方法将被直接调用；另外，<code>update()</code>依然会通过动态派发的方式来调用，这样，<code>ParticleModel</code>的子类就可以重载<code>update()</code>来自定义实现。</p>
 <figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">ParticleModel</span> </span>&#123;</div><div class="line">	<span class="keyword">final</span> <span class="keyword">var</span> point = ( x: <span class="number">0.0</span>, y: <span class="number">0.0</span> )</div><div class="line">	<span class="keyword">final</span> <span class="keyword">var</span> velocity = <span class="number">100.0</span></div><div class="line"></div><div class="line">	<span class="keyword">final</span> <span class="function"><span class="keyword">func</span> <span class="title">updatePoint</span><span class="params">(newPoint: <span class="params">(Double, Double)</span></span></span>, newVelocity: <span class="type">Double</span>) &#123;</div><div class="line">		point = newPoint</div><div class="line">		velocity = newVelocity</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">func</span> <span class="title">update</span><span class="params">(newP: <span class="params">(Double, Double)</span></span></span>, newV: <span class="type">Double</span>) &#123;</div><div class="line">		updatePoint(newP, newVelocity: newV)</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>除了上面所示，在属性和方法声明前加<code>final</code>关键字，还可以直接在类上加<code>final</code>，表示该类将不能作为父类被子类化，隐含的表明该类的所有的方法和属性都是<code>final</code>的。</p>
