@@ -84,12 +84,15 @@
 
 
 
+<meta name="description" content="记录whatever">
 <meta property="og:type" content="website">
 <meta property="og:title" content="钟武的技术博客">
 <meta property="og:url" content="http://yoursite.com/index.html">
 <meta property="og:site_name" content="钟武的技术博客">
+<meta property="og:description" content="记录whatever">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="钟武的技术博客">
+<meta name="twitter:description" content="记录whatever">
 
 
 
@@ -268,6 +271,131 @@
           <div id="content" class="content">
             
   <section id="posts" class="posts-expand">
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2016/08/26/WebP图片格式iOS实例/" itemprop="url">
+                  WebP图片格式iOS实例
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-08-26T15:38:31+08:00" content="2016-08-26">
+              2016-08-26
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/08/26/WebP图片格式iOS实例/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/26/WebP图片格式iOS实例/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>俗话说，谷歌大法好，<code>WebP</code>是由谷歌公司推出的图片文件格式，支持有损、无损压缩。从<a href="https://developers.google.com/speed/webp/">官方文档</a>，可以看到如下图所示的对比，大意就是压缩率比PNG、JPEG等高。腾讯也对<code>WebP</code>做了测试，测试链接请戳<a href="http://isux.tencent.com/introduction-of-webp.html">这里</a>。现在，很多公司都已经开始使用<code>Webp</code>格式，国内如腾讯、淘宝、今日头条等等。</p>
+<p> <img src="http://oc54pu02q.bkt.clouddn.com/QQ20160826-0@2x.png" width = "500" height = "" alt="" align=center /></p>
+<h1 id="iOS-WebP-示例"><a href="#iOS-WebP-示例" class="headerlink" title="iOS WebP 示例"></a>iOS WebP 示例</h1><p>iOS原生肯定是不支持<code>Webp</code>格式的，接下来，介绍三种方法来展示在iOS端如何支持<code>Webp</code>格式：</p>
+<h2 id="编译源代码"><a href="#编译源代码" class="headerlink" title="编译源代码"></a>编译源代码</h2><p>从官网下载<code>Webp</code>库的源代码，下载地址请戳<a href="https://developers.google.com/speed/webp/download">这里</a>，下载如下图所示的部分，下载后是一个<code>tar</code>文件，名字类似于<br> <img src="http://oc54pu02q.bkt.clouddn.com/QQ20160826-1@2x.png" width = "500" height = "" alt="" align=center /><br> <code>libwebp-0.5.1.tar</code>，创建一个<code>build</code>文件夹，将该压缩文件放到<code>build</code>目录，然后再创建一个<code>build.sh</code>的shell文件，该文件用来生成通用的<code>framework</code>，代码如下：</p>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/08/26/WebP图片格式iOS实例/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
     
       
 
@@ -939,12 +1067,12 @@
                src="/images/avatar.JPG"
                alt="钟武" />
           <p class="site-author-name" itemprop="name">钟武</p>
-          <p class="site-description motion-element" itemprop="description"></p>
+          <p class="site-description motion-element" itemprop="description">记录whatever</p>
         </div>
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-count">6</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>

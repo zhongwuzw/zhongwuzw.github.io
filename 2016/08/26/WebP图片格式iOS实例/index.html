@@ -1,0 +1,746 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="iOS,Objective-C," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="前言俗话说，谷歌大法好，WebP是由谷歌公司推出的图片文件格式，支持有损、无损压缩。从官方文档，可以看到如下图所示的对比，大意就是压缩率比PNG、JPEG等高。腾讯也对WebP做了测试，测试链接请戳这里。现在，很多公司都已经开始使用Webp格式，国内如腾讯、淘宝、今日头条等等。
+ 
+iOS WebP 示例iOS原生肯定是不支持Webp格式的，接下来，介绍三种方法来展示在iOS端如何支持Webp格式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WebP图片格式iOS实例">
+<meta property="og:url" content="http://yoursite.com/2016/08/26/WebP图片格式iOS实例/index.html">
+<meta property="og:site_name" content="钟武的技术博客">
+<meta property="og:description" content="前言俗话说，谷歌大法好，WebP是由谷歌公司推出的图片文件格式，支持有损、无损压缩。从官方文档，可以看到如下图所示的对比，大意就是压缩率比PNG、JPEG等高。腾讯也对WebP做了测试，测试链接请戳这里。现在，很多公司都已经开始使用Webp格式，国内如腾讯、淘宝、今日头条等等。
+ 
+iOS WebP 示例iOS原生肯定是不支持Webp格式的，接下来，介绍三种方法来展示在iOS端如何支持Webp格式">
+<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/QQ20160826-0@2x.png">
+<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/QQ20160826-1@2x.png">
+<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/QQ20160826-2@2x.png">
+<meta property="og:updated_time" content="2016-08-26T09:03:07.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="WebP图片格式iOS实例">
+<meta name="twitter:description" content="前言俗话说，谷歌大法好，WebP是由谷歌公司推出的图片文件格式，支持有损、无损压缩。从官方文档，可以看到如下图所示的对比，大意就是压缩率比PNG、JPEG等高。腾讯也对WebP做了测试，测试链接请戳这里。现在，很多公司都已经开始使用Webp格式，国内如腾讯、淘宝、今日头条等等。
+ 
+iOS WebP 示例iOS原生肯定是不支持Webp格式的，接下来，介绍三种方法来展示在iOS端如何支持Webp格式">
+<meta name="twitter:image" content="http://oc54pu02q.bkt.clouddn.com/QQ20160826-0@2x.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6318342119949862000,
+      author: '主编大人'
+    }
+  };
+</script>
+
+  <title> WebP图片格式iOS实例 | 钟武的技术博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">钟武的技术博客</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'YGK5yTgHPMjDTB4ucwmx','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                WebP图片格式iOS实例
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-08-26T15:38:31+08:00" content="2016-08-26">
+              2016-08-26
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/08/26/WebP图片格式iOS实例/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/26/WebP图片格式iOS实例/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>俗话说，谷歌大法好，<code>WebP</code>是由谷歌公司推出的图片文件格式，支持有损、无损压缩。从<a href="https://developers.google.com/speed/webp/" target="_blank" rel="external">官方文档</a>，可以看到如下图所示的对比，大意就是压缩率比PNG、JPEG等高。腾讯也对<code>WebP</code>做了测试，测试链接请戳<a href="http://isux.tencent.com/introduction-of-webp.html" target="_blank" rel="external">这里</a>。现在，很多公司都已经开始使用<code>Webp</code>格式，国内如腾讯、淘宝、今日头条等等。</p>
+<p> <img src="http://oc54pu02q.bkt.clouddn.com/QQ20160826-0@2x.png" width="500" height="" alt="" align="center"></p>
+<h1 id="iOS-WebP-示例"><a href="#iOS-WebP-示例" class="headerlink" title="iOS WebP 示例"></a>iOS WebP 示例</h1><p>iOS原生肯定是不支持<code>Webp</code>格式的，接下来，介绍三种方法来展示在iOS端如何支持<code>Webp</code>格式：</p>
+<h2 id="编译源代码"><a href="#编译源代码" class="headerlink" title="编译源代码"></a>编译源代码</h2><p>从官网下载<code>Webp</code>库的源代码，下载地址请戳<a href="https://developers.google.com/speed/webp/download" target="_blank" rel="external">这里</a>，下载如下图所示的部分，下载后是一个<code>tar</code>文件，名字类似于<br> <img src="http://oc54pu02q.bkt.clouddn.com/QQ20160826-1@2x.png" width="500" height="" alt="" align="center"><br> <code>libwebp-0.5.1.tar</code>，创建一个<code>build</code>文件夹，将该压缩文件放到<code>build</code>目录，然后再创建一个<code>build.sh</code>的shell文件，该文件用来生成通用的<code>framework</code>，代码如下：</p>
+ <a id="more"></a>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div></pre></td><td class="code"><pre><div class="line"> <span class="comment">#!/bin/sh</span></div><div class="line"><span class="comment">#</span></div><div class="line"><span class="comment"># <span class="doctag">Note:</span> This build script assumes it can find the archive for libwebp </span></div><div class="line"><span class="comment"># in the current directory. You can download it from the following URL:</span></div><div class="line"><span class="comment">#  http://code.google.com/speed/webp/download.html</span></div><div class="line"><span class="comment">#</span></div><div class="line"><span class="comment"># The resulting framework will can be found in the current directory </span></div><div class="line"><span class="comment"># with the name WebP.framework</span></div><div class="line"><span class="comment">#</span></div><div class="line"></div><div class="line">SDK=9.3	<span class="comment">#改成自己的SDK版本</span></div><div class="line">PLATFORMS=<span class="string">"iPhoneSimulator iPhoneSimulator-64 iPhoneOS-V7 iPhoneOS-V7s iPhoneOS-ARM64"</span></div><div class="line">DEVELOPER=`xcode-select -print-path`</div><div class="line">TOPDIR=`<span class="built_in">pwd</span>`</div><div class="line">BUILDDIR=<span class="string">"<span class="variable">$TOPDIR</span>/tmp"</span></div><div class="line">FINALDIR=<span class="string">"<span class="variable">$TOPDIR</span>/WebP.framework"</span></div><div class="line">LIBLIST=<span class="string">''</span></div><div class="line">DEVROOT=<span class="string">"<span class="variable">$&#123;DEVELOPER&#125;</span>/Toolchains/XcodeDefault.xctoolchain"</span></div><div class="line"></div><div class="line">mkdir -p <span class="variable">$BUILDDIR</span></div><div class="line">mkdir -p <span class="variable">$FINALDIR</span></div><div class="line">mkdir <span class="variable">$FINALDIR</span>/Headers/</div><div class="line"></div><div class="line"><span class="keyword">for</span> PLATFORM <span class="keyword">in</span> <span class="variable">$&#123;PLATFORMS&#125;</span></div><div class="line"><span class="keyword">do</span></div><div class="line">  <span class="keyword">if</span> [ <span class="string">"<span class="variable">$&#123;PLATFORM&#125;</span>"</span> == <span class="string">"iPhoneOS-V7"</span> ]</div><div class="line">  <span class="keyword">then</span></div><div class="line">    SDKPATH=<span class="string">"<span class="variable">$&#123;DEVELOPER&#125;</span>/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.3.sdk/"</span>	<span class="comment">#改成自己的SDK版本</span></div><div class="line">    ARCH=<span class="string">"armv7"</span></div><div class="line">    HOST=<span class="variable">$&#123;ARCH&#125;</span>-apple-darwin</div><div class="line">  <span class="keyword">elif</span> [ <span class="string">"<span class="variable">$&#123;PLATFORM&#125;</span>"</span> == <span class="string">"iPhoneOS-V7s"</span> ]</div><div class="line">  <span class="keyword">then</span></div><div class="line">    SDKPATH=<span class="string">"<span class="variable">$&#123;DEVELOPER&#125;</span>/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.3.sdk/"</span>	<span class="comment">#改成自己的SDK版本</span></div><div class="line">    ARCH=<span class="string">"armv7s"</span></div><div class="line">    HOST=<span class="variable">$&#123;ARCH&#125;</span>-apple-darwin</div><div class="line">  <span class="keyword">elif</span> [ <span class="string">"<span class="variable">$&#123;PLATFORM&#125;</span>"</span> == <span class="string">"iPhoneOS-ARM64"</span> ]</div><div class="line">  <span class="keyword">then</span></div><div class="line">    SDKPATH=<span class="string">"<span class="variable">$&#123;DEVELOPER&#125;</span>/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.3.sdk/"</span>	<span class="comment">#改成自己的SDK版本</span></div><div class="line">    ARCH=<span class="string">"arm64"</span></div><div class="line">    HOST=<span class="string">"aarch64-apple-darwin"</span></div><div class="line">  <span class="keyword">elif</span> [ <span class="string">"<span class="variable">$&#123;PLATFORM&#125;</span>"</span> == <span class="string">"iPhoneSimulator-64"</span> ]</div><div class="line">  <span class="keyword">then</span></div><div class="line">    SDKPATH=<span class="string">"<span class="variable">$&#123;DEVELOPER&#125;</span>/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator9.3.sdk/"</span>	<span class="comment">#改成自己的SDK版本</span></div><div class="line">    ARCH=<span class="string">"x86_64"</span></div><div class="line">    HOST=<span class="variable">$&#123;ARCH&#125;</span>-apple-darwin</div><div class="line">  <span class="keyword">else</span></div><div class="line">    SDKPATH=<span class="string">"<span class="variable">$&#123;DEVELOPER&#125;</span>/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator9.3.sdk/"</span>	<span class="comment">#改成自己的SDK版本</span></div><div class="line">    ARCH=<span class="string">"i386"</span></div><div class="line">    HOST=<span class="variable">$&#123;ARCH&#125;</span>-apple-darwin</div><div class="line">  <span class="keyword">fi</span></div><div class="line"></div><div class="line">  <span class="built_in">export</span> CC=<span class="variable">$&#123;DEVROOT&#125;</span>/usr/bin/cc</div><div class="line">  <span class="built_in">export</span> LD=<span class="variable">$&#123;DEVROOT&#125;</span>/usr/bin/ld</div><div class="line">  <span class="built_in">export</span> CPP=<span class="variable">$&#123;DEVROOT&#125;</span>/usr/bin/cpp</div><div class="line">  <span class="built_in">export</span> CXX=<span class="variable">$&#123;DEVROOT&#125;</span>/usr/bin/g++</div><div class="line">  <span class="built_in">export</span> AR=<span class="variable">$&#123;DEVROOT&#125;</span>/usr/bin/ar</div><div class="line">  <span class="built_in">export</span> AS=<span class="variable">$&#123;DEVROOT&#125;</span>/usr/bin/as</div><div class="line">  <span class="built_in">export</span> NM=<span class="variable">$&#123;DEVROOT&#125;</span>/usr/bin/nm</div><div class="line">  <span class="built_in">export</span> CXXCPP=<span class="variable">$&#123;DEVROOT&#125;</span>/usr/bin/cpp</div><div class="line">  <span class="built_in">export</span> RANLIB=<span class="variable">$&#123;DEVROOT&#125;</span>/usr/bin/ranlib</div><div class="line"></div><div class="line">  rm -rf libwebp-0.5.1	<span class="comment">#根据自己的libwebp版本</span></div><div class="line">  tar xzf libwebp-0.5.1.tar</div><div class="line">  <span class="built_in">cd</span> libwebp-0.5.1</div><div class="line"></div><div class="line">  sh autogen.sh</div><div class="line"></div><div class="line">  ROOTDIR=<span class="string">"/tmp/install.$$.<span class="variable">$&#123;ARCH&#125;</span>"</span></div><div class="line">  rm -rf <span class="string">"<span class="variable">$&#123;ROOTDIR&#125;</span>"</span></div><div class="line">  mkdir -p <span class="string">"<span class="variable">$&#123;ROOTDIR&#125;</span>"</span></div><div class="line"></div><div class="line">  <span class="built_in">export</span> LDFLAGS=<span class="string">"-arch <span class="variable">$&#123;ARCH&#125;</span> -miphoneos-version-min=7.0 -pipe -isysroot <span class="variable">$&#123;SDKPATH&#125;</span> -O3 -DNDEBUG"</span></div><div class="line">  <span class="built_in">export</span> CFLAGS=<span class="string">"-arch <span class="variable">$&#123;ARCH&#125;</span> -miphoneos-version-min=7.0 -pipe -isysroot <span class="variable">$&#123;SDKPATH&#125;</span> -O3 -DNDEBUG"</span></div><div class="line">  <span class="built_in">export</span> CXXFLAGS=<span class="string">"-arch <span class="variable">$&#123;ARCH&#125;</span> -miphoneos-version-min=7.0 -pipe -isysroot <span class="variable">$&#123;SDKPATH&#125;</span> -O3 -DNDEBUG"</span></div><div class="line"></div><div class="line">./configure --host=<span class="variable">$&#123;HOST&#125;</span> --prefix=<span class="variable">$&#123;ROOTDIR&#125;</span> --disable-shared --enable-static \</div><div class="line">            --enable-libwebpdecoder --enable-swap-16bit-csp --build=$(./config.guess)</div><div class="line">  make</div><div class="line">  make install</div><div class="line"></div><div class="line">  LIBLIST=<span class="string">"<span class="variable">$&#123;LIBLIST&#125;</span> <span class="variable">$&#123;ROOTDIR&#125;</span>/lib/libwebp.a"</span></div><div class="line">  cp -Rp <span class="variable">$&#123;ROOTDIR&#125;</span>/include/webp/* <span class="variable">$FINALDIR</span>/Headers/</div><div class="line"></div><div class="line">  <span class="built_in">cd</span> ..</div><div class="line"><span class="keyword">done</span></div><div class="line"></div><div class="line"><span class="variable">$&#123;DEVROOT&#125;</span>/usr/bin/lipo -create <span class="variable">$LIBLIST</span> -output <span class="variable">$FINALDIR</span>/WebP</div><div class="line"></div><div class="line">rm -rf libwebp-0.5.1</div><div class="line">rm -rf <span class="variable">$&#123;BUILDDIR&#125;</span></div></pre></td></tr></table></figure>
+<p> 上面的代码需要注意的几个地方，就是<code>SDKPath</code>、<code>SDK</code>变量需改成自己Xcode的SDK的版本号，因为我这个实例用的是<code>libwebp-0.5.1</code>版本，如果用的是其他的版本，则需要把脚本中的所有<code>libwebp-0.5.1</code>替换成你自己的版本名。一切妥当后，执行<code>./build.sh</code>命令，最后会生成一个<code>WebP.framework</code>框架，将其添加到自己的项目中，然后在<code>Build Settings</code>的<code>Framework Search Paths</code>中添加<code>WebP.framework</code>框架所在的目录路径即可。</p>
+<h2 id="直接使用官方编译好的framework"><a href="#直接使用官方编译好的framework" class="headerlink" title="直接使用官方编译好的framework"></a>直接使用官方编译好的<code>framework</code></h2><p> 直接使用官方编译好的<code>framework</code>，下载地址请戳<a href="https://developers.google.com/speed/webp/download" target="_blank" rel="external">这里</a>，下载如下如图所示的文件，下载完之后直接改名为<code>WebP.framework</code>，添加到项目中，同样，在<code>Build Settings</code>的<code>Framework Search Paths</code>中添加<code>WebP.framework</code>框架所在的目录路径即可。<br> <img src="http://oc54pu02q.bkt.clouddn.com/QQ20160826-2@2x.png" width="500" height="" alt="" align="center"></p>
+<p> <em>项目示例请戳<a href="https://github.com/zhongwuzw/WebP-iOS-example" target="_blank" rel="external">这里</a>，欢迎Star。</em></p>
+<h2 id="SDWebImage"><a href="#SDWebImage" class="headerlink" title="SDWebImage"></a>SDWebImage</h2><p><a href="https://github.com/rs/SDWebImage" target="_blank" rel="external">SDWebImage</a>支持<code>Webp</code>格式，默认不开启，需要添加SubSpecs，具体步骤参看<code>SDWebImage</code>官方说明。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag">#iOS</a>
+          
+            <a href="/tags/Objective-C/" rel="tag">#Objective-C</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/08/24/Swift之通过减少动态派发来提升性能/" rel="next" title="Swift之通过减少动态派发来提升性能">
+                <i class="fa fa-chevron-left"></i> Swift之通过减少动态派发来提升性能
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2016/08/26/WebP图片格式iOS实例/"
+     data-title="WebP图片格式iOS实例"
+     data-content=""
+     data-url="http://yoursite.com/2016/08/26/WebP图片格式iOS实例/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  <p>热评文章</p>
+  <div class="ds-top-threads" data-range="weekly" data-num-items="4"></div>
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/08/26/WebP图片格式iOS实例/"
+           data-title="WebP图片格式iOS实例" data-url="http://yoursite.com/2016/08/26/WebP图片格式iOS实例/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.JPG"
+               alt="钟武" />
+          <p class="site-author-name" itemprop="name">钟武</p>
+          <p class="site-description motion-element" itemprop="description">记录whatever</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">6</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/zhongwuzw" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/zhongwuzw" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.douban.com/people/zhongwu/" target="_blank" title="豆瓣">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  豆瓣
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#iOS-WebP-示例"><span class="nav-number">2.</span> <span class="nav-text">iOS WebP 示例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#编译源代码"><span class="nav-number">2.1.</span> <span class="nav-text">编译源代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#直接使用官方编译好的framework"><span class="nav-number">2.2.</span> <span class="nav-text">直接使用官方编译好的framework</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SDWebImage"><span class="nav-number">2.3.</span> <span class="nav-text">SDWebImage</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">钟武</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"zhongwuzw"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+      
+      <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+      <script src="/js/src/hook-duoshuo.js"></script>
+    
+  
+
+
+
+
+
+  
+  
+  
+
+  
+
+  
+
+</body>
+</html>
