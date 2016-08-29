@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="iOS,Swift," />
+  <meta name="keywords" content="Hexo, NexT" />
 
 
 
@@ -86,24 +86,16 @@
 
 
 
-<meta name="description" content="前言在Swift中，为了确保类的存储属性都能有一个初始值，提供了几种初始化的方法，接下来将讨论一下Desinated(指定)、Convenience（便捷）初始化器。
-Designated（指定）初始化器
-之前使用过Objective-C的应该比较了解指定初始化器，很多类都提供了指定初始化器，如UIViewController的为：- (instancetype)initWithNibName:(">
+<meta name="description" content="记录whatever">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Swift的Designated和Convenience初始化器">
-<meta property="og:url" content="http://yoursite.com/2016/08/19/Swift的Designated和Convenience初始化器/index.html">
+<meta property="og:title" content="test">
+<meta property="og:url" content="http://yoursite.com/2016/08/29/test/index.html">
 <meta property="og:site_name" content="钟武的技术博客">
-<meta property="og:description" content="前言在Swift中，为了确保类的存储属性都能有一个初始值，提供了几种初始化的方法，接下来将讨论一下Desinated(指定)、Convenience（便捷）初始化器。
-Designated（指定）初始化器
-之前使用过Objective-C的应该比较了解指定初始化器，很多类都提供了指定初始化器，如UIViewController的为：- (instancetype)initWithNibName:(">
-<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/QQ20160819-0@2x.png">
-<meta property="og:updated_time" content="2016-08-23T07:43:38.000Z">
+<meta property="og:description" content="记录whatever">
+<meta property="og:updated_time" content="2016-08-29T05:11:30.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Swift的Designated和Convenience初始化器">
-<meta name="twitter:description" content="前言在Swift中，为了确保类的存储属性都能有一个初始值，提供了几种初始化的方法，接下来将讨论一下Desinated(指定)、Convenience（便捷）初始化器。
-Designated（指定）初始化器
-之前使用过Objective-C的应该比较了解指定初始化器，很多类都提供了指定初始化器，如UIViewController的为：- (instancetype)initWithNibName:(">
-<meta name="twitter:image" content="http://oc54pu02q.bkt.clouddn.com/QQ20160819-0@2x.png">
+<meta name="twitter:title" content="test">
+<meta name="twitter:description" content="记录whatever">
 
 
 
@@ -121,7 +113,7 @@ Designated（指定）初始化器
   };
 </script>
 
-  <title> Swift的Designated和Convenience初始化器 | 钟武的技术博客 </title>
+  <title> test | 钟武的技术博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -301,7 +293,7 @@ Designated（指定）初始化器
             
             
               
-                Swift的Designated和Convenience初始化器
+                test
               
             
           </h1>
@@ -313,38 +305,19 @@ Designated（指定）初始化器
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-08-19T15:46:48+08:00" content="2016-08-19">
-              2016-08-19
+            <time itemprop="dateCreated" datetime="2016-08-29T13:11:30+08:00" content="2016-08-29">
+              2016-08-29
             </time>
           </span>
 
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/iOS/" itemprop="url" rel="index">
-                    <span itemprop="name">iOS</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
           
 
           
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/08/19/Swift的Designated和Convenience初始化器/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/19/Swift的Designated和Convenience初始化器/" itemprop="commentsCount"></span>
+                <a href="/2016/08/29/test/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/29/test/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -367,36 +340,7 @@ Designated（指定）初始化器
       
 
       
-        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在Swift中，为了确保类的存储属性都能有一个初始值，提供了几种初始化的方法，接下来将讨论一下Desinated(指定)、Convenience（便捷）初始化器。</p>
-<h1 id="Designated（指定）初始化器"><a href="#Designated（指定）初始化器" class="headerlink" title="Designated（指定）初始化器"></a>Designated（指定）初始化器</h1><ul>
-<li><p>之前使用过Objective-C的应该比较了解指定初始化器，很多类都提供了指定初始化器，如UIViewController的为：<code>- (instancetype)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle</code>,UIView的<code>- (instancetype)initWithFrame:(CGRect)aRect</code>，其作用是该类或者其子类在初始化的过程中都会调用指定初始化器。</p>
-</li>
-<li><p>当在类中定义指定初始化器时，该初始化器会初始化该类的所有存储属性，且当该类是有父类时，<strong>必须</strong>调用父类的<strong>指定</strong>初始化器，注意顺序，先初始化该类自己定义的存储属性，再使用super来调用父类的指定初始化器，跌倒过来编译器会报错。</p>
-</li>
-</ul>
-<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">RecipeIngredient</span>: <span class="title">Food</span> </span>&#123;</div><div class="line">    <span class="keyword">var</span> quantity: <span class="type">Int</span></div><div class="line">    <span class="comment">//指定初始化器</span></div><div class="line">    <span class="keyword">init</span>(name: <span class="type">String</span>, quantity: <span class="type">Int</span>) &#123;</div><div class="line">        <span class="keyword">self</span>.quantity = quantity</div><div class="line">        <span class="keyword">super</span>.<span class="keyword">init</span>(name: name) <span class="comment">//放在该类存储属性初始化之后</span></div><div class="line">    &#125;</div><div class="line">    <span class="keyword">override</span> <span class="keyword">convenience</span> <span class="keyword">init</span>(name: <span class="type">String</span>) &#123;</div><div class="line">        <span class="keyword">self</span>.<span class="keyword">init</span>(name: name, quantity: <span class="number">1</span>)</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li>每一个类都必须至少有一个指定初始化器。</li>
-</ul>
-<a id="more"></a>
-<h1 id="Convenience（便捷）初始化器"><a href="#Convenience（便捷）初始化器" class="headerlink" title="Convenience（便捷）初始化器"></a>Convenience（便捷）初始化器</h1><ul>
-<li>便捷初始化器需要带一个convenience修饰符，如下代码,在便捷初始化器的定义中，<strong>必须先调用其他的初始化器之后，再赋类的存储属性值</strong>。</li>
-</ul>
-<figure class="highlight less"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="selector-tag">convenience</span> <span class="selector-tag">init</span>(parameters) &#123;</div><div class="line">    statements</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li><p>便捷初始化器如果重载了父类的指定初始化器，则必须使用override修饰符。</p>
-</li>
-<li><p>如果子类提供了其父类的<strong>所有</strong>（注意：必须是所有的）指定初始化器的实现，实现有两种，一种是子类的存储属性都提供了默认值，且没有定义指定初始化器，则会自动集成父类的指定初始化器；另一种是在子类中重新定义，子类中重新定义的方法可以是便捷初始化器，既子类中的便捷初始化器可以重载父类的指定初始化器。这样子类就会自动继承父类的便捷初始化器。</p>
-</li>
-</ul>
-<h1 id="指定初始化器和便捷初始化器之间的关系"><a href="#指定初始化器和便捷初始化器之间的关系" class="headerlink" title="指定初始化器和便捷初始化器之间的关系"></a>指定初始化器和便捷初始化器之间的关系</h1><p>指定初始化器和便捷初始化器之间的3个法则：</p>
-<ol>
-<li>指定初始化器必须调用其<strong><em>直接</em></strong>父类的指定初始化器。</li>
-<li>便捷初始化器必须调用该类中其他的初始化器，其初始化器的类型不限。</li>
-<li>在便捷初始化器的调用链中最后必须调用一个指定初始化器。</li>
-</ol>
-<p>最后，直接上官方文档的图示就会对上面的3个规则有比较清晰的认识：<br> <img src="http://oc54pu02q.bkt.clouddn.com/QQ20160819-0@2x.png" width="500" height="254" alt="" align="center"></p>
-
+        
       
     </div>
 
@@ -415,30 +359,18 @@ Designated（指定）初始化器
 
     <footer class="post-footer">
       
-        <div class="post-tags">
-          
-            <a href="/tags/iOS/" rel="tag">#iOS</a>
-          
-            <a href="/tags/Swift/" rel="tag">#Swift</a>
-          
-        </div>
-      
 
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/08/18/知乎日报iOS/" rel="next" title="知乎日报iOS">
-                <i class="fa fa-chevron-left"></i> 知乎日报iOS
+              <a href="/2016/08/26/WebP图片格式iOS实例/" rel="next" title="WebP图片格式iOS实例">
+                <i class="fa fa-chevron-left"></i> WebP图片格式iOS实例
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/08/23/Swift中使用Objective-C的Runtime/" rel="prev" title="Swift中使用Objective-C的Runtime">
-                Swift中使用Objective-C的Runtime <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -453,10 +385,10 @@ Designated（指定）初始化器
 
     <div class="post-spread">
       
-        <div class="ds-share flat" data-thread-key="2016/08/19/Swift的Designated和Convenience初始化器/"
-     data-title="Swift的Designated和Convenience初始化器"
+        <div class="ds-share flat" data-thread-key="2016/08/29/test/"
+     data-title="test"
      data-content=""
-     data-url="http://yoursite.com/2016/08/19/Swift的Designated和Convenience初始化器/">
+     data-url="http://yoursite.com/2016/08/29/test/">
   <div class="ds-share-inline">
     <ul  class="ds-share-icons-16">
 
@@ -486,8 +418,8 @@ Designated（指定）初始化器
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/08/19/Swift的Designated和Convenience初始化器/"
-           data-title="Swift的Designated和Convenience初始化器" data-url="http://yoursite.com/2016/08/19/Swift的Designated和Convenience初始化器/">
+      <div class="ds-thread" data-thread-key="2016/08/29/test/"
+           data-title="test" data-url="http://yoursite.com/2016/08/29/test/">
       </div>
     
   </div>
@@ -614,7 +546,7 @@ Designated（指定）初始化器
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Designated（指定）初始化器"><span class="nav-number">2.</span> <span class="nav-text">Designated（指定）初始化器</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Convenience（便捷）初始化器"><span class="nav-number">3.</span> <span class="nav-text">Convenience（便捷）初始化器</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#指定初始化器和便捷初始化器之间的关系"><span class="nav-number">4.</span> <span class="nav-text">指定初始化器和便捷初始化器之间的关系</span></a></li></ol></div>
+              <p class="post-toc-empty">此文章未包含目录</p>
             
           </div>
         </section>
