@@ -239,7 +239,7 @@
     <link href="http://yoursite.com/2016/08/18/%E7%9F%A5%E4%B9%8E%E6%97%A5%E6%8A%A5iOS/"/>
     <id>http://yoursite.com/2016/08/18/知乎日报iOS/</id>
     <published>2016-08-18T09:31:02.000Z</published>
-    <updated>2016-08-23T07:43:29.000Z</updated>
+    <updated>2016-08-31T02:01:35.000Z</updated>
     
     <content type="html"><![CDATA[<p><strong>Disclaimer - 声明</strong><br><em>Zhihu</em> is a trademark of <em>Zhihu. Inc</em>. This app is not created nor endorsed by Zhihu Inc. All the information and content accessible through Zhihu Daily Purify are subject to Zhihu’s copyright and terms of use. This is a free app and does not charge for anything. All content are available for free from <a href="http://www.zhihu.com" target="_blank" rel="external">Zhihu</a>.</p>
 <p>『知乎』是 <em>知乎. Inc</em> 的注册商标。本软件与其代码非由知乎创作或维护。软件中所包含的信息与内容皆违反版权与知乎用户协议。它是一个免费软件，使用它不收取您任何费用。其中的所有内容均可在<a href="http://www.zhihu.com" target="_blank" rel="external">知乎</a>获取。</p>
@@ -277,12 +277,16 @@
 <li><p>夜间模式实现：使用UIView的Category，类别中使用Objective-C的关联对象来存储模式的配置项，并且作为Observer来监听夜间模式的切换。</p>
 </li>
 </ul>
+<h2 id="5-设置-移动网络不下载图片"><a href="#5-设置-移动网络不下载图片" class="headerlink" title="5.设置-移动网络不下载图片"></a>5.设置-移动网络不下载图片</h2><p><img src="https://raw.githubusercontent.com/zhongwuzw/ZhihuDaily/master/images/demo6.gif" alt=""></p>
+<ul>
+<li>实现：使用NSURLProtocol来进行图片的管理，这里需要注意的就是要解决AF、SDWebCache使用NSURLSession的问题。</li>
+</ul>
 <h2 id="Features-特性"><a href="#Features-特性" class="headerlink" title="Features - 特性"></a>Features - 特性</h2><ul>
 <li>实现知乎日报大多数功能</li>
 <li>没有广告</li>
 </ul>
 <h2 id="TODO-后续实现"><a href="#TODO-后续实现" class="headerlink" title="TODO - 后续实现"></a>TODO - 后续实现</h2><ul>
-<li>网络状况切换管理</li>
+<li><del>网络状况切换管理</del> （已完成）</li>
 </ul>
 ]]></content>
     
