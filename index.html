@@ -295,6 +295,130 @@
             
               
                 
+                <a class="post-title-link" href="/2016/08/31/NSURLProtocol无法截获NSURLSession解决方案/" itemprop="url">
+                  NSURLProtocol无法截获NSURLSession解决方案
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-08-31T11:27:20+08:00" content="2016-08-31">
+              2016-08-31
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/08/31/NSURLProtocol无法截获NSURLSession解决方案/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/31/NSURLProtocol无法截获NSURLSession解决方案/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在做<a href="https://github.com/zhongwuzw/ZhihuDaily">知乎日报</a>的项目时，在其设置界面中有一个选项，当开启时，可以在移动网络状况下不下载图片。这个需求的解决方案有两种，一种是在每一个使用网络图片的地方，在下载前进行判断，如果当前网络为移动蜂窝网络，且开启了<code>在移动网络状况下不下载图片</code>的选项时，放弃图片的下载；还有一种方案就是直接在<code>NSURLProtocol</code>中进行截获，在<code>+ (BOOL)canInitWithRequest:(NSURLRequest *)request</code>中进行判断，当<code>request.URL</code>请求为图片，并开启不下载图片选项，且当前为移动网络状况下，截获该请求。在<a href="https://github.com/zhongwuzw/ZhihuDaily">知乎日报</a>项目中，我使用的第二种，既子类<code>NSURLProtocol</code>来实现请求拦截。</p>
+<h2 id="NSURLProtocol实现图片下载拦截"><a href="#NSURLProtocol实现图片下载拦截" class="headerlink" title="NSURLProtocol实现图片下载拦截"></a>NSURLProtocol实现图片下载拦截</h2><p>一开始，觉得思路很简单，直接创建<code>PictureBlockURLProtocol</code>类，其是<code>NSURLProtocol</code>的子类,在<code>Implement</code>实现中定义如下：</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//获取当前网络状态</span></div><div class="line">+ (<span class="built_in">BOOL</span>)isBlockPictureDownload&#123;</div><div class="line">    Reachability *reachability = ((AppDelegate *)[[<span class="built_in">UIApplication</span> sharedApplication] delegate]).reachability;</div><div class="line">    </div><div class="line">    NetworkStatus netStatus = [reachability currentReachabilityStatus];</div><div class="line">    </div><div class="line">    <span class="built_in">BOOL</span> isBlock = netStatus == ReachableViaWWAN?<span class="literal">YES</span> : <span class="literal">NO</span>;</div><div class="line">    </div><div class="line">    <span class="keyword">return</span> isBlock;</div><div class="line">&#125;</div><div class="line"></div><div class="line">+ (<span class="built_in">BOOL</span>)canInitWithRequest:(<span class="built_in">NSURLRequest</span> *)request</div><div class="line">&#123;</div><div class="line">    <span class="keyword">if</span> ([<span class="built_in">NSURLProtocol</span> propertyForKey:HybridResourceProtocolKey inRequest:request]) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="literal">NO</span>;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="comment">//满足条件时直接截获请求</span></div><div class="line">    <span class="keyword">if</span> ([[UserConfig sharedInstance] isBlockPicture] &amp;&amp; ([request.URL.pathExtension caseInsensitiveCompare:<span class="string">@"jpg"</span>] == <span class="built_in">NSOrderedSame</span> || [request.URL.pathExtension caseInsensitiveCompare:<span class="string">@"png"</span>] == <span class="built_in">NSOrderedSame</span>) &amp;&amp; [<span class="keyword">self</span> isBlockPictureDownload]) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="literal">YES</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="literal">NO</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line">+ (<span class="built_in">NSURLRequest</span> *)canonicalRequestForRequest:(<span class="built_in">NSURLRequest</span> *)request</div><div class="line">&#123;</div><div class="line">    <span class="keyword">return</span> request;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)startLoading&#123;&#125;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)stopLoading&#123;&#125;</div></pre></td></tr></table></figure>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/08/31/NSURLProtocol无法截获NSURLSession解决方案/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2016/08/26/WebP图片格式iOS实例/" itemprop="url">
                   WebP图片格式iOS实例
                 </a>
@@ -1074,7 +1198,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">6</span>
+              <span class="site-state-item-count">7</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
