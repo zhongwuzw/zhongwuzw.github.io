@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2016-09-01T06:35:23.000Z</updated>
+  <updated>2016-09-05T10:31:49.000Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,64 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>iOS越狱设备添加Entitlements授权</title>
+    <link href="http://yoursite.com/2016/09/05/iOS%E6%8E%88%E6%9D%83%E7%9B%B8%E5%85%B3/"/>
+    <id>http://yoursite.com/2016/09/05/iOS授权相关/</id>
+    <published>2016-09-05T03:18:18.000Z</published>
+    <updated>2016-09-05T10:31:49.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="在iOS越狱设备上添加Entitlements授权"><a href="#在iOS越狱设备上添加Entitlements授权" class="headerlink" title="在iOS越狱设备上添加Entitlements授权"></a>在iOS越狱设备上添加Entitlements授权</h2><p>院里的一款用于网络测试的APP，在iOS8.3之前，可以通过引入CoreTelephony框架，调用其私有函数来获取信号强度，MCC、MNC等相关参数，但在iOS8.3之后，无法通过私有API进行获取，遂boss让我进行研究，看有没有解决方案，遂开始研究。<br>首先，经过多方的调研，发现在iOS8.3 above的系统是有解决方案的，参见<a href="http://stackoverflow.com/questions/13399659/get-cellid-mcc-mnc-lac-and-network-in-ios-5-1" target="_blank" rel="external">Stackoverflow</a>，大概思路是需要添加<code>Entitlements</code>授权，既在entitlements文件中添加如下的key，但是由于Apple 的<code>CodeSign</code>的机制，导致无法添加私有的<code>Entitlements</code>授权，所以需要绕过Apple的签名机制。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">key</span>&gt;</span>com.apple.CommCenter.fine-grained<span class="tag">&lt;/<span class="name">key</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">array</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">string</span>&gt;</span>spi<span class="tag">&lt;/<span class="name">string</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">array</span>&gt;</span></div></pre></td></tr></table></figure>
+<h2 id="绕过签名机制"><a href="#绕过签名机制" class="headerlink" title="绕过签名机制"></a>绕过签名机制</h2><p>一开始，使用ldid来进行签名，签名之后会导致app闪退，遂使用了另外一种方法，禁用codesign，采用伪证书的方式，接下来将详细列出步骤。</p>
+<a id="more"></a>
+<h2 id="解决步骤"><a href="#解决步骤" class="headerlink" title="解决步骤"></a>解决步骤</h2><ol>
+<li>设备必须越狱，这是前提。</li>
+<li>Apple Developer的账号，免费的就行。</li>
+<li><p>装完Xcode之后，执行如下命令，作用是禁用Xcode的CodeSign机制，然后允许进行AD_HOC签名。</p>
+ <figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">sudo defaults <span class="keyword">write</span> <span class="regexp">/Applications/</span>Xcode.app<span class="regexp">/Contents/</span>Developer<span class="regexp">/Platforms/i</span>PhoneOS.platform<span class="regexp">/Developer/</span>SDKs<span class="regexp">/iPhoneOS.sdk/</span>SDKSettings.plist DefaultProperties -dict-add CODE_SIGNING_REQUIRED -string NO</div><div class="line">sudo defaults <span class="keyword">write</span> <span class="regexp">/Applications/</span>Xcode.app<span class="regexp">/Contents/</span>Developer<span class="regexp">/Platforms/i</span>PhoneOS.platform<span class="regexp">/Developer/</span>SDKs<span class="regexp">/iPhoneOS.sdk/</span>SDKSettings.plist DefaultProperties -dict-add ENTITLEMENTS_REQUIRED -string NO</div><div class="line">sudo defaults <span class="keyword">write</span> <span class="regexp">/Applications/</span>Xcode.app<span class="regexp">/Contents/</span>Developer<span class="regexp">/Platforms/i</span>PhoneOS.platform<span class="regexp">/Developer/</span>SDKs<span class="regexp">/iPhoneOS.sdk/</span>SDKSettings.plist DefaultProperties -dict-add AD_HOC_CODE_SIGNING_ALLOWED -string YES</div><div class="line">sudo chmod <span class="number">644</span> <span class="regexp">/Applications/</span>Xcode.app<span class="regexp">/Contents/</span>Developer<span class="regexp">/Platforms/i</span>PhoneOS.platform<span class="regexp">/Developer/</span>SDKs<span class="regexp">/iPhoneOS.sdk/</span>SDKSettings.plist</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<ol>
+<li>打开Xcode，进行完初始化之后，退出即可。</li>
+<li>打开Mac上的钥匙串访问应用，点击菜单栏上的<code>钥匙串访问-证书助理-创建证书</code>，在弹出的框中的证书类型选择<code>代码签名</code>，并勾选<code>让我覆盖这些默认值</code>，然后一路往下走，完成后就创建了一个新的证书。</li>
+<li><p>在开发的项目中添加<code>Entitlements</code>文件，代码如下，其中，key为<code>com.apple.CommCenter.fine-grained</code>的节点是我的项目需要添加的key，别的项目可忽略该键值：</p>
+ <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">	<span class="php"><span class="meta">&lt;?</span>xml version=<span class="string">"1.0"</span> encoding=<span class="string">"UTF-8"</span><span class="meta">?&gt;</span></span></div><div class="line"><span class="meta">&lt;!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">plist</span> <span class="attr">version</span>=<span class="string">"1.0"</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">dict</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">key</span>&gt;</span>get-task-allow<span class="tag">&lt;/<span class="name">key</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">true</span>/&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">key</span>&gt;</span>application-identifier<span class="tag">&lt;/<span class="name">key</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">string</span>&gt;</span>$(AppIdentifierPrefix)$(CFBundleIdentifier)<span class="tag">&lt;/<span class="name">string</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">key</span>&gt;</span>com.apple.CommCenter.fine-grained<span class="tag">&lt;/<span class="name">key</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">array</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">string</span>&gt;</span>spi<span class="tag">&lt;/<span class="name">string</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">array</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">dict</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">plist</span>&gt;</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>在项目<code>Build Settings</code>设置的Code Signing部分，将<code>Code Signing Entitlements</code>设为Entilements文件名，然后将<code>Code Signing Identity</code>设为<code>Ad Hoc Code Sign</code>,如果项目包含多个target，则需要进行同样的设置。</p>
+</li>
+<li>完成。</li>
+</ol>
+<h2 id="基本命令"><a href="#基本命令" class="headerlink" title="基本命令"></a>基本命令</h2><ul>
+<li>ldid授权命令：<code>ldid -Sentitlements.xml OTS_SDK_3.1.app/OTS_SDK_3.1</code></li>
+<li>ldid查看授权：<code>ldid -e OTS_SDK_3.1.app/OTS_SDK_3.1</code></li>
+<li>codesign查看权限：<code>codesign -d --entitlements - Example.app</code></li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="http://stackoverflow.com/questions/13399659/get-cellid-mcc-mnc-lac-and-network-in-ios-5-1" target="_blank" rel="external">http://stackoverflow.com/questions/13399659/get-cellid-mcc-mnc-lac-and-network-in-ios-5-1</a></li>
+<li><a href="http://iphonedevwiki.net/index.php/Ldid" target="_blank" rel="external">http://iphonedevwiki.net/index.php/Ldid</a></li>
+<li><a href="http://stackoverflow.com/questions/14871748/how-do-i-change-my-ios-applications-entitlements/14885266#14885266" target="_blank" rel="external">http://stackoverflow.com/questions/14871748/how-do-i-change-my-ios-applications-entitlements/14885266#14885266</a></li>
+<li><a href="https://angelxwind.net/?page/how2asu" target="_blank" rel="external">https://angelxwind.net/?page/how2asu</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;在iOS越狱设备上添加Entitlements授权&quot;&gt;&lt;a href=&quot;#在iOS越狱设备上添加Entitlements授权&quot; class=&quot;headerlink&quot; title=&quot;在iOS越狱设备上添加Entitlements授权&quot;&gt;&lt;/a&gt;在iOS越狱设备上添加Entitlements授权&lt;/h2&gt;&lt;p&gt;院里的一款用于网络测试的APP，在iOS8.3之前，可以通过引入CoreTelephony框架，调用其私有函数来获取信号强度，MCC、MNC等相关参数，但在iOS8.3之后，无法通过私有API进行获取，遂boss让我进行研究，看有没有解决方案，遂开始研究。&lt;br&gt;首先，经过多方的调研，发现在iOS8.3 above的系统是有解决方案的，参见&lt;a href=&quot;http://stackoverflow.com/questions/13399659/get-cellid-mcc-mnc-lac-and-network-in-ios-5-1&quot;&gt;Stackoverflow&lt;/a&gt;，大概思路是需要添加&lt;code&gt;Entitlements&lt;/code&gt;授权，既在entitlements文件中添加如下的key，但是由于Apple 的&lt;code&gt;CodeSign&lt;/code&gt;的机制，导致无法添加私有的&lt;code&gt;Entitlements&lt;/code&gt;授权，所以需要绕过Apple的签名机制。&lt;/p&gt;
+&lt;figure class=&quot;highlight xml&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;tag&quot;&gt;&amp;lt;&lt;span class=&quot;name&quot;&gt;key&lt;/span&gt;&amp;gt;&lt;/span&gt;com.apple.CommCenter.fine-grained&lt;span class=&quot;tag&quot;&gt;&amp;lt;/&lt;span class=&quot;name&quot;&gt;key&lt;/span&gt;&amp;gt;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;tag&quot;&gt;&amp;lt;&lt;span class=&quot;name&quot;&gt;array&lt;/span&gt;&amp;gt;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;tag&quot;&gt;&amp;lt;&lt;span class=&quot;name&quot;&gt;string&lt;/span&gt;&amp;gt;&lt;/span&gt;spi&lt;span class=&quot;tag&quot;&gt;&amp;lt;/&lt;span class=&quot;name&quot;&gt;string&lt;/span&gt;&amp;gt;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;tag&quot;&gt;&amp;lt;/&lt;span class=&quot;name&quot;&gt;array&lt;/span&gt;&amp;gt;&lt;/span&gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;h2 id=&quot;绕过签名机制&quot;&gt;&lt;a href=&quot;#绕过签名机制&quot; class=&quot;headerlink&quot; title=&quot;绕过签名机制&quot;&gt;&lt;/a&gt;绕过签名机制&lt;/h2&gt;&lt;p&gt;一开始，使用ldid来进行签名，签名之后会导致app闪退，遂使用了另外一种方法，禁用codesign，采用伪证书的方式，接下来将详细列出步骤。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="iOS" scheme="http://yoursite.com/categories/iOS/"/>
+    
+    
+      <category term="iOS" scheme="http://yoursite.com/tags/iOS/"/>
+    
+      <category term="越狱" scheme="http://yoursite.com/tags/%E8%B6%8A%E7%8B%B1/"/>
+    
+  </entry>
   
   <entry>
     <title>NSURLProtocol无法截获NSURLSession解决方案</title>
