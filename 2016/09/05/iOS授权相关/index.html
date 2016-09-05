@@ -92,7 +92,7 @@
 <meta property="og:url" content="http://yoursite.com/2016/09/05/iOS授权相关/index.html">
 <meta property="og:site_name" content="钟武的技术博客">
 <meta property="og:description" content="在iOS越狱设备上添加Entitlements授权院里的一款用于网络测试的APP，在iOS8.3之前，可以通过引入CoreTelephony框架，调用其私有函数来获取信号强度，MCC、MNC等相关参数，但在iOS8.3之后，无法通过私有API进行获取，APP开发团队一直没解决，Boss找到我，让我研究一下，看有没有解决方案，遂开始研究。首先，经过多方的调研，发现在iOS8.3 above的系统是有">
-<meta property="og:updated_time" content="2016-09-05T10:39:30.000Z">
+<meta property="og:updated_time" content="2016-09-05T11:01:41.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS越狱设备添加Entitlements授权">
 <meta name="twitter:description" content="在iOS越狱设备上添加Entitlements授权院里的一款用于网络测试的APP，在iOS8.3之前，可以通过引入CoreTelephony框架，调用其私有函数来获取信号强度，MCC、MNC等相关参数，但在iOS8.3之后，无法通过私有API进行获取，APP开发团队一直没解决，Boss找到我，让我研究一下，看有没有解决方案，遂开始研究。首先，经过多方的调研，发现在iOS8.3 above的系统是有">
@@ -364,7 +364,7 @@
 <h2 id="绕过签名机制"><a href="#绕过签名机制" class="headerlink" title="绕过签名机制"></a>绕过签名机制</h2><p>一开始，使用ldid来进行签名，签名之后会导致app闪退，遂使用了另外一种方法，禁用codesign，采用伪证书的方式，接下来将详细列出步骤。</p>
 <a id="more"></a>
 <h2 id="解决步骤"><a href="#解决步骤" class="headerlink" title="解决步骤"></a>解决步骤</h2><ol>
-<li>设备必须越狱，这是前提。</li>
+<li>设备必须越狱，这是前提，且在Cydia中安装<code>AppSync Unified</code>插件。</li>
 <li>Apple Developer的账号，免费的就行。</li>
 <li><p>装完Xcode之后，执行如下命令，作用是禁用Xcode的CodeSign机制，然后允许进行AD_HOC签名。</p>
  <figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">sudo defaults <span class="keyword">write</span> <span class="regexp">/Applications/</span>Xcode.app<span class="regexp">/Contents/</span>Developer<span class="regexp">/Platforms/i</span>PhoneOS.platform<span class="regexp">/Developer/</span>SDKs<span class="regexp">/iPhoneOS.sdk/</span>SDKSettings.plist DefaultProperties -dict-add CODE_SIGNING_REQUIRED -string NO</div><div class="line">sudo defaults <span class="keyword">write</span> <span class="regexp">/Applications/</span>Xcode.app<span class="regexp">/Contents/</span>Developer<span class="regexp">/Platforms/i</span>PhoneOS.platform<span class="regexp">/Developer/</span>SDKs<span class="regexp">/iPhoneOS.sdk/</span>SDKSettings.plist DefaultProperties -dict-add ENTITLEMENTS_REQUIRED -string NO</div><div class="line">sudo defaults <span class="keyword">write</span> <span class="regexp">/Applications/</span>Xcode.app<span class="regexp">/Contents/</span>Developer<span class="regexp">/Platforms/i</span>PhoneOS.platform<span class="regexp">/Developer/</span>SDKs<span class="regexp">/iPhoneOS.sdk/</span>SDKSettings.plist DefaultProperties -dict-add AD_HOC_CODE_SIGNING_ALLOWED -string YES</div><div class="line">sudo chmod <span class="number">644</span> <span class="regexp">/Applications/</span>Xcode.app<span class="regexp">/Contents/</span>Developer<span class="regexp">/Platforms/i</span>PhoneOS.platform<span class="regexp">/Developer/</span>SDKs<span class="regexp">/iPhoneOS.sdk/</span>SDKSettings.plist</div></pre></td></tr></table></figure>
@@ -390,6 +390,7 @@
 <li><a href="http://iphonedevwiki.net/index.php/Ldid" target="_blank" rel="external">http://iphonedevwiki.net/index.php/Ldid</a></li>
 <li><a href="http://stackoverflow.com/questions/14871748/how-do-i-change-my-ios-applications-entitlements/14885266#14885266" target="_blank" rel="external">http://stackoverflow.com/questions/14871748/how-do-i-change-my-ios-applications-entitlements/14885266#14885266</a></li>
 <li><a href="https://angelxwind.net/?page/how2asu" target="_blank" rel="external">https://angelxwind.net/?page/how2asu</a></li>
+<li><a href="https://cydia.angelxwind.net/?page/net.angelxwind.appsyncunified" target="_blank" rel="external">https://cydia.angelxwind.net/?page/net.angelxwind.appsyncunified</a></li>
 </ul>
 
       
