@@ -86,16 +86,16 @@
 
 
 
-<meta name="description" content="在iOS越狱设备上添加Entitlements授权院里的一款用于网络测试的APP，在iOS8.3之前，可以通过引入CoreTelephony框架，调用其私有函数来获取信号强度，MCC、MNC等相关参数，但在iOS8.3之后，无法通过私有API进行获取，遂boss让我进行研究，看有没有解决方案，遂开始研究。首先，经过多方的调研，发现在iOS8.3 above的系统是有解决方案的，参见Stackove">
+<meta name="description" content="在iOS越狱设备上添加Entitlements授权院里的一款用于网络测试的APP，在iOS8.3之前，可以通过引入CoreTelephony框架，调用其私有函数来获取信号强度，MCC、MNC等相关参数，但在iOS8.3之后，无法通过私有API进行获取，APP开发团队一直没解决，Boss找到我，让我研究一下，看有没有解决方案，遂开始研究。首先，经过多方的调研，发现在iOS8.3 above的系统是有">
 <meta property="og:type" content="article">
 <meta property="og:title" content="iOS越狱设备添加Entitlements授权">
 <meta property="og:url" content="http://yoursite.com/2016/09/05/iOS授权相关/index.html">
 <meta property="og:site_name" content="钟武的技术博客">
-<meta property="og:description" content="在iOS越狱设备上添加Entitlements授权院里的一款用于网络测试的APP，在iOS8.3之前，可以通过引入CoreTelephony框架，调用其私有函数来获取信号强度，MCC、MNC等相关参数，但在iOS8.3之后，无法通过私有API进行获取，遂boss让我进行研究，看有没有解决方案，遂开始研究。首先，经过多方的调研，发现在iOS8.3 above的系统是有解决方案的，参见Stackove">
-<meta property="og:updated_time" content="2016-09-05T10:31:49.000Z">
+<meta property="og:description" content="在iOS越狱设备上添加Entitlements授权院里的一款用于网络测试的APP，在iOS8.3之前，可以通过引入CoreTelephony框架，调用其私有函数来获取信号强度，MCC、MNC等相关参数，但在iOS8.3之后，无法通过私有API进行获取，APP开发团队一直没解决，Boss找到我，让我研究一下，看有没有解决方案，遂开始研究。首先，经过多方的调研，发现在iOS8.3 above的系统是有">
+<meta property="og:updated_time" content="2016-09-05T10:39:30.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS越狱设备添加Entitlements授权">
-<meta name="twitter:description" content="在iOS越狱设备上添加Entitlements授权院里的一款用于网络测试的APP，在iOS8.3之前，可以通过引入CoreTelephony框架，调用其私有函数来获取信号强度，MCC、MNC等相关参数，但在iOS8.3之后，无法通过私有API进行获取，遂boss让我进行研究，看有没有解决方案，遂开始研究。首先，经过多方的调研，发现在iOS8.3 above的系统是有解决方案的，参见Stackove">
+<meta name="twitter:description" content="在iOS越狱设备上添加Entitlements授权院里的一款用于网络测试的APP，在iOS8.3之前，可以通过引入CoreTelephony框架，调用其私有函数来获取信号强度，MCC、MNC等相关参数，但在iOS8.3之后，无法通过私有API进行获取，APP开发团队一直没解决，Boss找到我，让我研究一下，看有没有解决方案，遂开始研究。首先，经过多方的调研，发现在iOS8.3 above的系统是有">
 
 
 
@@ -359,7 +359,7 @@
       
 
       
-        <h2 id="在iOS越狱设备上添加Entitlements授权"><a href="#在iOS越狱设备上添加Entitlements授权" class="headerlink" title="在iOS越狱设备上添加Entitlements授权"></a>在iOS越狱设备上添加Entitlements授权</h2><p>院里的一款用于网络测试的APP，在iOS8.3之前，可以通过引入CoreTelephony框架，调用其私有函数来获取信号强度，MCC、MNC等相关参数，但在iOS8.3之后，无法通过私有API进行获取，遂boss让我进行研究，看有没有解决方案，遂开始研究。<br>首先，经过多方的调研，发现在iOS8.3 above的系统是有解决方案的，参见<a href="http://stackoverflow.com/questions/13399659/get-cellid-mcc-mnc-lac-and-network-in-ios-5-1" target="_blank" rel="external">Stackoverflow</a>，大概思路是需要添加<code>Entitlements</code>授权，既在entitlements文件中添加如下的key，但是由于Apple 的<code>CodeSign</code>的机制，导致无法添加私有的<code>Entitlements</code>授权，所以需要绕过Apple的签名机制。</p>
+        <h2 id="在iOS越狱设备上添加Entitlements授权"><a href="#在iOS越狱设备上添加Entitlements授权" class="headerlink" title="在iOS越狱设备上添加Entitlements授权"></a>在iOS越狱设备上添加Entitlements授权</h2><p>院里的一款用于网络测试的APP，在iOS8.3之前，可以通过引入CoreTelephony框架，调用其私有函数来获取信号强度，MCC、MNC等相关参数，但在iOS8.3之后，无法通过私有API进行获取，APP开发团队一直没解决，Boss找到我，让我研究一下，看有没有解决方案，遂开始研究。<br>首先，经过多方的调研，发现在iOS8.3 above的系统是有解决方案的，参见<a href="http://stackoverflow.com/questions/13399659/get-cellid-mcc-mnc-lac-and-network-in-ios-5-1" target="_blank" rel="external">Stackoverflow</a>，大概思路是需要添加<code>Entitlements</code>授权，既在entitlements文件中添加如下的key，但是由于Apple 的<code>CodeSign</code>的机制，导致无法添加私有的<code>Entitlements</code>授权，所以需要绕过Apple的签名机制。</p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">key</span>&gt;</span>com.apple.CommCenter.fine-grained<span class="tag">&lt;/<span class="name">key</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">array</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">string</span>&gt;</span>spi<span class="tag">&lt;/<span class="name">string</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">array</span>&gt;</span></div></pre></td></tr></table></figure>
 <h2 id="绕过签名机制"><a href="#绕过签名机制" class="headerlink" title="绕过签名机制"></a>绕过签名机制</h2><p>一开始，使用ldid来进行签名，签名之后会导致app闪退，遂使用了另外一种方法，禁用codesign，采用伪证书的方式，接下来将详细列出步骤。</p>
 <a id="more"></a>
