@@ -1,28 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom">
-  <title>钟武的技术博客</title>
+<search>
   
-  <link href="/atom.xml" rel="self"/>
   
-  <link href="http://yoursite.com/"/>
-  <updated>2016-09-08T15:17:10.000Z</updated>
-  <id>http://yoursite.com/</id>
-  
-  <author>
-    <name>钟武</name>
     
-  </author>
-  
-  <generator uri="http://hexo.io/">Hexo</generator>
-  
-  <entry>
-    <title>源码分析之SDWebImage</title>
-    <link href="http://yoursite.com/2016/09/08/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B9%8BSDWebImage/"/>
-    <id>http://yoursite.com/2016/09/08/源码分析之SDWebImage/</id>
-    <published>2016-09-08T08:02:49.000Z</published>
-    <updated>2016-09-08T15:17:10.000Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><hr>
+    <entry>
+      <title><![CDATA[源码分析之SDWebImage]]></title>
+      <url>http://yoursite.com/2016/09/08/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B9%8BSDWebImage/</url>
+      <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><hr>
 <p>在iOS开发中，很多都使用到<a href="https://github.com/rs/SDWebImage" target="_blank" rel="external">SDWebImage</a>库，该库使用了外观模式，提供简洁的API，<code>UIButton</code>、<code>UIImageView</code>等类可以直接调用API进行网络图片的下载，接下来，就来分析一下<code>SDWebImage</code>的整个工作流程。</p>
 <h2 id="整体结构"><a href="#整体结构" class="headerlink" title="整体结构"></a>整体结构</h2><hr>
 <p>查看<code>SDWebImage</code>的整个项目结构，除去一些辅助的类，其结构大致如下图所示，<code>UIView+WebCacheOperation</code>类作为<code>UIView</code>的类别，提供基本的方法，通过关联引用来存储与该View相关联的<code>Operation</code>,该<code>Operation</code>满足<code>&lt;SDWebImageOperation&gt;</code>协议，提供的方法包括设置、取消、移除<code>Operation</code>操作。<br><code>UIImageView+WebCache</code>类提供对外的接口，我们一般会通过该类提供的API来请求网络图片。<br><code>SDWebImageManager</code>类将作为Manager来进行下载和缓存的管理，而真正负责下载的类为<code>SDWebImageDownloader</code>类，<code>SDWebImageDownloaderOperation</code>负责封装下载对象；管理缓存的类为<code>SDImageCache</code>。<br>好了，大致结构就是这样，接下来将通过一次调用来分析其内部的具体流程。</p>
@@ -48,33 +32,12 @@
 <li>代码4：当image存在，且选项包含<code>SDWebImageRefreshCached</code>时，去掉下载选项中的<code>SDWebImageDownloaderProgressiveDownload</code>选项，既移除<code>progresive</code>功能，该功能可以在图片下载的过程中渐进式的展示图片；除此之外，再把<code>SDWebImageDownloaderIgnoreCachedResponse</code>选项加到下载选项中，该选项忽略<code>NSURLCache</code>的缓存，关于<code>NSURLCache</code>，可参考<a href="http://nshipster.cn/nsurlcache/" target="_blank" rel="external">NSURLCache</a></li>
 </ol>
 ]]></content>
+    </entry>
     
-    <summary type="html">
-    
-      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;hr&gt;
-&lt;p&gt;在iOS开发中，很多都使用到&lt;a href=&quot;https://github.com/rs/SDWebImage&quot; target=&quot;
-    
-    </summary>
-    
-      <category term="iOS" scheme="http://yoursite.com/categories/iOS/"/>
-    
-    
-      <category term="iOS" scheme="http://yoursite.com/tags/iOS/"/>
-    
-      <category term="源码分析" scheme="http://yoursite.com/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/"/>
-    
-      <category term="SDWebImage" scheme="http://yoursite.com/tags/SDWebImage/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>iOS越狱设备添加Entitlements授权</title>
-    <link href="http://yoursite.com/2016/09/05/iOS%E6%8E%88%E6%9D%83%E7%9B%B8%E5%85%B3/"/>
-    <id>http://yoursite.com/2016/09/05/iOS授权相关/</id>
-    <published>2016-09-05T03:18:18.000Z</published>
-    <updated>2016-09-06T10:20:14.000Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="在iOS越狱设备上添加Entitlements授权"><a href="#在iOS越狱设备上添加Entitlements授权" class="headerlink" title="在iOS越狱设备上添加Entitlements授权"></a>在iOS越狱设备上添加Entitlements授权</h2><p>院里的一款用于网络测试的APP，在iOS8.3之前，可以通过引入CoreTelephony框架，调用其私有函数来获取信号强度，MCC、MNC等相关参数，但在iOS8.3之后，无法通过私有API进行获取，APP开发团队一直没解决，Boss找到我，让我研究一下，看有没有解决方案，遂开始研究。<br>首先，经过多方的调研，发现在iOS8.3 above的系统是有解决方案的，参见<a href="http://stackoverflow.com/questions/13399659/get-cellid-mcc-mnc-lac-and-network-in-ios-5-1" target="_blank" rel="external">Stackoverflow</a>，大概思路是需要添加<code>Entitlements</code>授权，既在entitlements文件中添加如下的key，但是由于Apple 的<code>CodeSign</code>的机制，导致无法添加私有的<code>Entitlements</code>授权，所以需要绕过Apple的签名机制。</p>
+    <entry>
+      <title><![CDATA[iOS越狱设备添加Entitlements授权]]></title>
+      <url>http://yoursite.com/2016/09/05/iOS%E6%8E%88%E6%9D%83%E7%9B%B8%E5%85%B3/</url>
+      <content type="html"><![CDATA[<h2 id="在iOS越狱设备上添加Entitlements授权"><a href="#在iOS越狱设备上添加Entitlements授权" class="headerlink" title="在iOS越狱设备上添加Entitlements授权"></a>在iOS越狱设备上添加Entitlements授权</h2><p>院里的一款用于网络测试的APP，在iOS8.3之前，可以通过引入CoreTelephony框架，调用其私有函数来获取信号强度，MCC、MNC等相关参数，但在iOS8.3之后，无法通过私有API进行获取，APP开发团队一直没解决，Boss找到我，让我研究一下，看有没有解决方案，遂开始研究。<br>首先，经过多方的调研，发现在iOS8.3 above的系统是有解决方案的，参见<a href="http://stackoverflow.com/questions/13399659/get-cellid-mcc-mnc-lac-and-network-in-ios-5-1" target="_blank" rel="external">Stackoverflow</a>，大概思路是需要添加<code>Entitlements</code>授权，既在entitlements文件中添加如下的key，但是由于Apple 的<code>CodeSign</code>的机制，导致无法添加私有的<code>Entitlements</code>授权，所以需要绕过Apple的签名机制。</p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">key</span>&gt;</span>com.apple.CommCenter.fine-grained<span class="tag">&lt;/<span class="name">key</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">array</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">string</span>&gt;</span>spi<span class="tag">&lt;/<span class="name">string</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">array</span>&gt;</span></div></pre></td></tr></table></figure>
 <h2 id="绕过签名机制"><a href="#绕过签名机制" class="headerlink" title="绕过签名机制"></a>绕过签名机制</h2><p>一开始，使用ldid来进行签名，签名之后会导致app闪退，遂使用了另外一种方法，禁用codesign，采用伪证书的方式，接下来将详细列出步骤。</p>
 <a id="more"></a>
@@ -109,32 +72,12 @@
 <li><a href="http://stackoverflow.com/questions/12768109/how-to-use-ldid" target="_blank" rel="external">http://stackoverflow.com/questions/12768109/how-to-use-ldid</a></li>
 </ul>
 ]]></content>
+    </entry>
     
-    <summary type="html">
-    
-      &lt;h2 id=&quot;在iOS越狱设备上添加Entitlements授权&quot;&gt;&lt;a href=&quot;#在iOS越狱设备上添加Entitlements授权&quot; class=&quot;headerlink&quot; title=&quot;在iOS越狱设备上添加Entitlements授权&quot;&gt;&lt;/a&gt;在iOS越狱设备上添加Entitlements授权&lt;/h2&gt;&lt;p&gt;院里的一款用于网络测试的APP，在iOS8.3之前，可以通过引入CoreTelephony框架，调用其私有函数来获取信号强度，MCC、MNC等相关参数，但在iOS8.3之后，无法通过私有API进行获取，APP开发团队一直没解决，Boss找到我，让我研究一下，看有没有解决方案，遂开始研究。&lt;br&gt;首先，经过多方的调研，发现在iOS8.3 above的系统是有解决方案的，参见&lt;a href=&quot;http://stackoverflow.com/questions/13399659/get-cellid-mcc-mnc-lac-and-network-in-ios-5-1&quot;&gt;Stackoverflow&lt;/a&gt;，大概思路是需要添加&lt;code&gt;Entitlements&lt;/code&gt;授权，既在entitlements文件中添加如下的key，但是由于Apple 的&lt;code&gt;CodeSign&lt;/code&gt;的机制，导致无法添加私有的&lt;code&gt;Entitlements&lt;/code&gt;授权，所以需要绕过Apple的签名机制。&lt;/p&gt;
-&lt;figure class=&quot;highlight xml&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;tag&quot;&gt;&amp;lt;&lt;span class=&quot;name&quot;&gt;key&lt;/span&gt;&amp;gt;&lt;/span&gt;com.apple.CommCenter.fine-grained&lt;span class=&quot;tag&quot;&gt;&amp;lt;/&lt;span class=&quot;name&quot;&gt;key&lt;/span&gt;&amp;gt;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;tag&quot;&gt;&amp;lt;&lt;span class=&quot;name&quot;&gt;array&lt;/span&gt;&amp;gt;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;tag&quot;&gt;&amp;lt;&lt;span class=&quot;name&quot;&gt;string&lt;/span&gt;&amp;gt;&lt;/span&gt;spi&lt;span class=&quot;tag&quot;&gt;&amp;lt;/&lt;span class=&quot;name&quot;&gt;string&lt;/span&gt;&amp;gt;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;tag&quot;&gt;&amp;lt;/&lt;span class=&quot;name&quot;&gt;array&lt;/span&gt;&amp;gt;&lt;/span&gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;h2 id=&quot;绕过签名机制&quot;&gt;&lt;a href=&quot;#绕过签名机制&quot; class=&quot;headerlink&quot; title=&quot;绕过签名机制&quot;&gt;&lt;/a&gt;绕过签名机制&lt;/h2&gt;&lt;p&gt;一开始，使用ldid来进行签名，签名之后会导致app闪退，遂使用了另外一种方法，禁用codesign，采用伪证书的方式，接下来将详细列出步骤。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="iOS" scheme="http://yoursite.com/categories/iOS/"/>
-    
-    
-      <category term="iOS" scheme="http://yoursite.com/tags/iOS/"/>
-    
-      <category term="越狱" scheme="http://yoursite.com/tags/%E8%B6%8A%E7%8B%B1/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>NSURLProtocol无法截获NSURLSession解决方案</title>
-    <link href="http://yoursite.com/2016/08/31/NSURLProtocol%E6%97%A0%E6%B3%95%E6%88%AA%E8%8E%B7NSURLSession%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/"/>
-    <id>http://yoursite.com/2016/08/31/NSURLProtocol无法截获NSURLSession解决方案/</id>
-    <published>2016-08-31T03:27:20.000Z</published>
-    <updated>2016-09-01T06:35:23.000Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在做<a href="https://github.com/zhongwuzw/ZhihuDaily" target="_blank" rel="external">知乎日报</a>的项目时，在其设置界面中有一个选项，当开启时，可以在移动网络状况下不下载图片。这个需求的解决方案有两种，一种是在每一个使用网络图片的地方，在下载前进行判断，如果当前网络为移动蜂窝网络，且开启了<code>在移动网络状况下不下载图片</code>的选项时，放弃图片的下载；还有一种方案就是直接在<code>NSURLProtocol</code>中进行截获，在<code>+ (BOOL)canInitWithRequest:(NSURLRequest *)request</code>中进行判断，当<code>request.URL</code>请求为图片，并开启不下载图片选项，且当前为移动网络状况下，截获该请求。在<a href="https://github.com/zhongwuzw/ZhihuDaily" target="_blank" rel="external">知乎日报</a>项目中，我使用的第二种，既子类<code>NSURLProtocol</code>来实现请求拦截。</p>
+    <entry>
+      <title><![CDATA[NSURLProtocol无法截获NSURLSession解决方案]]></title>
+      <url>http://yoursite.com/2016/08/31/NSURLProtocol%E6%97%A0%E6%B3%95%E6%88%AA%E8%8E%B7NSURLSession%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/</url>
+      <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在做<a href="https://github.com/zhongwuzw/ZhihuDaily" target="_blank" rel="external">知乎日报</a>的项目时，在其设置界面中有一个选项，当开启时，可以在移动网络状况下不下载图片。这个需求的解决方案有两种，一种是在每一个使用网络图片的地方，在下载前进行判断，如果当前网络为移动蜂窝网络，且开启了<code>在移动网络状况下不下载图片</code>的选项时，放弃图片的下载；还有一种方案就是直接在<code>NSURLProtocol</code>中进行截获，在<code>+ (BOOL)canInitWithRequest:(NSURLRequest *)request</code>中进行判断，当<code>request.URL</code>请求为图片，并开启不下载图片选项，且当前为移动网络状况下，截获该请求。在<a href="https://github.com/zhongwuzw/ZhihuDaily" target="_blank" rel="external">知乎日报</a>项目中，我使用的第二种，既子类<code>NSURLProtocol</code>来实现请求拦截。</p>
 <h2 id="NSURLProtocol实现图片下载拦截"><a href="#NSURLProtocol实现图片下载拦截" class="headerlink" title="NSURLProtocol实现图片下载拦截"></a>NSURLProtocol实现图片下载拦截</h2><p>一开始，觉得思路很简单，直接创建<code>PictureBlockURLProtocol</code>类，其是<code>NSURLProtocol</code>的子类,在<code>Implement</code>实现中定义如下：</p>
 <figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//获取当前网络状态</span></div><div class="line">+ (<span class="built_in">BOOL</span>)isBlockPictureDownload&#123;</div><div class="line">    Reachability *reachability = ((AppDelegate *)[[<span class="built_in">UIApplication</span> sharedApplication] delegate]).reachability;</div><div class="line">    </div><div class="line">    NetworkStatus netStatus = [reachability currentReachabilityStatus];</div><div class="line">    </div><div class="line">    <span class="built_in">BOOL</span> isBlock = netStatus == ReachableViaWWAN?<span class="literal">YES</span> : <span class="literal">NO</span>;</div><div class="line">    </div><div class="line">    <span class="keyword">return</span> isBlock;</div><div class="line">&#125;</div><div class="line"></div><div class="line">+ (<span class="built_in">BOOL</span>)canInitWithRequest:(<span class="built_in">NSURLRequest</span> *)request</div><div class="line">&#123;</div><div class="line">    <span class="keyword">if</span> ([<span class="built_in">NSURLProtocol</span> propertyForKey:HybridResourceProtocolKey inRequest:request]) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="literal">NO</span>;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="comment">//满足条件时直接截获请求</span></div><div class="line">    <span class="keyword">if</span> ([[UserConfig sharedInstance] isBlockPicture] &amp;&amp; ([request.URL.pathExtension caseInsensitiveCompare:<span class="string">@"jpg"</span>] == <span class="built_in">NSOrderedSame</span> || [request.URL.pathExtension caseInsensitiveCompare:<span class="string">@"png"</span>] == <span class="built_in">NSOrderedSame</span>) &amp;&amp; [<span class="keyword">self</span> isBlockPictureDownload]) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="literal">YES</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="literal">NO</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line">+ (<span class="built_in">NSURLRequest</span> *)canonicalRequestForRequest:(<span class="built_in">NSURLRequest</span> *)request</div><div class="line">&#123;</div><div class="line">    <span class="keyword">return</span> request;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)startLoading&#123;&#125;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)stopLoading&#123;&#125;</div></pre></td></tr></table></figure>
  <a id="more"></a>
@@ -146,32 +89,12 @@
 <p> 如上代码所示，在创建的每一个<code>NSURLSessionConfiguration</code>实例中，添加自定义的<code>NSURLProtocol</code>类到其<code>protocolClasses</code>属性，运行后，发现问题解决了，可以截获<code>NSURLSession</code>发出的请求了。</p>
 <p> Done！！！！</p>
 ]]></content>
+    </entry>
     
-    <summary type="html">
-    
-      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;在做&lt;a href=&quot;https://github.com/zhongwuzw/ZhihuDaily&quot;&gt;知乎日报&lt;/a&gt;的项目时，在其设置界面中有一个选项，当开启时，可以在移动网络状况下不下载图片。这个需求的解决方案有两种，一种是在每一个使用网络图片的地方，在下载前进行判断，如果当前网络为移动蜂窝网络，且开启了&lt;code&gt;在移动网络状况下不下载图片&lt;/code&gt;的选项时，放弃图片的下载；还有一种方案就是直接在&lt;code&gt;NSURLProtocol&lt;/code&gt;中进行截获，在&lt;code&gt;+ (BOOL)canInitWithRequest:(NSURLRequest *)request&lt;/code&gt;中进行判断，当&lt;code&gt;request.URL&lt;/code&gt;请求为图片，并开启不下载图片选项，且当前为移动网络状况下，截获该请求。在&lt;a href=&quot;https://github.com/zhongwuzw/ZhihuDaily&quot;&gt;知乎日报&lt;/a&gt;项目中，我使用的第二种，既子类&lt;code&gt;NSURLProtocol&lt;/code&gt;来实现请求拦截。&lt;/p&gt;
-&lt;h2 id=&quot;NSURLProtocol实现图片下载拦截&quot;&gt;&lt;a href=&quot;#NSURLProtocol实现图片下载拦截&quot; class=&quot;headerlink&quot; title=&quot;NSURLProtocol实现图片下载拦截&quot;&gt;&lt;/a&gt;NSURLProtocol实现图片下载拦截&lt;/h2&gt;&lt;p&gt;一开始，觉得思路很简单，直接创建&lt;code&gt;PictureBlockURLProtocol&lt;/code&gt;类，其是&lt;code&gt;NSURLProtocol&lt;/code&gt;的子类,在&lt;code&gt;Implement&lt;/code&gt;实现中定义如下：&lt;/p&gt;
-&lt;figure class=&quot;highlight objectivec&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;19&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;20&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;21&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;22&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;23&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;24&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;25&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;26&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;27&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;28&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;29&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;30&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;31&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;32&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;//获取当前网络状态&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;+ (&lt;span class=&quot;built_in&quot;&gt;BOOL&lt;/span&gt;)isBlockPictureDownload&amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    Reachability *reachability = ((AppDelegate *)[[&lt;span class=&quot;built_in&quot;&gt;UIApplication&lt;/span&gt; sharedApplication] delegate]).reachability;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    NetworkStatus netStatus = [reachability currentReachabilityStatus];&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;built_in&quot;&gt;BOOL&lt;/span&gt; isBlock = netStatus == ReachableViaWWAN?&lt;span class=&quot;literal&quot;&gt;YES&lt;/span&gt; : &lt;span class=&quot;literal&quot;&gt;NO&lt;/span&gt;;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; isBlock;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;+ (&lt;span class=&quot;built_in&quot;&gt;BOOL&lt;/span&gt;)canInitWithRequest:(&lt;span class=&quot;built_in&quot;&gt;NSURLRequest&lt;/span&gt; *)request&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;if&lt;/span&gt; ([&lt;span class=&quot;built_in&quot;&gt;NSURLProtocol&lt;/span&gt; propertyForKey:HybridResourceProtocolKey inRequest:request]) &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;literal&quot;&gt;NO&lt;/span&gt;;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;comment&quot;&gt;//满足条件时直接截获请求&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;if&lt;/span&gt; ([[UserConfig sharedInstance] isBlockPicture] &amp;amp;&amp;amp; ([request.URL.pathExtension caseInsensitiveCompare:&lt;span class=&quot;string&quot;&gt;@&quot;jpg&quot;&lt;/span&gt;] == &lt;span class=&quot;built_in&quot;&gt;NSOrderedSame&lt;/span&gt; || [request.URL.pathExtension caseInsensitiveCompare:&lt;span class=&quot;string&quot;&gt;@&quot;png&quot;&lt;/span&gt;] == &lt;span class=&quot;built_in&quot;&gt;NSOrderedSame&lt;/span&gt;) &amp;amp;&amp;amp; [&lt;span class=&quot;keyword&quot;&gt;self&lt;/span&gt; isBlockPictureDownload]) &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;literal&quot;&gt;YES&lt;/span&gt;;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;literal&quot;&gt;NO&lt;/span&gt;;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;+ (&lt;span class=&quot;built_in&quot;&gt;NSURLRequest&lt;/span&gt; *)canonicalRequestForRequest:(&lt;span class=&quot;built_in&quot;&gt;NSURLRequest&lt;/span&gt; *)request&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; request;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;- (&lt;span class=&quot;keyword&quot;&gt;void&lt;/span&gt;)startLoading&amp;#123;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;- (&lt;span class=&quot;keyword&quot;&gt;void&lt;/span&gt;)stopLoading&amp;#123;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-    
-    </summary>
-    
-      <category term="iOS" scheme="http://yoursite.com/categories/iOS/"/>
-    
-    
-      <category term="iOS" scheme="http://yoursite.com/tags/iOS/"/>
-    
-      <category term="Objective-C" scheme="http://yoursite.com/tags/Objective-C/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>WebP图片格式iOS实例</title>
-    <link href="http://yoursite.com/2016/08/26/WebP%E5%9B%BE%E7%89%87%E6%A0%BC%E5%BC%8FiOS%E5%AE%9E%E4%BE%8B/"/>
-    <id>http://yoursite.com/2016/08/26/WebP图片格式iOS实例/</id>
-    <published>2016-08-26T07:38:31.000Z</published>
-    <updated>2016-08-28T15:14:43.000Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>俗话说，谷歌大法好，<code>WebP</code>是由谷歌公司推出的图片文件格式，支持有损、无损压缩。从<a href="https://developers.google.com/speed/webp/" target="_blank" rel="external">官方文档</a>，可以看到如下图所示的对比，大意就是压缩率比PNG、JPEG等高。腾讯也对<code>WebP</code>做了测试，测试链接请戳<a href="http://isux.tencent.com/introduction-of-webp.html" target="_blank" rel="external">这里</a>。现在，很多公司都已经开始使用<code>WebP</code>格式，国内如腾讯、淘宝、今日头条等等。</p>
+    <entry>
+      <title><![CDATA[WebP图片格式iOS实例]]></title>
+      <url>http://yoursite.com/2016/08/26/WebP%E5%9B%BE%E7%89%87%E6%A0%BC%E5%BC%8FiOS%E5%AE%9E%E4%BE%8B/</url>
+      <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>俗话说，谷歌大法好，<code>WebP</code>是由谷歌公司推出的图片文件格式，支持有损、无损压缩。从<a href="https://developers.google.com/speed/webp/" target="_blank" rel="external">官方文档</a>，可以看到如下图所示的对比，大意就是压缩率比PNG、JPEG等高。腾讯也对<code>WebP</code>做了测试，测试链接请戳<a href="http://isux.tencent.com/introduction-of-webp.html" target="_blank" rel="external">这里</a>。现在，很多公司都已经开始使用<code>WebP</code>格式，国内如腾讯、淘宝、今日头条等等。</p>
 <p> <img src="http://oc54pu02q.bkt.clouddn.com/QQ20160826-0@2x.png" width="500" height="" alt="" align="center"></p>
 <h1 id="iOS-WebP-示例"><a href="#iOS-WebP-示例" class="headerlink" title="iOS WebP 示例"></a>iOS WebP 示例</h1><p>iOS原生肯定是不支持<code>WebP</code>格式的，接下来，将介绍三种方法来展示在iOS端如何支持<code>WebP</code>格式：</p>
 <h2 id="编译源代码"><a href="#编译源代码" class="headerlink" title="编译源代码"></a>编译源代码</h2><p>从官网下载<code>WebP</code>库的源代码，下载地址请戳<a href="https://developers.google.com/speed/webp/download" target="_blank" rel="external">这里</a>，下载如下图所示的部分，下载后是一个<code>tar</code>文件，名字类似于<br> <img src="http://oc54pu02q.bkt.clouddn.com/QQ20160826-1@2x.png" width="500" height="" alt="" align="center"><br> <code>libwebp-0.5.1.tar</code>，创建一个<code>build</code>文件夹，将该压缩文件放到<code>build</code>目录，然后再创建一个<code>build.sh</code>的shell文件，该文件用来生成通用的<code>framework</code>，代码如下：</p>
@@ -182,33 +105,12 @@
 <p> <em>项目示例请戳<a href="https://github.com/zhongwuzw/WebP-iOS-example" target="_blank" rel="external">这里</a>，欢迎Star。</em></p>
 <h2 id="SDWebImage"><a href="#SDWebImage" class="headerlink" title="SDWebImage"></a>SDWebImage</h2><p><a href="https://github.com/rs/SDWebImage" target="_blank" rel="external">SDWebImage</a>支持<code>WebP</code>格式，但是默认不开启，需要添加SubSpecs，具体步骤参看<code>SDWebImage</code>官方说明。</p>
 ]]></content>
+    </entry>
     
-    <summary type="html">
-    
-      &lt;h1 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h1&gt;&lt;p&gt;俗话说，谷歌大法好，&lt;code&gt;WebP&lt;/code&gt;是由谷歌公司推出的图片文件格式，支持有损、无损压缩。从&lt;a href=&quot;https://developers.google.com/speed/webp/&quot;&gt;官方文档&lt;/a&gt;，可以看到如下图所示的对比，大意就是压缩率比PNG、JPEG等高。腾讯也对&lt;code&gt;WebP&lt;/code&gt;做了测试，测试链接请戳&lt;a href=&quot;http://isux.tencent.com/introduction-of-webp.html&quot;&gt;这里&lt;/a&gt;。现在，很多公司都已经开始使用&lt;code&gt;WebP&lt;/code&gt;格式，国内如腾讯、淘宝、今日头条等等。&lt;/p&gt;
-&lt;p&gt; &lt;img src=&quot;http://oc54pu02q.bkt.clouddn.com/QQ20160826-0@2x.png&quot; width = &quot;500&quot; height = &quot;&quot; alt=&quot;&quot; align=center /&gt;&lt;/p&gt;
-&lt;h1 id=&quot;iOS-WebP-示例&quot;&gt;&lt;a href=&quot;#iOS-WebP-示例&quot; class=&quot;headerlink&quot; title=&quot;iOS WebP 示例&quot;&gt;&lt;/a&gt;iOS WebP 示例&lt;/h1&gt;&lt;p&gt;iOS原生肯定是不支持&lt;code&gt;WebP&lt;/code&gt;格式的，接下来，将介绍三种方法来展示在iOS端如何支持&lt;code&gt;WebP&lt;/code&gt;格式：&lt;/p&gt;
-&lt;h2 id=&quot;编译源代码&quot;&gt;&lt;a href=&quot;#编译源代码&quot; class=&quot;headerlink&quot; title=&quot;编译源代码&quot;&gt;&lt;/a&gt;编译源代码&lt;/h2&gt;&lt;p&gt;从官网下载&lt;code&gt;WebP&lt;/code&gt;库的源代码，下载地址请戳&lt;a href=&quot;https://developers.google.com/speed/webp/download&quot;&gt;这里&lt;/a&gt;，下载如下图所示的部分，下载后是一个&lt;code&gt;tar&lt;/code&gt;文件，名字类似于&lt;br&gt; &lt;img src=&quot;http://oc54pu02q.bkt.clouddn.com/QQ20160826-1@2x.png&quot; width = &quot;500&quot; height = &quot;&quot; alt=&quot;&quot; align=center /&gt;&lt;br&gt; &lt;code&gt;libwebp-0.5.1.tar&lt;/code&gt;，创建一个&lt;code&gt;build&lt;/code&gt;文件夹，将该压缩文件放到&lt;code&gt;build&lt;/code&gt;目录，然后再创建一个&lt;code&gt;build.sh&lt;/code&gt;的shell文件，该文件用来生成通用的&lt;code&gt;framework&lt;/code&gt;，代码如下：&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="iOS" scheme="http://yoursite.com/categories/iOS/"/>
-    
-    
-      <category term="iOS" scheme="http://yoursite.com/tags/iOS/"/>
-    
-      <category term="Objective-C" scheme="http://yoursite.com/tags/Objective-C/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Swift之通过减少动态派发来提升性能</title>
-    <link href="http://yoursite.com/2016/08/24/Swift%E4%B9%8B%E9%80%9A%E8%BF%87%E5%87%8F%E5%B0%91%E5%8A%A8%E6%80%81%E6%B4%BE%E5%8F%91%E6%9D%A5%E6%8F%90%E5%8D%87%E6%80%A7%E8%83%BD/"/>
-    <id>http://yoursite.com/2016/08/24/Swift之通过减少动态派发来提升性能/</id>
-    <published>2016-08-24T15:23:01.000Z</published>
-    <updated>2016-08-25T03:30:30.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>Swift是OO（面向对象）的语言，所以少不了方法和属性的重载等特性，程序只能在运行时来确定具体的方法或属性来间接调用或间接访问，这就叫做动态派发。从性能上考虑，对于动态派发的方法，会有常量时间的运行时开销。接下来将介绍三种方法来移除这样的动态性，<code>final</code>，<code>private</code>，全模块优化（Whole Module Optimization），以此提升性能。</p>
+    <entry>
+      <title><![CDATA[Swift之通过减少动态派发来提升性能]]></title>
+      <url>http://yoursite.com/2016/08/24/Swift%E4%B9%8B%E9%80%9A%E8%BF%87%E5%87%8F%E5%B0%91%E5%8A%A8%E6%80%81%E6%B4%BE%E5%8F%91%E6%9D%A5%E6%8F%90%E5%8D%87%E6%80%A7%E8%83%BD/</url>
+      <content type="html"><![CDATA[<p>Swift是OO（面向对象）的语言，所以少不了方法和属性的重载等特性，程序只能在运行时来确定具体的方法或属性来间接调用或间接访问，这就叫做动态派发。从性能上考虑，对于动态派发的方法，会有常量时间的运行时开销。接下来将介绍三种方法来移除这样的动态性，<code>final</code>，<code>private</code>，全模块优化（Whole Module Optimization），以此提升性能。</p>
 <p>考虑下面的例子：</p>
 <figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">ParticleModel</span> </span>&#123;</div><div class="line">	<span class="keyword">var</span> point = ( <span class="number">0.0</span>, <span class="number">0.0</span> )</div><div class="line">	<span class="keyword">var</span> velocity = <span class="number">100.0</span></div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">func</span> <span class="title">updatePoint</span><span class="params">(newPoint: <span class="params">(Double, Double)</span></span></span>, newVelocity: <span class="type">Double</span>) &#123;</div><div class="line">		point = newPoint</div><div class="line">		velocity = newVelocity</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">func</span> <span class="title">update</span><span class="params">(newP: <span class="params">(Double, Double)</span></span></span>, newV: <span class="type">Double</span>) &#123;</div><div class="line">		updatePoint(newP, newVelocity: newV)</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">var</span> p = <span class="type">ParticleModel</span>()</div><div class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">stride</span>(from: <span class="number">0.0</span>, through: <span class="number">360</span>, by: <span class="number">1.0</span>) &#123;</div><div class="line">	p.update((i * sin(i), i), newV:i*<span class="number">1000</span>)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>如上述代码所示，调用过程为：</p>
@@ -243,41 +145,12 @@
 </li>
 </ul>
 ]]></content>
+    </entry>
     
-    <summary type="html">
-    
-      &lt;p&gt;Swift是OO（面向对象）的语言，所以少不了方法和属性的重载等特性，程序只能在运行时来确定具体的方法或属性来间接调用或间接访问，这就叫做动态派发。从性能上考虑，对于动态派发的方法，会有常量时间的运行时开销。接下来将介绍三种方法来移除这样的动态性，&lt;code&gt;final&lt;/code&gt;，&lt;code&gt;private&lt;/code&gt;，全模块优化（Whole Module Optimization），以此提升性能。&lt;/p&gt;
-&lt;p&gt;考虑下面的例子：&lt;/p&gt;
-&lt;figure class=&quot;highlight swift&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;ParticleModel&lt;/span&gt; &lt;/span&gt;&amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;	&lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; point = ( &lt;span class=&quot;number&quot;&gt;0.0&lt;/span&gt;, &lt;span class=&quot;number&quot;&gt;0.0&lt;/span&gt; )&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;	&lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; velocity = &lt;span class=&quot;number&quot;&gt;100.0&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;	&lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;func&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;updatePoint&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(newPoint: &lt;span class=&quot;params&quot;&gt;(Double, Double)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;, newVelocity: &lt;span class=&quot;type&quot;&gt;Double&lt;/span&gt;) &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;		point = newPoint&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;		velocity = newVelocity&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;	&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;	&lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;func&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;update&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(newP: &lt;span class=&quot;params&quot;&gt;(Double, Double)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;, newV: &lt;span class=&quot;type&quot;&gt;Double&lt;/span&gt;) &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;		updatePoint(newP, newVelocity: newV)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;	&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; p = &lt;span class=&quot;type&quot;&gt;ParticleModel&lt;/span&gt;()&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;for&lt;/span&gt; i &lt;span class=&quot;keyword&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;built_in&quot;&gt;stride&lt;/span&gt;(from: &lt;span class=&quot;number&quot;&gt;0.0&lt;/span&gt;, through: &lt;span class=&quot;number&quot;&gt;360&lt;/span&gt;, by: &lt;span class=&quot;number&quot;&gt;1.0&lt;/span&gt;) &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;	p.update((i * sin(i), i), newV:i*&lt;span class=&quot;number&quot;&gt;1000&lt;/span&gt;)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;p&gt;如上述代码所示，调用过程为：&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;调用变量&lt;code&gt;p&lt;/code&gt;的&lt;code&gt;update&lt;/code&gt;方法。&lt;/li&gt;
-&lt;li&gt;调用&lt;code&gt;p&lt;/code&gt;的&lt;code&gt;updatePoint&lt;/code&gt;方法。&lt;/li&gt;
-&lt;li&gt;获取&lt;code&gt;p&lt;/code&gt;的元组类型变量&lt;code&gt;point&lt;/code&gt;。&lt;/li&gt;
-&lt;li&gt;获取&lt;code&gt;p&lt;/code&gt;的属性velocity。&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;由于&lt;code&gt;ParticleModel&lt;/code&gt;可以被子类，所以其方法和属性就能被重载，这就不可避免的需要使用动态调用。&lt;/p&gt;
-&lt;p&gt;在Swift中，动态调用是通过在一个方法表中找到方法然后执行间接的调用（类似于C++的虚函数表），对于这种先查找再调用的过程，其效率是要低于方法的直接调用，而且间接调用会阻止许多编译器优化，这将加重间接调用的开销。接下来将列举一些技巧来禁用动态派发的行为，以达到提升性能的目的。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="iOS" scheme="http://yoursite.com/categories/iOS/"/>
-    
-    
-      <category term="iOS" scheme="http://yoursite.com/tags/iOS/"/>
-    
-      <category term="Swift" scheme="http://yoursite.com/tags/Swift/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Swift中使用Objective-C的Runtime</title>
-    <link href="http://yoursite.com/2016/08/23/Swift%E4%B8%AD%E4%BD%BF%E7%94%A8Objective-C%E7%9A%84Runtime/"/>
-    <id>http://yoursite.com/2016/08/23/Swift中使用Objective-C的Runtime/</id>
-    <published>2016-08-23T07:41:47.000Z</published>
-    <updated>2016-08-24T15:24:26.000Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="Swift调用Objective-C的Runtime"><a href="#Swift调用Objective-C的Runtime" class="headerlink" title="Swift调用Objective-C的Runtime"></a>Swift调用Objective-C的Runtime</h1><hr>
+    <entry>
+      <title><![CDATA[Swift中使用Objective-C的Runtime]]></title>
+      <url>http://yoursite.com/2016/08/23/Swift%E4%B8%AD%E4%BD%BF%E7%94%A8Objective-C%E7%9A%84Runtime/</url>
+      <content type="html"><![CDATA[<h1 id="Swift调用Objective-C的Runtime"><a href="#Swift调用Objective-C的Runtime" class="headerlink" title="Swift调用Objective-C的Runtime"></a>Swift调用Objective-C的Runtime</h1><hr>
 <p>首先，我们来测试一下使用Swift代码来调用Objective-C Runtime的方法，首先创建两个类，用来做对比，一个是纯的Swift类，另一个继承自NSObject：</p>
 <figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//纯Swift类</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">SwiftClass</span> </span>&#123;</div><div class="line">    <span class="keyword">var</span> aBool = <span class="literal">true</span></div><div class="line">    <span class="keyword">var</span> aInt = <span class="number">3</span></div><div class="line">    <span class="keyword">var</span> aStrig = <span class="string">"sss"</span></div><div class="line">    <span class="keyword">var</span> aObject :<span class="type">AnyObject</span>?</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">func</span> <span class="title">swiftTest</span><span class="params">()</span></span> &#123;</div><div class="line">        </div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//继承自NSObject的类</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">SwiftWithOCClass</span> :<span class="title">NSObject</span></span>&#123;</div><div class="line">    <span class="keyword">var</span> aBool = <span class="literal">true</span></div><div class="line">    <span class="keyword">var</span> aInt = <span class="number">3</span></div><div class="line">    <span class="keyword">var</span> aStrig = <span class="string">"sss"</span></div><div class="line">    <span class="keyword">var</span> aObject :<span class="type">AnyObject</span>?</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">func</span> <span class="title">swiftTest</span><span class="params">(aCharacter:Character)</span></span> &#123;</div><div class="line">        </div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">func</span> <span class="title">justTest</span><span class="params">()</span></span> &#123;</div><div class="line">        </div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <a id="more"></a>
@@ -302,32 +175,12 @@
 <li>在App Delegate中实现Method Swizzling：在AppDelegate的<code>application(_:didFinishLaunchingWithOptions:)</code>方法中进行Method Swizzling。</li>
 </ul>
 ]]></content>
+    </entry>
     
-    <summary type="html">
-    
-      &lt;h1 id=&quot;Swift调用Objective-C的Runtime&quot;&gt;&lt;a href=&quot;#Swift调用Objective-C的Runtime&quot; class=&quot;headerlink&quot; title=&quot;Swift调用Objective-C的Runtime&quot;&gt;&lt;/a&gt;Swift调用Objective-C的Runtime&lt;/h1&gt;&lt;hr&gt;
-&lt;p&gt;首先，我们来测试一下使用Swift代码来调用Objective-C Runtime的方法，首先创建两个类，用来做对比，一个是纯的Swift类，另一个继承自NSObject：&lt;/p&gt;
-&lt;figure class=&quot;highlight swift&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;19&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;20&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;21&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;22&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;23&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;24&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;25&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;26&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;27&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;//纯Swift类&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;SwiftClass&lt;/span&gt; &lt;/span&gt;&amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; aBool = &lt;span class=&quot;literal&quot;&gt;true&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; aInt = &lt;span class=&quot;number&quot;&gt;3&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; aStrig = &lt;span class=&quot;string&quot;&gt;&quot;sss&quot;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; aObject :&lt;span class=&quot;type&quot;&gt;AnyObject&lt;/span&gt;?&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;func&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;swiftTest&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;()&lt;/span&gt;&lt;/span&gt; &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;//继承自NSObject的类&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;SwiftWithOCClass&lt;/span&gt; :&lt;span class=&quot;title&quot;&gt;NSObject&lt;/span&gt;&lt;/span&gt;&amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; aBool = &lt;span class=&quot;literal&quot;&gt;true&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; aInt = &lt;span class=&quot;number&quot;&gt;3&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; aStrig = &lt;span class=&quot;string&quot;&gt;&quot;sss&quot;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; aObject :&lt;span class=&quot;type&quot;&gt;AnyObject&lt;/span&gt;?&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;func&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;swiftTest&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(aCharacter:Character)&lt;/span&gt;&lt;/span&gt; &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;func&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;justTest&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;()&lt;/span&gt;&lt;/span&gt; &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-    
-    </summary>
-    
-      <category term="iOS" scheme="http://yoursite.com/categories/iOS/"/>
-    
-    
-      <category term="iOS" scheme="http://yoursite.com/tags/iOS/"/>
-    
-      <category term="Swift" scheme="http://yoursite.com/tags/Swift/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Swift的Designated和Convenience初始化器</title>
-    <link href="http://yoursite.com/2016/08/19/Swift%E7%9A%84Designated%E5%92%8CConvenience%E5%88%9D%E5%A7%8B%E5%8C%96%E5%99%A8/"/>
-    <id>http://yoursite.com/2016/08/19/Swift的Designated和Convenience初始化器/</id>
-    <published>2016-08-19T07:46:48.000Z</published>
-    <updated>2016-08-23T07:43:38.000Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在Swift中，为了确保类的存储属性都能有一个初始值，提供了几种初始化的方法，接下来将讨论一下Desinated(指定)、Convenience（便捷）初始化器。</p>
+    <entry>
+      <title><![CDATA[Swift的Designated和Convenience初始化器]]></title>
+      <url>http://yoursite.com/2016/08/19/Swift%E7%9A%84Designated%E5%92%8CConvenience%E5%88%9D%E5%A7%8B%E5%8C%96%E5%99%A8/</url>
+      <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在Swift中，为了确保类的存储属性都能有一个初始值，提供了几种初始化的方法，接下来将讨论一下Desinated(指定)、Convenience（便捷）初始化器。</p>
 <h1 id="Designated（指定）初始化器"><a href="#Designated（指定）初始化器" class="headerlink" title="Designated（指定）初始化器"></a>Designated（指定）初始化器</h1><ul>
 <li><p>之前使用过Objective-C的应该比较了解指定初始化器，很多类都提供了指定初始化器，如UIViewController的为：<code>- (instancetype)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle</code>,UIView的<code>- (instancetype)initWithFrame:(CGRect)aRect</code>，其作用是该类或者其子类在初始化的过程中都会调用指定初始化器。</p>
 </li>
@@ -357,40 +210,12 @@
 </ol>
 <p>最后，直接上官方文档的图示就会对上面的3个规则有比较清晰的认识：<br> <img src="http://oc54pu02q.bkt.clouddn.com/QQ20160819-0@2x.png" width="500" height="254" alt="" align="center"></p>
 ]]></content>
+    </entry>
     
-    <summary type="html">
-    
-      &lt;h1 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h1&gt;&lt;p&gt;在Swift中，为了确保类的存储属性都能有一个初始值，提供了几种初始化的方法，接下来将讨论一下Desinated(指定)、Convenience（便捷）初始化器。&lt;/p&gt;
-&lt;h1 id=&quot;Designated（指定）初始化器&quot;&gt;&lt;a href=&quot;#Designated（指定）初始化器&quot; class=&quot;headerlink&quot; title=&quot;Designated（指定）初始化器&quot;&gt;&lt;/a&gt;Designated（指定）初始化器&lt;/h1&gt;&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;之前使用过Objective-C的应该比较了解指定初始化器，很多类都提供了指定初始化器，如UIViewController的为：&lt;code&gt;- (instancetype)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle&lt;/code&gt;,UIView的&lt;code&gt;- (instancetype)initWithFrame:(CGRect)aRect&lt;/code&gt;，其作用是该类或者其子类在初始化的过程中都会调用指定初始化器。&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;当在类中定义指定初始化器时，该初始化器会初始化该类的所有存储属性，且当该类是有父类时，&lt;strong&gt;必须&lt;/strong&gt;调用父类的&lt;strong&gt;指定&lt;/strong&gt;初始化器，注意顺序，先初始化该类自己定义的存储属性，再使用super来调用父类的指定初始化器，跌倒过来编译器会报错。&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;figure class=&quot;highlight swift&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;RecipeIngredient&lt;/span&gt;: &lt;span class=&quot;title&quot;&gt;Food&lt;/span&gt; &lt;/span&gt;&amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;var&lt;/span&gt; quantity: &lt;span class=&quot;type&quot;&gt;Int&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;comment&quot;&gt;//指定初始化器&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;init&lt;/span&gt;(name: &lt;span class=&quot;type&quot;&gt;String&lt;/span&gt;, quantity: &lt;span class=&quot;type&quot;&gt;Int&lt;/span&gt;) &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &lt;span class=&quot;keyword&quot;&gt;self&lt;/span&gt;.quantity = quantity&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &lt;span class=&quot;keyword&quot;&gt;super&lt;/span&gt;.&lt;span class=&quot;keyword&quot;&gt;init&lt;/span&gt;(name: name) &lt;span class=&quot;comment&quot;&gt;//放在该类存储属性初始化之后&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;override&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;convenience&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;init&lt;/span&gt;(name: &lt;span class=&quot;type&quot;&gt;String&lt;/span&gt;) &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &lt;span class=&quot;keyword&quot;&gt;self&lt;/span&gt;.&lt;span class=&quot;keyword&quot;&gt;init&lt;/span&gt;(name: name, quantity: &lt;span class=&quot;number&quot;&gt;1&lt;/span&gt;)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;ul&gt;
-&lt;li&gt;每一个类都必须至少有一个指定初始化器。&lt;/li&gt;
-&lt;/ul&gt;
-    
-    </summary>
-    
-      <category term="iOS" scheme="http://yoursite.com/categories/iOS/"/>
-    
-    
-      <category term="iOS" scheme="http://yoursite.com/tags/iOS/"/>
-    
-      <category term="Swift" scheme="http://yoursite.com/tags/Swift/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>知乎日报iOS</title>
-    <link href="http://yoursite.com/2016/08/18/%E7%9F%A5%E4%B9%8E%E6%97%A5%E6%8A%A5iOS/"/>
-    <id>http://yoursite.com/2016/08/18/知乎日报iOS/</id>
-    <published>2016-08-18T09:31:02.000Z</published>
-    <updated>2016-08-31T02:01:35.000Z</updated>
-    
-    <content type="html"><![CDATA[<p><strong>Disclaimer - 声明</strong><br><em>Zhihu</em> is a trademark of <em>Zhihu. Inc</em>. This app is not created nor endorsed by Zhihu Inc. All the information and content accessible through Zhihu Daily Purify are subject to Zhihu’s copyright and terms of use. This is a free app and does not charge for anything. All content are available for free from <a href="http://www.zhihu.com" target="_blank" rel="external">Zhihu</a>.</p>
+    <entry>
+      <title><![CDATA[知乎日报iOS]]></title>
+      <url>http://yoursite.com/2016/08/18/%E7%9F%A5%E4%B9%8E%E6%97%A5%E6%8A%A5iOS/</url>
+      <content type="html"><![CDATA[<p><strong>Disclaimer - 声明</strong><br><em>Zhihu</em> is a trademark of <em>Zhihu. Inc</em>. This app is not created nor endorsed by Zhihu Inc. All the information and content accessible through Zhihu Daily Purify are subject to Zhihu’s copyright and terms of use. This is a free app and does not charge for anything. All content are available for free from <a href="http://www.zhihu.com" target="_blank" rel="external">Zhihu</a>.</p>
 <p>『知乎』是 <em>知乎. Inc</em> 的注册商标。本软件与其代码非由知乎创作或维护。软件中所包含的信息与内容皆违反版权与知乎用户协议。它是一个免费软件，使用它不收取您任何费用。其中的所有内容均可在<a href="http://www.zhihu.com" target="_blank" rel="external">知乎</a>获取。</p>
 <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>最近工作工作不是很忙，所以准备开发项目练练手，之前发现了这个<em><a href="https://github.com/izzyleung/ZhihuDailyPurify/" target="_blank" rel="external">知乎日报API</a></em>,其提供了知乎日报的API地址，所以决定开发知乎日报。先上<em><a href="https://github.com/zhongwuzw/ZhihuDaily" target="_blank" rel="external">Github地址</a></em>，欢迎<em>Star、Issues、Pull Request</em>。</p>
 <h1 id="展示"><a href="#展示" class="headerlink" title="展示"></a>展示</h1><h2 id="1-应用主页部分："><a href="#1-应用主页部分：" class="headerlink" title="1.应用主页部分："></a>1.应用主页部分：</h2><p><img src="https://raw.githubusercontent.com/zhongwuzw/ZhihuDaily/master/images/demo1.gif" alt=""><br><a id="more"></a></p>
@@ -438,48 +263,15 @@
 <li><del>网络状况切换管理</del> （已完成）</li>
 </ul>
 ]]></content>
+    </entry>
     
-    <summary type="html">
-    
-      &lt;p&gt;&lt;strong&gt;Disclaimer - 声明&lt;/strong&gt;&lt;br&gt;&lt;em&gt;Zhihu&lt;/em&gt; is a trademark of &lt;em&gt;Zhihu. Inc&lt;/em&gt;. This app is not created nor endorsed by Zhihu Inc. All the information and content accessible through Zhihu Daily Purify are subject to Zhihu’s copyright and terms of use. This is a free app and does not charge for anything. All content are available for free from &lt;a href=&quot;http://www.zhihu.com&quot;&gt;Zhihu&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;『知乎』是 &lt;em&gt;知乎. Inc&lt;/em&gt; 的注册商标。本软件与其代码非由知乎创作或维护。软件中所包含的信息与内容皆违反版权与知乎用户协议。它是一个免费软件，使用它不收取您任何费用。其中的所有内容均可在&lt;a href=&quot;http://www.zhihu.com&quot;&gt;知乎&lt;/a&gt;获取。&lt;/p&gt;
-&lt;h1 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h1&gt;&lt;p&gt;最近工作工作不是很忙，所以准备开发项目练练手，之前发现了这个&lt;em&gt;&lt;a href=&quot;https://github.com/izzyleung/ZhihuDailyPurify/&quot;&gt;知乎日报API&lt;/a&gt;&lt;/em&gt;,其提供了知乎日报的API地址，所以决定开发知乎日报。先上&lt;em&gt;&lt;a href=&quot;https://github.com/zhongwuzw/ZhihuDaily&quot;&gt;Github地址&lt;/a&gt;&lt;/em&gt;，欢迎&lt;em&gt;Star、Issues、Pull Request&lt;/em&gt;。&lt;/p&gt;
-&lt;h1 id=&quot;展示&quot;&gt;&lt;a href=&quot;#展示&quot; class=&quot;headerlink&quot; title=&quot;展示&quot;&gt;&lt;/a&gt;展示&lt;/h1&gt;&lt;h2 id=&quot;1-应用主页部分：&quot;&gt;&lt;a href=&quot;#1-应用主页部分：&quot; class=&quot;headerlink&quot; title=&quot;1.应用主页部分：&quot;&gt;&lt;/a&gt;1.应用主页部分：&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/zhongwuzw/ZhihuDaily/master/images/demo1.gif&quot; alt=&quot;&quot;&gt;&lt;br&gt;
-    
-    </summary>
-    
-      <category term="iOS" scheme="http://yoursite.com/categories/iOS/"/>
-    
-    
-      <category term="iOS" scheme="http://yoursite.com/tags/iOS/"/>
-    
-      <category term="Objective-C" scheme="http://yoursite.com/tags/Objective-C/"/>
-    
-      <category term="知乎日报" scheme="http://yoursite.com/tags/%E7%9F%A5%E4%B9%8E%E6%97%A5%E6%8A%A5/"/>
-    
-      <category term="项目开发" scheme="http://yoursite.com/tags/%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Hello World</title>
-    <link href="http://yoursite.com/2016/08/13/hello-world/"/>
-    <id>http://yoursite.com/2016/08/13/hello-world/</id>
-    <published>2016-08-13T14:20:45.000Z</published>
-    <updated>2016-08-23T02:42:04.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>Hello World，以前在学习以及项目开发中学到的很多知识点，都会记录在我的印象笔记中，作为整理学习，但是现在，我要开始把我的一些积累放到我的这个小博客上，有问题欢迎大家指正，也附上我的<a href="https://github.com/zhongwuzw" target="_blank" rel="external">Github</a>地址。ps:近期我会整理一下我的印象笔记，将一些知识点放到博客上来。</p>
+    <entry>
+      <title><![CDATA[Hello World]]></title>
+      <url>http://yoursite.com/2016/08/13/hello-world/</url>
+      <content type="html"><![CDATA[<p>Hello World，以前在学习以及项目开发中学到的很多知识点，都会记录在我的印象笔记中，作为整理学习，但是现在，我要开始把我的一些积累放到我的这个小博客上，有问题欢迎大家指正，也附上我的<a href="https://github.com/zhongwuzw" target="_blank" rel="external">Github</a>地址。ps:近期我会整理一下我的印象笔记，将一些知识点放到博客上来。</p>
 ]]></content>
+    </entry>
     
-    <summary type="html">
-    
-      &lt;p&gt;Hello World，以前在学习以及项目开发中学到的很多知识点，都会记录在我的印象笔记中，作为整理学习，但是现在，我要开始把我的一些积累放到我的这个小博客上，有问题欢迎大家指正，也附上我的&lt;a href=&quot;https://github.com/zhongwuzw&quot; tar
-    
-    </summary>
-    
-      <category term="其它" scheme="http://yoursite.com/categories/%E5%85%B6%E5%AE%83/"/>
-    
-    
-  </entry>
   
-</feed>
+  
+</search>
