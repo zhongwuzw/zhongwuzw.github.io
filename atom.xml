@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://zhongwuzw.github.io/"/>
-  <updated>2016-09-09T08:21:23.000Z</updated>
+  <updated>2016-09-10T00:44:55.000Z</updated>
   <id>https://zhongwuzw.github.io/</id>
   
   <author>
@@ -20,18 +20,18 @@
     <link href="https://zhongwuzw.github.io/2016/09/08/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B9%8BSDWebImage/"/>
     <id>https://zhongwuzw.github.io/2016/09/08/源码分析之SDWebImage/</id>
     <published>2016-09-08T08:02:49.000Z</published>
-    <updated>2016-09-09T08:21:23.000Z</updated>
+    <updated>2016-09-10T00:44:55.000Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><hr>
 <p>在iOS开发中，很多都使用到<a href="https://github.com/rs/SDWebImage" target="_blank" rel="external">SDWebImage</a>库，该库使用了外观模式，提供简洁的API，<code>UIButton</code>、<code>UIImageView</code>等类可以直接调用API进行网络图片的下载，接下来，就来分析一下<code>SDWebImage</code>的整个工作流程。</p>
 <h2 id="整体结构"><a href="#整体结构" class="headerlink" title="整体结构"></a>整体结构</h2><hr>
-<p>查看<code>SDWebImage</code>的整个项目结构，除去一些辅助的类，其结构大致如下图所示，<code>UIView+WebCacheOperation</code>类作为<code>UIView</code>的类别，提供基本的方法，通过关联引用来存储与该View相关联的<code>Operation</code>,该<code>Operation</code>满足<code>&lt;SDWebImageOperation&gt;</code>协议，提供的方法包括设置、取消、移除<code>Operation</code>操作。<br><code>UIImageView+WebCache</code>类提供对外的接口，我们一般会通过该类提供的API来请求网络图片。<br><code>SDWebImageManager</code>类将作为Manager来进行下载和缓存的管理，而真正负责下载的类为<code>SDWebImageDownloader</code>类，<code>SDWebImageDownloaderOperation</code>负责封装下载对象；管理缓存的类为<code>SDImageCache</code>。<br>好了，大致结构就是这样，接下来将通过一次调用来分析其内部的具体流程。</p>
+<p>查看<code>SDWebImage</code>的整个项目结构，除去一些辅助的类，其结构大致如下图所示，<code>UIView+WebCacheOperation</code>类作为<code>UIView</code>的类别，提供基本的方法，如设置、取消、移除<code>Operation</code>操作，该<code>Operation</code>满足<code>&lt;SDWebImageOperation&gt;</code>协议，并通过关联引用来进行存储。<br><code>UIImageView+WebCache</code>、<code>SDWebImageManager</code>等类提供对外的接口。<br><code>SDWebImageManager</code>类将作为Manager来进行下载和缓存的管理，而真正负责下载的类为<code>SDWebImageDownloader</code>类，<code>SDWebImageDownloaderOperation</code>负责封装下载对象；管理缓存的类为<code>SDImageCache</code>。<br>好了，大致结构就是这样，接下来将通过一次调用来分析其内部的具体流程。</p>
 <p><img src="http://oc54pu02q.bkt.clouddn.com/%E6%9C%AA%E5%91%BD%E5%90%8D%202.png" alt=""></p>
 <a id="more"></a>
 <h2 id="具体流程"><a href="#具体流程" class="headerlink" title="具体流程"></a>具体流程</h2><hr>
-<p>接下来，以设置<code>UIImageView</code>类的图片为例，我们将使用<code>UIImageView+WebCache</code>提供的API，其提供的接口方法非常清晰，你可以什么都不用管，直接调用<code>- (void)sd_setImageWithURL:(NSURL *)url</code>方法就能进行图片的赋值，<code>SDWebImageCache</code>将负责根据默认配置进行下载和缓存。<br><code>UIImageView+WebCache</code>类提供的下载接口如下，不管是使用其中的哪个方法，最终都会等同于调用最后一个方法，其中缺省的参数会使用默认值。</p>
+<p>接下来，以设置<code>UIImageView</code>类的图片为例，我们将使用<code>UIImageView+WebCache</code>提供的API，其接口方法非常简便，你可以什么都不用管，直接调用<code>- (void)sd_setImageWithURL:(NSURL *)url</code>方法就能进行图片的赋值，<code>SDWebImageCache</code>库将自动根据默认配置进行下载和缓存。<br><code>UIImageView+WebCache</code>类提供的下载接口如下，每个接口方法只是参宿的个数不一样，不管是使用其中的哪个方法，最终都会等同于调用最后一个方法，其中缺省的参数会使用默认值。</p>
 <figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">- (<span class="keyword">void</span>)<span class="string">sd_setImageWithURL:</span>(NSURL *)url;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)<span class="string">sd_setImageWithURL:</span>(NSURL *)url <span class="string">placeholderImage:</span>(UIImage *)placeholder;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)<span class="string">sd_setImageWithURL:</span>(NSURL *)url <span class="string">placeholderImage:</span>(UIImage *)placeholder <span class="string">options:</span>(SDWebImageOptions)options;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)<span class="string">sd_setImageWithURL:</span>(NSURL *)url <span class="string">completed:</span>(SDWebImageCompletionBlock)completedBlock;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)<span class="string">sd_setImageWithURL:</span>(NSURL *)url <span class="string">placeholderImage:</span>(UIImage *)placeholder <span class="string">completed:</span>(SDWebImageCompletionBlock)completedBlock;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)<span class="string">sd_setImageWithURL:</span>(NSURL *)url <span class="string">placeholderImage:</span>(UIImage *)placeholder <span class="string">options:</span>(SDWebImageOptions)options <span class="string">completed:</span>(SDWebImageCompletionBlock)completedBlock;</div><div class="line"></div><div class="line"><span class="comment">//最终都会通过我来调用</span></div><div class="line">- (<span class="keyword">void</span>)<span class="string">sd_setImageWithURL:</span>(NSURL *)url <span class="string">placeholderImage:</span>(UIImage *)placeholder <span class="string">options:</span>(SDWebImageOptions)options <span class="string">progress:</span>(SDWebImageDownloaderProgressBlock)progressBlock <span class="string">completed:</span>(SDWebImageCompletionBlock)completedBlock;</div></pre></td></tr></table></figure>
-<p>接下来，我们就来看一下方法的处理流程，代码如下:</p>
+<p>接下来，我们就来看一下方法的处理流程，代码如下所示:</p>
 <ol>
 <li>代码1：用来取消之前的图片加载。</li>
 <li>代码2：当选项不包含<code>SDWebImageDelayPlaceholder</code>时，设置占位图片。</li>
@@ -70,7 +70,7 @@
       &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;hr&gt;
 &lt;p&gt;在iOS开发中，很多都使用到&lt;a href=&quot;https://github.com/rs/SDWebImage&quot;&gt;SDWebImage&lt;/a&gt;库，该库使用了外观模式，提供简洁的API，&lt;code&gt;UIButton&lt;/code&gt;、&lt;code&gt;UIImageView&lt;/code&gt;等类可以直接调用API进行网络图片的下载，接下来，就来分析一下&lt;code&gt;SDWebImage&lt;/code&gt;的整个工作流程。&lt;/p&gt;
 &lt;h2 id=&quot;整体结构&quot;&gt;&lt;a href=&quot;#整体结构&quot; class=&quot;headerlink&quot; title=&quot;整体结构&quot;&gt;&lt;/a&gt;整体结构&lt;/h2&gt;&lt;hr&gt;
-&lt;p&gt;查看&lt;code&gt;SDWebImage&lt;/code&gt;的整个项目结构，除去一些辅助的类，其结构大致如下图所示，&lt;code&gt;UIView+WebCacheOperation&lt;/code&gt;类作为&lt;code&gt;UIView&lt;/code&gt;的类别，提供基本的方法，通过关联引用来存储与该View相关联的&lt;code&gt;Operation&lt;/code&gt;,该&lt;code&gt;Operation&lt;/code&gt;满足&lt;code&gt;&amp;lt;SDWebImageOperation&amp;gt;&lt;/code&gt;协议，提供的方法包括设置、取消、移除&lt;code&gt;Operation&lt;/code&gt;操作。&lt;br&gt;&lt;code&gt;UIImageView+WebCache&lt;/code&gt;类提供对外的接口，我们一般会通过该类提供的API来请求网络图片。&lt;br&gt;&lt;code&gt;SDWebImageManager&lt;/code&gt;类将作为Manager来进行下载和缓存的管理，而真正负责下载的类为&lt;code&gt;SDWebImageDownloader&lt;/code&gt;类，&lt;code&gt;SDWebImageDownloaderOperation&lt;/code&gt;负责封装下载对象；管理缓存的类为&lt;code&gt;SDImageCache&lt;/code&gt;。&lt;br&gt;好了，大致结构就是这样，接下来将通过一次调用来分析其内部的具体流程。&lt;/p&gt;
+&lt;p&gt;查看&lt;code&gt;SDWebImage&lt;/code&gt;的整个项目结构，除去一些辅助的类，其结构大致如下图所示，&lt;code&gt;UIView+WebCacheOperation&lt;/code&gt;类作为&lt;code&gt;UIView&lt;/code&gt;的类别，提供基本的方法，如设置、取消、移除&lt;code&gt;Operation&lt;/code&gt;操作，该&lt;code&gt;Operation&lt;/code&gt;满足&lt;code&gt;&amp;lt;SDWebImageOperation&amp;gt;&lt;/code&gt;协议，并通过关联引用来进行存储。&lt;br&gt;&lt;code&gt;UIImageView+WebCache&lt;/code&gt;、&lt;code&gt;SDWebImageManager&lt;/code&gt;等类提供对外的接口。&lt;br&gt;&lt;code&gt;SDWebImageManager&lt;/code&gt;类将作为Manager来进行下载和缓存的管理，而真正负责下载的类为&lt;code&gt;SDWebImageDownloader&lt;/code&gt;类，&lt;code&gt;SDWebImageDownloaderOperation&lt;/code&gt;负责封装下载对象；管理缓存的类为&lt;code&gt;SDImageCache&lt;/code&gt;。&lt;br&gt;好了，大致结构就是这样，接下来将通过一次调用来分析其内部的具体流程。&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;http://oc54pu02q.bkt.clouddn.com/%E6%9C%AA%E5%91%BD%E5%90%8D%202.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
     
     </summary>
