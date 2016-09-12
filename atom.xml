@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://zhongwuzw.github.io/"/>
-  <updated>2016-09-11T13:26:32.000Z</updated>
+  <updated>2016-09-12T08:33:04.000Z</updated>
   <id>https://zhongwuzw.github.io/</id>
   
   <author>
@@ -16,11 +16,64 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>iOS事件处理之Hit-Testing</title>
+    <link href="https://zhongwuzw.github.io/2016/09/12/iOS%E4%BA%8B%E4%BB%B6%E5%A4%84%E7%90%86%E4%B9%8BHit-Testing/"/>
+    <id>https://zhongwuzw.github.io/2016/09/12/iOS事件处理之Hit-Testing/</id>
+    <published>2016-09-12T04:25:12.000Z</published>
+    <updated>2016-09-12T08:33:04.000Z</updated>
+    
+    <content type="html"><![CDATA[<hr>
+<p>iOS中，Hit-Testing主要用于决定哪个视图来接收Touch事件，确定完后，就会依据响应者链来进行事件的处理。接下来，将分析Hit-Testing的工作流程。</p>
+<blockquote>
+<p>由于不确定的原因，Hit-Testing测试会被执行多次，导致单个视图的<code>-(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event</code>方法会被调用多次，由于是幂等的，所以结果不影响。</p>
+</blockquote>
+<p>Hit-Testing使用的搜索算法为逆前序深度遍历（逆前序遍历和前序遍历是对称的，逆前序遍历先访问根节点，然后进行从其索引最大的子视图到最小的子视图的遍历）。当touch事件的point发生在多个视图的重叠部分时，根据算法最右子树中的最深视图就是位于最前端的视图。</p>
+<p>下图展示了一个视图层级树的示例以及展示在屏幕上的UI，树的分支顺序安排反应了子视图数组的顺序，比如<code>View A</code>的索引小于<code>View B</code>。<br><img src="http://oc54pu02q.bkt.clouddn.com/hit-test-view-hierarchy.png" alt=""><br>由上图，<code>View A.2</code>和<code>View B.1</code>两个视图重叠了，但是因为<code>View B</code>和<code>View A</code>是兄弟视图，且<code>View B</code>的索引大于<code>View A</code>，因此，当用户的touch事件发生在<code>View A.2</code>和<code>View B.1</code>重叠的部分时，Hit-Testing将返回<code>View B.1</code>。</p>
+<p>通过应用逆前序深度遍历算法，当找到第一个最深的后代视图满足后就会停止遍历。<br><img src="http://oc54pu02q.bkt.clouddn.com/hit-test-depth-first-traversal.png" alt=""></p>
+<p>遍历算法是以向<code>UIWindow</code>发送<code>hitTest:withEvent</code>消息开始的，<code>UIWindow</code>是视图层级的根视图，返回的值即是包含触摸点最前端的视图。<br>下图展示了Hit-Testing的逻辑：<br><img src="http://oc54pu02q.bkt.clouddn.com/hit-test-flowchart.png" alt=""><br>如下代码展示了原生<code>hitTest:withEvent:</code>方法可能的实现：</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">- (<span class="built_in">UIView</span> *)hitTest:(<span class="built_in">CGPoint</span>)point withEvent:(<span class="built_in">UIEvent</span> *)event &#123;</div><div class="line">    <span class="keyword">if</span> (!<span class="keyword">self</span>.isUserInteractionEnabled || <span class="keyword">self</span>.isHidden || <span class="keyword">self</span>.alpha &lt;= <span class="number">0.01</span>) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="literal">nil</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span> ([<span class="keyword">self</span> pointInside:point withEvent:event]) &#123;</div><div class="line">        <span class="keyword">for</span> (<span class="built_in">UIView</span> *subview <span class="keyword">in</span> [<span class="keyword">self</span>.subviews reverseObjectEnumerator]) &#123;</div><div class="line">            <span class="built_in">CGPoint</span> convertedPoint = [subview convertPoint:point fromView:<span class="keyword">self</span>];</div><div class="line">            <span class="built_in">UIView</span> *hitTestView = [subview hitTest:convertedPoint withEvent:event];</div><div class="line">            <span class="keyword">if</span> (hitTestView) &#123;</div><div class="line">                <span class="keyword">return</span> hitTestView;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">self</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="literal">nil</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>hitTest:withEvent</code>方法首先检测视图是否允许接收touch事件，当如下条件满足时，既允许接收事件：</p>
+<ul>
+<li>视图没被隐藏：<br>  <code>self.hidden == NO</code></li>
+<li>视图允许用户交互：<br>  <code>self.userInteractionEnabled = YES</code></li>
+<li>视图的alpha值大于0.01：<br>  <code>self.alpha &gt; 0.01</code></li>
+<li>touch事件的触摸点在视图的bounds内：<br>  <code>pointInside:withEvent: == YES</code></li>
+</ul>
+<p>当视图允许接收touch事件后，该方法将对其<code>subviews</code>子视图数组的每个视图，以逆序的方式，发送<code>hitTest:withEvent:</code>消息，直到返回非<code>nil</code>的值。当其子视图都返回<code>nil</code>或者没有子视图时，则返回视图本身。<br>如果视图不被允许接收touch事件，那么方法会返回<code>nil</code>，且不需要对视图的子树进行遍历。</p>
+<h2 id="重载hitTest-withEvent-示例"><a href="#重载hitTest-withEvent-示例" class="headerlink" title="重载hitTest:withEvent:示例"></a>重载<code>hitTest:withEvent:</code>示例</h2><p>当默认的搜索算法不满足要求时，可以重载<code>hitTest:withEvent:</code>来自定义。</p>
+<h3 id="增加视图的touch区域"><a href="#增加视图的touch区域" class="headerlink" title="增加视图的touch区域"></a>增加视图的touch区域</h3><p>当需要一个视图的touch区域大于它的bounds时，可以重载<code>hitTest:withEvent:</code>方法，比如，下面展示了一个20X20的视图<code>UIView</code>，该大小可能对于处理touch来说有点小，因此，可以通过重载<code>hitTest:withEvent:</code>方法来在每个方向上增加10points：<br><img src="http://oc54pu02q.bkt.clouddn.com/hit-test-increase-touch-area.png" alt=""></p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">- (<span class="built_in">UIView</span> *)hitTest:(<span class="built_in">CGPoint</span>)point withEvent:(<span class="built_in">UIEvent</span> *)event &#123;</div><div class="line">    <span class="keyword">if</span> (!<span class="keyword">self</span>.isUserInteractionEnabled || <span class="keyword">self</span>.isHidden || <span class="keyword">self</span>.alpha &lt;= <span class="number">0.01</span>) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="literal">nil</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">CGRect</span> touchRect = <span class="built_in">CGRectInset</span>(<span class="keyword">self</span>.bounds, <span class="number">-10</span>, <span class="number">-10</span>);</div><div class="line">    <span class="keyword">if</span> (<span class="built_in">CGRectContainsPoint</span>(touchRect, point)) &#123;</div><div class="line">        <span class="keyword">for</span> (<span class="built_in">UIView</span> *subview <span class="keyword">in</span> [<span class="keyword">self</span>.subviews reverseObjectEnumerator]) &#123;</div><div class="line">            <span class="built_in">CGPoint</span> convertedPoint = [subview convertPoint:point fromView:<span class="keyword">self</span>];</div><div class="line">            <span class="built_in">UIView</span> *hitTestView = [subview hitTest:convertedPoint withEvent:event];</div><div class="line">            <span class="keyword">if</span> (hitTestView) &#123;</div><div class="line">                <span class="keyword">return</span> hitTestView;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">self</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="literal">nil</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>注意，该实现能正确执行的前提是，希望响应touch事件的区域必须在其父视图的bounds范围内，或者重写父视图的<code>hitTest:withEvent:</code>方法来包含能响应touch的区域。</p>
+</blockquote>
+<h3 id="将touch事件传到其下面的视图，既透传"><a href="#将touch事件传到其下面的视图，既透传" class="headerlink" title="将touch事件传到其下面的视图，既透传"></a>将touch事件传到其下面的视图，既透传</h3><p>有时我们需要一个视图忽略touch事件并把他们传到其下面的视图，比如，当touch的pints在视图的子视图时，返回子视图，否则将事件透传到下面的视图，代码如下：</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">- (<span class="built_in">UIView</span> *)hitTest:(<span class="built_in">CGPoint</span>)point withEvent:(<span class="built_in">UIEvent</span> *)event &#123;</div><div class="line">    <span class="built_in">UIView</span> *hitTestView = [<span class="keyword">super</span> hitTest:point withEvent:event];</div><div class="line">    <span class="keyword">if</span> (hitTestView == <span class="keyword">self</span>) &#123;</div><div class="line">        hitTestView = <span class="literal">nil</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> hitTestView;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="将touch事件传给子视图"><a href="#将touch事件传给子视图" class="headerlink" title="将touch事件传给子视图"></a>将touch事件传给子视图</h3><p>父视图对所有touch事件进行重定向，传到子视图中，比如，一个图片旋转功能，由一个父视图和一个<code>UIScrollView</code>组成，且设置<code>UIScrollView</code>视图的<code>pagingEnabled</code>属性为<code>YES</code>，且设置父视图的<code>clipsToBounds</code>属性为NO。<br><img src="http://oc54pu02q.bkt.clouddn.com/hit-test-pass-touches-to-subviews.png" alt=""><br>为了让<code>UIScrollView</code>不仅能够响应其bounds范围内的事件，同样也能响应其父视图的bounds内的事件，可以重载父视图的<code>hitTest:withEvent:</code>方法，代码如下：</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">- (<span class="built_in">UIView</span> *)hitTest:(<span class="built_in">CGPoint</span>)point withEvent:(<span class="built_in">UIEvent</span> *)event &#123;</div><div class="line">    <span class="built_in">UIView</span> *hitTestView = [<span class="keyword">super</span> hitTest:point withEvent:event];</div><div class="line">    <span class="keyword">if</span> (hitTestView) &#123;</div><div class="line">        hitTestView = <span class="keyword">self</span>.scrollView;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> hitTestView;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;hr&gt;
+&lt;p&gt;iOS中，Hit-Testing主要用于决定哪个视图来接收Touch事件，确定完后，就会依据响应者链来进行事件的处理。接下来，将分析Hit-Testing的工作流程。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;由于不确定的原因，Hit-Testing测试会被执行多次
+    
+    </summary>
+    
+      <category term="iOS" scheme="https://zhongwuzw.github.io/categories/iOS/"/>
+    
+    
+      <category term="iOS" scheme="https://zhongwuzw.github.io/tags/iOS/"/>
+    
+  </entry>
+  
+  <entry>
     <title>iOS越狱相关基础知识</title>
     <link href="https://zhongwuzw.github.io/2016/09/11/iOS%E8%B6%8A%E7%8B%B1%E7%9B%B8%E5%85%B3%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/"/>
     <id>https://zhongwuzw.github.io/2016/09/11/iOS越狱相关基础知识/</id>
     <published>2016-09-11T11:01:59.000Z</published>
-    <updated>2016-09-11T13:26:32.000Z</updated>
+    <updated>2016-09-12T02:53:41.000Z</updated>
     
     <content type="html"><![CDATA[<h2 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h2><hr>
 <ul>

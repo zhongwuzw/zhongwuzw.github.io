@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="iOS,Swift," />
+  <meta name="keywords" content="iOS," />
 
 
 
@@ -86,24 +86,28 @@
 
 
 
-<meta name="description" content="前言在Swift中，为了确保类的存储属性都能有一个初始值，提供了几种初始化的方法，接下来将讨论一下Desinated(指定)、Convenience（便捷）初始化器。
-Designated（指定）初始化器
-之前使用过Objective-C的应该比较了解指定初始化器，很多类都提供了指定初始化器，如UIViewController的为：- (instancetype)initWithNibName:(">
+<meta name="description" content="iOS中，Hit-Testing主要用于决定哪个视图来接收Touch事件，确定完后，就会依据响应者链来进行事件的处理。接下来，将分析Hit-Testing的工作流程。
+
+由于不确定的原因，Hit-Testing测试会被执行多次，导致单个视图的-(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event方法会被调用多次，由于是幂等的，所以">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Swift的Designated和Convenience初始化器">
-<meta property="og:url" content="https://zhongwuzw.github.io/2016/08/19/Swift的Designated和Convenience初始化器/index.html">
+<meta property="og:title" content="iOS事件处理之Hit-Testing">
+<meta property="og:url" content="https://zhongwuzw.github.io/2016/09/12/iOS事件处理之Hit-Testing/index.html">
 <meta property="og:site_name" content="钟武的技术博客">
-<meta property="og:description" content="前言在Swift中，为了确保类的存储属性都能有一个初始值，提供了几种初始化的方法，接下来将讨论一下Desinated(指定)、Convenience（便捷）初始化器。
-Designated（指定）初始化器
-之前使用过Objective-C的应该比较了解指定初始化器，很多类都提供了指定初始化器，如UIViewController的为：- (instancetype)initWithNibName:(">
-<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/QQ20160819-0@2x.png">
-<meta property="og:updated_time" content="2016-08-23T07:43:38.000Z">
+<meta property="og:description" content="iOS中，Hit-Testing主要用于决定哪个视图来接收Touch事件，确定完后，就会依据响应者链来进行事件的处理。接下来，将分析Hit-Testing的工作流程。
+
+由于不确定的原因，Hit-Testing测试会被执行多次，导致单个视图的-(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event方法会被调用多次，由于是幂等的，所以">
+<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/hit-test-view-hierarchy.png">
+<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/hit-test-depth-first-traversal.png">
+<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/hit-test-flowchart.png">
+<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/hit-test-increase-touch-area.png">
+<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/hit-test-pass-touches-to-subviews.png">
+<meta property="og:updated_time" content="2016-09-12T08:33:04.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Swift的Designated和Convenience初始化器">
-<meta name="twitter:description" content="前言在Swift中，为了确保类的存储属性都能有一个初始值，提供了几种初始化的方法，接下来将讨论一下Desinated(指定)、Convenience（便捷）初始化器。
-Designated（指定）初始化器
-之前使用过Objective-C的应该比较了解指定初始化器，很多类都提供了指定初始化器，如UIViewController的为：- (instancetype)initWithNibName:(">
-<meta name="twitter:image" content="http://oc54pu02q.bkt.clouddn.com/QQ20160819-0@2x.png">
+<meta name="twitter:title" content="iOS事件处理之Hit-Testing">
+<meta name="twitter:description" content="iOS中，Hit-Testing主要用于决定哪个视图来接收Touch事件，确定完后，就会依据响应者链来进行事件的处理。接下来，将分析Hit-Testing的工作流程。
+
+由于不确定的原因，Hit-Testing测试会被执行多次，导致单个视图的-(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event方法会被调用多次，由于是幂等的，所以">
+<meta name="twitter:image" content="http://oc54pu02q.bkt.clouddn.com/hit-test-view-hierarchy.png">
 
 
 
@@ -121,7 +125,7 @@ Designated（指定）初始化器
   };
 </script>
 
-  <title> Swift的Designated和Convenience初始化器 | 钟武的技术博客 </title>
+  <title> iOS事件处理之Hit-Testing | 钟武的技术博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -294,7 +298,7 @@ Designated（指定）初始化器
             
             
               
-                Swift的Designated和Convenience初始化器
+                iOS事件处理之Hit-Testing
               
             
           </h1>
@@ -306,8 +310,8 @@ Designated（指定）初始化器
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-08-19T15:46:48+08:00" content="2016-08-19">
-              2016-08-19
+            <time itemprop="dateCreated" datetime="2016-09-12T12:25:12+08:00" content="2016-09-12">
+              2016-09-12
             </time>
           </span>
 
@@ -336,8 +340,8 @@ Designated（指定）初始化器
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/08/19/Swift的Designated和Convenience初始化器/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/19/Swift的Designated和Convenience初始化器/" itemprop="commentsCount"></span>
+                <a href="/2016/09/12/iOS事件处理之Hit-Testing/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/09/12/iOS事件处理之Hit-Testing/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -360,35 +364,34 @@ Designated（指定）初始化器
       
 
       
-        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在Swift中，为了确保类的存储属性都能有一个初始值，提供了几种初始化的方法，接下来将讨论一下Desinated(指定)、Convenience（便捷）初始化器。</p>
-<h1 id="Designated（指定）初始化器"><a href="#Designated（指定）初始化器" class="headerlink" title="Designated（指定）初始化器"></a>Designated（指定）初始化器</h1><ul>
-<li><p>之前使用过Objective-C的应该比较了解指定初始化器，很多类都提供了指定初始化器，如UIViewController的为：<code>- (instancetype)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle</code>,UIView的<code>- (instancetype)initWithFrame:(CGRect)aRect</code>，其作用是该类或者其子类在初始化的过程中都会调用指定初始化器。</p>
-</li>
-<li><p>当在类中定义指定初始化器时，该初始化器会初始化该类的所有存储属性，且当该类是有父类时，<strong>必须</strong>调用父类的<strong>指定</strong>初始化器，注意顺序，先初始化该类自己定义的存储属性，再使用super来调用父类的指定初始化器，跌倒过来编译器会报错。</p>
-</li>
-</ul>
-<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">RecipeIngredient</span>: <span class="title">Food</span> </span>&#123;</div><div class="line">    <span class="keyword">var</span> quantity: <span class="type">Int</span></div><div class="line">    <span class="comment">//指定初始化器</span></div><div class="line">    <span class="keyword">init</span>(name: <span class="type">String</span>, quantity: <span class="type">Int</span>) &#123;</div><div class="line">        <span class="keyword">self</span>.quantity = quantity</div><div class="line">        <span class="keyword">super</span>.<span class="keyword">init</span>(name: name) <span class="comment">//放在该类存储属性初始化之后</span></div><div class="line">    &#125;</div><div class="line">    <span class="keyword">override</span> <span class="keyword">convenience</span> <span class="keyword">init</span>(name: <span class="type">String</span>) &#123;</div><div class="line">        <span class="keyword">self</span>.<span class="keyword">init</span>(name: name, quantity: <span class="number">1</span>)</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+        <hr>
+<p>iOS中，Hit-Testing主要用于决定哪个视图来接收Touch事件，确定完后，就会依据响应者链来进行事件的处理。接下来，将分析Hit-Testing的工作流程。</p>
+<blockquote>
+<p>由于不确定的原因，Hit-Testing测试会被执行多次，导致单个视图的<code>-(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event</code>方法会被调用多次，由于是幂等的，所以结果不影响。</p>
+</blockquote>
+<p>Hit-Testing使用的搜索算法为逆前序深度遍历（逆前序遍历和前序遍历是对称的，逆前序遍历先访问根节点，然后进行从其索引最大的子视图到最小的子视图的遍历）。当touch事件的point发生在多个视图的重叠部分时，根据算法最右子树中的最深视图就是位于最前端的视图。</p>
+<p>下图展示了一个视图层级树的示例以及展示在屏幕上的UI，树的分支顺序安排反应了子视图数组的顺序，比如<code>View A</code>的索引小于<code>View B</code>。<br><img src="http://oc54pu02q.bkt.clouddn.com/hit-test-view-hierarchy.png" alt=""><br>由上图，<code>View A.2</code>和<code>View B.1</code>两个视图重叠了，但是因为<code>View B</code>和<code>View A</code>是兄弟视图，且<code>View B</code>的索引大于<code>View A</code>，因此，当用户的touch事件发生在<code>View A.2</code>和<code>View B.1</code>重叠的部分时，Hit-Testing将返回<code>View B.1</code>。</p>
+<p>通过应用逆前序深度遍历算法，当找到第一个最深的后代视图满足后就会停止遍历。<br><img src="http://oc54pu02q.bkt.clouddn.com/hit-test-depth-first-traversal.png" alt=""></p>
+<p>遍历算法是以向<code>UIWindow</code>发送<code>hitTest:withEvent</code>消息开始的，<code>UIWindow</code>是视图层级的根视图，返回的值即是包含触摸点最前端的视图。<br>下图展示了Hit-Testing的逻辑：<br><img src="http://oc54pu02q.bkt.clouddn.com/hit-test-flowchart.png" alt=""><br>如下代码展示了原生<code>hitTest:withEvent:</code>方法可能的实现：</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">- (<span class="built_in">UIView</span> *)hitTest:(<span class="built_in">CGPoint</span>)point withEvent:(<span class="built_in">UIEvent</span> *)event &#123;</div><div class="line">    <span class="keyword">if</span> (!<span class="keyword">self</span>.isUserInteractionEnabled || <span class="keyword">self</span>.isHidden || <span class="keyword">self</span>.alpha &lt;= <span class="number">0.01</span>) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="literal">nil</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span> ([<span class="keyword">self</span> pointInside:point withEvent:event]) &#123;</div><div class="line">        <span class="keyword">for</span> (<span class="built_in">UIView</span> *subview <span class="keyword">in</span> [<span class="keyword">self</span>.subviews reverseObjectEnumerator]) &#123;</div><div class="line">            <span class="built_in">CGPoint</span> convertedPoint = [subview convertPoint:point fromView:<span class="keyword">self</span>];</div><div class="line">            <span class="built_in">UIView</span> *hitTestView = [subview hitTest:convertedPoint withEvent:event];</div><div class="line">            <span class="keyword">if</span> (hitTestView) &#123;</div><div class="line">                <span class="keyword">return</span> hitTestView;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">self</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="literal">nil</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>hitTest:withEvent</code>方法首先检测视图是否允许接收touch事件，当如下条件满足时，既允许接收事件：</p>
 <ul>
-<li>每一个类都必须至少有一个指定初始化器。</li>
+<li>视图没被隐藏：<br>  <code>self.hidden == NO</code></li>
+<li>视图允许用户交互：<br>  <code>self.userInteractionEnabled = YES</code></li>
+<li>视图的alpha值大于0.01：<br>  <code>self.alpha &gt; 0.01</code></li>
+<li>touch事件的触摸点在视图的bounds内：<br>  <code>pointInside:withEvent: == YES</code></li>
 </ul>
-<a id="more"></a>
-<h1 id="Convenience（便捷）初始化器"><a href="#Convenience（便捷）初始化器" class="headerlink" title="Convenience（便捷）初始化器"></a>Convenience（便捷）初始化器</h1><ul>
-<li>便捷初始化器需要带一个convenience修饰符，如下代码,在便捷初始化器的定义中，<strong>必须先调用其他的初始化器之后，再赋类的存储属性值</strong>。</li>
-</ul>
-<figure class="highlight less"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="selector-tag">convenience</span> <span class="selector-tag">init</span>(parameters) &#123;</div><div class="line">    statements</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li><p>便捷初始化器如果重载了父类的指定初始化器，则必须使用override修饰符。</p>
-</li>
-<li><p>如果子类提供了其父类的<strong>所有</strong>（注意：必须是所有的）指定初始化器的实现，实现有两种，一种是子类的存储属性都提供了默认值，且没有定义指定初始化器，则会自动集成父类的指定初始化器；另一种是在子类中重新定义，子类中重新定义的方法可以是便捷初始化器，既子类中的便捷初始化器可以重载父类的指定初始化器。这样子类就会自动继承父类的便捷初始化器。</p>
-</li>
-</ul>
-<h1 id="指定初始化器和便捷初始化器之间的关系"><a href="#指定初始化器和便捷初始化器之间的关系" class="headerlink" title="指定初始化器和便捷初始化器之间的关系"></a>指定初始化器和便捷初始化器之间的关系</h1><p>指定初始化器和便捷初始化器之间的3个法则：</p>
-<ol>
-<li>指定初始化器必须调用其<strong><em>直接</em></strong>父类的指定初始化器。</li>
-<li>便捷初始化器必须调用该类中其他的初始化器，其初始化器的类型不限。</li>
-<li>在便捷初始化器的调用链中最后必须调用一个指定初始化器。</li>
-</ol>
-<p>最后，直接上官方文档的图示就会对上面的3个规则有比较清晰的认识：<br> <img src="http://oc54pu02q.bkt.clouddn.com/QQ20160819-0@2x.png" width="500" height="254" alt="" align="center"></p>
+<p>当视图允许接收touch事件后，该方法将对其<code>subviews</code>子视图数组的每个视图，以逆序的方式，发送<code>hitTest:withEvent:</code>消息，直到返回非<code>nil</code>的值。当其子视图都返回<code>nil</code>或者没有子视图时，则返回视图本身。<br>如果视图不被允许接收touch事件，那么方法会返回<code>nil</code>，且不需要对视图的子树进行遍历。</p>
+<h2 id="重载hitTest-withEvent-示例"><a href="#重载hitTest-withEvent-示例" class="headerlink" title="重载hitTest:withEvent:示例"></a>重载<code>hitTest:withEvent:</code>示例</h2><p>当默认的搜索算法不满足要求时，可以重载<code>hitTest:withEvent:</code>来自定义。</p>
+<h3 id="增加视图的touch区域"><a href="#增加视图的touch区域" class="headerlink" title="增加视图的touch区域"></a>增加视图的touch区域</h3><p>当需要一个视图的touch区域大于它的bounds时，可以重载<code>hitTest:withEvent:</code>方法，比如，下面展示了一个20X20的视图<code>UIView</code>，该大小可能对于处理touch来说有点小，因此，可以通过重载<code>hitTest:withEvent:</code>方法来在每个方向上增加10points：<br><img src="http://oc54pu02q.bkt.clouddn.com/hit-test-increase-touch-area.png" alt=""></p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">- (<span class="built_in">UIView</span> *)hitTest:(<span class="built_in">CGPoint</span>)point withEvent:(<span class="built_in">UIEvent</span> *)event &#123;</div><div class="line">    <span class="keyword">if</span> (!<span class="keyword">self</span>.isUserInteractionEnabled || <span class="keyword">self</span>.isHidden || <span class="keyword">self</span>.alpha &lt;= <span class="number">0.01</span>) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="literal">nil</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">CGRect</span> touchRect = <span class="built_in">CGRectInset</span>(<span class="keyword">self</span>.bounds, <span class="number">-10</span>, <span class="number">-10</span>);</div><div class="line">    <span class="keyword">if</span> (<span class="built_in">CGRectContainsPoint</span>(touchRect, point)) &#123;</div><div class="line">        <span class="keyword">for</span> (<span class="built_in">UIView</span> *subview <span class="keyword">in</span> [<span class="keyword">self</span>.subviews reverseObjectEnumerator]) &#123;</div><div class="line">            <span class="built_in">CGPoint</span> convertedPoint = [subview convertPoint:point fromView:<span class="keyword">self</span>];</div><div class="line">            <span class="built_in">UIView</span> *hitTestView = [subview hitTest:convertedPoint withEvent:event];</div><div class="line">            <span class="keyword">if</span> (hitTestView) &#123;</div><div class="line">                <span class="keyword">return</span> hitTestView;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">self</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="literal">nil</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>注意，该实现能正确执行的前提是，希望响应touch事件的区域必须在其父视图的bounds范围内，或者重写父视图的<code>hitTest:withEvent:</code>方法来包含能响应touch的区域。</p>
+</blockquote>
+<h3 id="将touch事件传到其下面的视图，既透传"><a href="#将touch事件传到其下面的视图，既透传" class="headerlink" title="将touch事件传到其下面的视图，既透传"></a>将touch事件传到其下面的视图，既透传</h3><p>有时我们需要一个视图忽略touch事件并把他们传到其下面的视图，比如，当touch的pints在视图的子视图时，返回子视图，否则将事件透传到下面的视图，代码如下：</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">- (<span class="built_in">UIView</span> *)hitTest:(<span class="built_in">CGPoint</span>)point withEvent:(<span class="built_in">UIEvent</span> *)event &#123;</div><div class="line">    <span class="built_in">UIView</span> *hitTestView = [<span class="keyword">super</span> hitTest:point withEvent:event];</div><div class="line">    <span class="keyword">if</span> (hitTestView == <span class="keyword">self</span>) &#123;</div><div class="line">        hitTestView = <span class="literal">nil</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> hitTestView;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="将touch事件传给子视图"><a href="#将touch事件传给子视图" class="headerlink" title="将touch事件传给子视图"></a>将touch事件传给子视图</h3><p>父视图对所有touch事件进行重定向，传到子视图中，比如，一个图片旋转功能，由一个父视图和一个<code>UIScrollView</code>组成，且设置<code>UIScrollView</code>视图的<code>pagingEnabled</code>属性为<code>YES</code>，且设置父视图的<code>clipsToBounds</code>属性为NO。<br><img src="http://oc54pu02q.bkt.clouddn.com/hit-test-pass-touches-to-subviews.png" alt=""><br>为了让<code>UIScrollView</code>不仅能够响应其bounds范围内的事件，同样也能响应其父视图的bounds内的事件，可以重载父视图的<code>hitTest:withEvent:</code>方法，代码如下：</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">- (<span class="built_in">UIView</span> *)hitTest:(<span class="built_in">CGPoint</span>)point withEvent:(<span class="built_in">UIEvent</span> *)event &#123;</div><div class="line">    <span class="built_in">UIView</span> *hitTestView = [<span class="keyword">super</span> hitTest:point withEvent:event];</div><div class="line">    <span class="keyword">if</span> (hitTestView) &#123;</div><div class="line">        hitTestView = <span class="keyword">self</span>.scrollView;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> hitTestView;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 
       
     </div>
@@ -412,8 +415,6 @@ Designated（指定）初始化器
           
             <a href="/tags/iOS/" rel="tag">#iOS</a>
           
-            <a href="/tags/Swift/" rel="tag">#Swift</a>
-          
         </div>
       
 
@@ -421,17 +422,13 @@ Designated（指定）初始化器
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/08/18/知乎日报iOS/" rel="next" title="知乎日报iOS">
-                <i class="fa fa-chevron-left"></i> 知乎日报iOS
+              <a href="/2016/09/11/iOS越狱相关基础知识/" rel="next" title="iOS越狱相关基础知识">
+                <i class="fa fa-chevron-left"></i> iOS越狱相关基础知识
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/08/23/Swift中使用Objective-C的Runtime/" rel="prev" title="Swift中使用Objective-C的Runtime">
-                Swift中使用Objective-C的Runtime <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -446,10 +443,10 @@ Designated（指定）初始化器
 
     <div class="post-spread">
       
-        <div class="ds-share flat" data-thread-key="2016/08/19/Swift的Designated和Convenience初始化器/"
-     data-title="Swift的Designated和Convenience初始化器"
+        <div class="ds-share flat" data-thread-key="2016/09/12/iOS事件处理之Hit-Testing/"
+     data-title="iOS事件处理之Hit-Testing"
      data-content=""
-     data-url="https://zhongwuzw.github.io/2016/08/19/Swift的Designated和Convenience初始化器/">
+     data-url="https://zhongwuzw.github.io/2016/09/12/iOS事件处理之Hit-Testing/">
   <div class="ds-share-inline">
     <ul  class="ds-share-icons-16">
 
@@ -479,8 +476,8 @@ Designated（指定）初始化器
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/08/19/Swift的Designated和Convenience初始化器/"
-           data-title="Swift的Designated和Convenience初始化器" data-url="https://zhongwuzw.github.io/2016/08/19/Swift的Designated和Convenience初始化器/">
+      <div class="ds-thread" data-thread-key="2016/09/12/iOS事件处理之Hit-Testing/"
+           data-title="iOS事件处理之Hit-Testing" data-url="https://zhongwuzw.github.io/2016/09/12/iOS事件处理之Hit-Testing/">
       </div>
     
   </div>
@@ -607,7 +604,7 @@ Designated（指定）初始化器
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Designated（指定）初始化器"><span class="nav-number">2.</span> <span class="nav-text">Designated（指定）初始化器</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Convenience（便捷）初始化器"><span class="nav-number">3.</span> <span class="nav-text">Convenience（便捷）初始化器</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#指定初始化器和便捷初始化器之间的关系"><span class="nav-number">4.</span> <span class="nav-text">指定初始化器和便捷初始化器之间的关系</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#重载hitTest-withEvent-示例"><span class="nav-number">1.</span> <span class="nav-text">重载hitTest:withEvent:示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#增加视图的touch区域"><span class="nav-number">1.1.</span> <span class="nav-text">增加视图的touch区域</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#将touch事件传到其下面的视图，既透传"><span class="nav-number">1.2.</span> <span class="nav-text">将touch事件传到其下面的视图，既透传</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#将touch事件传给子视图"><span class="nav-number">1.3.</span> <span class="nav-text">将touch事件传给子视图</span></a></li></ol></li></ol></div>
             
           </div>
         </section>
