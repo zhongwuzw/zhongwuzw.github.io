@@ -362,8 +362,8 @@
 <blockquote>
 <p>由于不确定的原因，Hit-Testing测试会被执行多次，导致单个视图的<code>-(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event</code>方法会被调用多次，由于是幂等的，所以结果不影响。</p>
 </blockquote>
-<p>Hit-Testing使用的搜索算法为<strong><em>逆前序深度遍历</em></strong>（逆前序遍历先访问根节点，然后进行从其索引最大的子视图到最小的子视图的遍历，既从右至左进行遍历）。当touch事件的points发生在多个视图的重叠部分时，根据算法将得到最右子树中的最深视图，该视图就是位于界面最前端的视图。</p>
-<p>下图展示了一个视图层级树的示例以及对象屏幕上的UI，树的分支顺序安排反应了子视图数组的顺序，比如<code>View A</code>的索引小于<code>View B</code>。<br><img src="http://oc54pu02q.bkt.clouddn.com/hit-test-view-hierarchy.png" alt=""></p>
+<p>Hit-Testing使用的搜索算法为<strong><em>逆前序深度遍历</em></strong>（逆前序遍历先访问根节点，然后进行从其索引最大的子视图到最小的子视图的遍历，既从右至左进行遍历）。当touch事件的points发生在多个视图的重叠部分时，根据算法将得到最右子树中的最深视图，而该视图就是位于界面最前端的视图。</p>
+<p>下图展示了一个视图层级树以及对应在屏幕上的显示结果，树的分支顺序安排反应了子视图数组的顺序，比如<code>View A</code>的索引小于<code>View B</code>。<br><img src="http://oc54pu02q.bkt.clouddn.com/hit-test-view-hierarchy.png" alt=""></p>
           <div class="post-more-link text-center">
             <a class="btn" href="/2016/09/12/iOS事件处理之Hit-Testing/#more" rel="contents">
               阅读全文 &raquo;
