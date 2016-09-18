@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://zhongwuzw.github.io/"/>
-  <updated>2016-09-18T10:44:00.000Z</updated>
+  <updated>2016-09-18T15:38:44.000Z</updated>
   <id>https://zhongwuzw.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://zhongwuzw.github.io/2016/09/18/Nginx%E7%9A%84%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/"/>
     <id>https://zhongwuzw.github.io/2016/09/18/Nginx的架构设计/</id>
     <published>2016-09-18T02:49:56.000Z</published>
-    <updated>2016-09-18T10:44:00.000Z</updated>
+    <updated>2016-09-18T15:38:44.000Z</updated>
     
     <content type="html"><![CDATA[<h2 id="Nginx架构概述"><a href="#Nginx架构概述" class="headerlink" title="Nginx架构概述"></a>Nginx架构概述</h2><hr>
 <p>传统基于进程或线程的模型（<code>Apache</code>就采用这种模型）在处理并发连接时会为每一个连接建立一个单独的进程或线程，且在网络或者输入/输出操作时阻塞。这将导致内存和<code>CPU</code>的大量消耗，因为新起一个单独的进程或线程需要准备新的运行时环境，包括堆和栈内存的分配，以及新的执行上下文，当然，这些也会导致多余的<code>CPU</code>开销。最终，会由于过多的上下文切换而导致服务器性能变差。<br>反过来，我们来看Nginx的架构设计，总结起来，它是模块化的、基于事件驱动、异步、单线程且非阻塞。<br>Nginx大量使用多路复用和事件通知，Nginx会创建几个数量有限（比如<code>worker</code>的数量和<code>CPU</code>的核数相同）的<code>worker</code>进程，每个<code>worker</code>进程包含一个高效的Run-loop，来处理多个网络连接，每个<code>worker</code>进程每秒能处理成千的并发连接。</p>
@@ -31,6 +31,17 @@
 <li>CPU密集型：比如处理大量的TCP/IP，SSL，或压缩时，Nginx <code>worker</code>进程的数量应当和CPU核的数量一致。</li>
 <li>磁盘I/O密集型：提供文件内容，或者大量的代理，这种情况下，<code>worker</code>进程的数量可以是CPU核数的1.5或2倍。</li>
 </ul>
+<h3 id="Nginx进程职责"><a href="#Nginx进程职责" class="headerlink" title="Nginx进程职责"></a>Nginx进程职责</h3><p>Nginx运行时会有多个进程，包括一个<code>master</code>进程和多个<code>worker</code>进程，除此之外，还包括一对特定作用的进程，<code>cache loader</code>进程和<code>cache manager</code>进程。所有的进程都是单线程（即只有一个主线程）的，且进程间通信主要使用共享内存的方式。<code>master</code>进程以<code>root</code>用户权限运行，其它进程则以非<code>root</code>方式运行。<br><code>master</code>进程主要负责如下的任务：</p>
+<ul>
+<li>读取和诊断配置文件</li>
+<li>创建、绑定以及关闭套接字</li>
+<li>启动、终止和管理<code>worker</code>进程</li>
+<li>无须重启即可动态更新配置</li>
+<li>平滑升级</li>
+<li>重新打开log文件</li>
+<li>编译内嵌的<code>Perl</code>脚本</li>
+</ul>
+<p><code>worker</code>进程</p>
 ]]></content>
     
     <summary type="html">

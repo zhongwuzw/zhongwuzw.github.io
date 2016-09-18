@@ -367,6 +367,17 @@
 <li>CPU密集型：比如处理大量的TCP/IP，SSL，或压缩时，Nginx <code>worker</code>进程的数量应当和CPU核的数量一致。</li>
 <li>磁盘I/O密集型：提供文件内容，或者大量的代理，这种情况下，<code>worker</code>进程的数量可以是CPU核数的1.5或2倍。</li>
 </ul>
+<h3 id="Nginx进程职责"><a href="#Nginx进程职责" class="headerlink" title="Nginx进程职责"></a>Nginx进程职责</h3><p>Nginx运行时会有多个进程，包括一个<code>master</code>进程和多个<code>worker</code>进程，除此之外，还包括一对特定作用的进程，<code>cache loader</code>进程和<code>cache manager</code>进程。所有的进程都是单线程（即只有一个主线程）的，且进程间通信主要使用共享内存的方式。<code>master</code>进程以<code>root</code>用户权限运行，其它进程则以非<code>root</code>方式运行。<br><code>master</code>进程主要负责如下的任务：</p>
+<ul>
+<li>读取和诊断配置文件</li>
+<li>创建、绑定以及关闭套接字</li>
+<li>启动、终止和管理<code>worker</code>进程</li>
+<li>无须重启即可动态更新配置</li>
+<li>平滑升级</li>
+<li>重新打开log文件</li>
+<li>编译内嵌的<code>Perl</code>脚本</li>
+</ul>
+<p><code>worker</code>进程</p>
 
           
         
