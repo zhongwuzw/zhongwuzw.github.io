@@ -86,20 +86,20 @@
 
 
 
-<meta name="description" content="调整Nginx的网站根目录
+<meta name="description" content="修改Nginx的网站根目录
 Nginx的默认网站文件保存在nginx的html目录下，由于我开发时都把项目放在自己的workspace里，所以准备更改网站根目录，更改方法为修改nginx.conf配置文件的root指令，root指令可以放在http、server、location块中，我选择把root指令放在server块中，如下所示：
 123456789101112131415161718192">
 <meta property="og:type" content="article">
-<meta property="og:title" content="调整Nginx的网站根目录">
+<meta property="og:title" content="修改Nginx的网站根目录">
 <meta property="og:url" content="https://zhongwuzw.github.io/2016/09/24/调整Nginx的网站根目录/index.html">
 <meta property="og:site_name" content="钟武的技术博客">
-<meta property="og:description" content="调整Nginx的网站根目录
+<meta property="og:description" content="修改Nginx的网站根目录
 Nginx的默认网站文件保存在nginx的html目录下，由于我开发时都把项目放在自己的workspace里，所以准备更改网站根目录，更改方法为修改nginx.conf配置文件的root指令，root指令可以放在http、server、location块中，我选择把root指令放在server块中，如下所示：
 123456789101112131415161718192">
-<meta property="og:updated_time" content="2016-09-25T14:04:53.000Z">
+<meta property="og:updated_time" content="2016-09-27T15:30:37.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="调整Nginx的网站根目录">
-<meta name="twitter:description" content="调整Nginx的网站根目录
+<meta name="twitter:title" content="修改Nginx的网站根目录">
+<meta name="twitter:description" content="修改Nginx的网站根目录
 Nginx的默认网站文件保存在nginx的html目录下，由于我开发时都把项目放在自己的workspace里，所以准备更改网站根目录，更改方法为修改nginx.conf配置文件的root指令，root指令可以放在http、server、location块中，我选择把root指令放在server块中，如下所示：
 123456789101112131415161718192">
 
@@ -119,7 +119,7 @@ Nginx的默认网站文件保存在nginx的html目录下，由于我开发时都
   };
 </script>
 
-  <title> 调整Nginx的网站根目录 | 钟武的技术博客 </title>
+  <title> 修改Nginx的网站根目录 | 钟武的技术博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -292,7 +292,7 @@ Nginx的默认网站文件保存在nginx的html目录下，由于我开发时都
             
             
               
-                调整Nginx的网站根目录
+                修改Nginx的网站根目录
               
             
           </h1>
@@ -358,7 +358,7 @@ Nginx的默认网站文件保存在nginx的html目录下，由于我开发时都
       
 
       
-        <h2 id="调整Nginx的网站根目录"><a href="#调整Nginx的网站根目录" class="headerlink" title="调整Nginx的网站根目录"></a>调整Nginx的网站根目录</h2><hr>
+        <h2 id="修改Nginx的网站根目录"><a href="#修改Nginx的网站根目录" class="headerlink" title="修改Nginx的网站根目录"></a>修改Nginx的网站根目录</h2><hr>
 <p>Nginx的默认网站文件保存在<code>nginx</code>的<code>html</code>目录下，由于我开发时都把项目放在自己的<code>workspace</code>里，所以准备更改网站根目录，更改方法为修改<code>nginx.conf</code>配置文件的<code>root</code>指令，<code>root</code>指令可以放在<code>http</code>、<code>server</code>、<code>location</code>块中，我选择把<code>root</code>指令放在<code>server</code>块中，如下所示：</p>
 <figure class="highlight dts"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="class">http </span>&#123;</div><div class="line">    include       mime.types;</div><div class="line">    default_type  application/octet-stream;</div><div class="line"></div><div class="line">    <span class="meta">#access_log  logs/access.log  main;</span></div><div class="line"></div><div class="line">    sendfile        on;</div><div class="line">    <span class="meta">#tcp_nopush     on;</span></div><div class="line">    </div><div class="line">    keepalive_timeout  <span class="number">65</span>;</div><div class="line"></div><div class="line">    <span class="meta">#gzip  on;</span></div><div class="line"></div><div class="line">    <span class="class">server </span>&#123;</div><div class="line">        listen       <span class="number">80</span>;</div><div class="line">        server_name  localhost;</div><div class="line">        <span class="comment">//配置root指令</span></div><div class="line">        root /Users<span class="meta-keyword">/zhongwu/</span>Documents<span class="meta-keyword">/workspace/</span>web;</div><div class="line">        &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>配置完成后，执行<code>sudo ./nginx -s reload</code>命令，Nginx支持动态更新配置信息。</p>
@@ -422,7 +422,7 @@ Nginx的默认网站文件保存在nginx的html目录下，由于我开发时都
     <div class="post-spread">
       
         <div class="ds-share flat" data-thread-key="2016/09/24/调整Nginx的网站根目录/"
-     data-title="调整Nginx的网站根目录"
+     data-title="修改Nginx的网站根目录"
      data-content=""
      data-url="https://zhongwuzw.github.io/2016/09/24/调整Nginx的网站根目录/">
   <div class="ds-share-inline">
@@ -455,7 +455,7 @@ Nginx的默认网站文件保存在nginx的html目录下，由于我开发时都
   <div class="comments" id="comments">
     
       <div class="ds-thread" data-thread-key="2016/09/24/调整Nginx的网站根目录/"
-           data-title="调整Nginx的网站根目录" data-url="https://zhongwuzw.github.io/2016/09/24/调整Nginx的网站根目录/">
+           data-title="修改Nginx的网站根目录" data-url="https://zhongwuzw.github.io/2016/09/24/调整Nginx的网站根目录/">
       </div>
     
   </div>
@@ -582,7 +582,7 @@ Nginx的默认网站文件保存在nginx的html目录下，由于我开发时都
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#调整Nginx的网站根目录"><span class="nav-number">1.</span> <span class="nav-text">调整Nginx的网站根目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决127-0-0-1能访问，而localhost不能访问"><span class="nav-number">2.</span> <span class="nav-text">解决127.0.0.1能访问，而localhost不能访问</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#修改Nginx的网站根目录"><span class="nav-number">1.</span> <span class="nav-text">修改Nginx的网站根目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决127-0-0-1能访问，而localhost不能访问"><span class="nav-number">2.</span> <span class="nav-text">解决127.0.0.1能访问，而localhost不能访问</span></a></li></ol></div>
             
           </div>
         </section>
