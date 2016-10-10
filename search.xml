@@ -9,7 +9,7 @@
       <content type="html"><![CDATA[<hr>
 <h2 id="Tips"><a href="#Tips" class="headerlink" title="Tips"></a>Tips</h2><hr>
 <ol>
-<li>iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙盒，如果需要访问，如果需要让自己的应用能够通过其访问，需要在应用的<code>info.plist</code>中添加<code>UIFileSharingEnabled</code>关键字，并赋值为<code>YES</code>，这样，就能访问其<code>Documents</code>目录了。</li>
+<li>iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙盒，如果需要让自己的应用能够通过其访问，需要在应用的<code>info.plist</code>中添加<code>UIFileSharingEnabled</code>关键字，并赋值为<code>YES</code>，这样，就能访问其<code>Documents</code>目录了(注意，其它目录还是无法访问)。</li>
 </ol>
 ]]></content>
     </entry>
