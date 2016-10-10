@@ -4,6 +4,17 @@
   
     
     <entry>
+      <title><![CDATA[iOS相关tips]]></title>
+      <url>https://zhongwuzw.github.io/2016/10/10/iOS%E7%9B%B8%E5%85%B3tips/</url>
+      <content type="html"><![CDATA[<hr>
+<h2 id="Tips"><a href="#Tips" class="headerlink" title="Tips"></a>Tips</h2><hr>
+<ol>
+<li>iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙盒，如果需要访问，如果需要让自己的应用能够通过其访问，需要在应用的<code>info.plist</code>中添加<code>UIFileSharingEnabled</code>关键字，并赋值为<code>YES</code>，这样，就能访问其<code>Documents</code>目录了。</li>
+</ol>
+]]></content>
+    </entry>
+    
+    <entry>
       <title><![CDATA[修改Nginx的网站根目录]]></title>
       <url>https://zhongwuzw.github.io/2016/09/24/%E8%B0%83%E6%95%B4Nginx%E7%9A%84%E7%BD%91%E7%AB%99%E6%A0%B9%E7%9B%AE%E5%BD%95/</url>
       <content type="html"><![CDATA[<h2 id="修改Nginx的网站根目录"><a href="#修改Nginx的网站根目录" class="headerlink" title="修改Nginx的网站根目录"></a>修改Nginx的网站根目录</h2><hr>
