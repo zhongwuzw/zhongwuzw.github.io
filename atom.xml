@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://zhongwuzw.github.io/"/>
-  <updated>2016-10-10T11:06:13.000Z</updated>
+  <updated>2016-10-11T09:52:41.000Z</updated>
   <id>https://zhongwuzw.github.io/</id>
   
   <author>
@@ -20,12 +20,16 @@
     <link href="https://zhongwuzw.github.io/2016/10/10/iOS%E7%9B%B8%E5%85%B3tips/"/>
     <id>https://zhongwuzw.github.io/2016/10/10/iOS相关tips/</id>
     <published>2016-10-10T10:50:03.000Z</published>
-    <updated>2016-10-10T11:06:13.000Z</updated>
+    <updated>2016-10-11T09:52:41.000Z</updated>
     
     <content type="html"><![CDATA[<hr>
 <h2 id="Tips"><a href="#Tips" class="headerlink" title="Tips"></a>Tips</h2><hr>
 <ol>
-<li>iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙盒，如果需要让自己的应用能够通过其访问，需要在应用的<code>info.plist</code>中添加<code>UIFileSharingEnabled</code>关键字，并赋值为<code>YES</code>，这样，就能访问其<code>Documents</code>目录了(注意，其它目录还是无法访问)。</li>
+<li><p>iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙盒，如果需要让自己的应用能够通过其访问，必须在应用的<code>info.plist</code>中添加<code>UIFileSharingEnabled</code>关键字，并赋值为<code>YES</code>，这样，就能访问其<code>Documents</code>目录了(注意，其它目录还是无法访问)。</p>
+</li>
+<li><p>使用<code>UIWebView</code>时，发现在首次加载网页时，加载时间异常的长，其原因是服务器需要花费一定的时间来解析请求来自于哪个平台，比如<code>PC</code>、<code>iPhone</code>、<code>iPad</code>等，以针对不同的平台响应不同的页面布局，解决该问题的方法为客户端直接请求特定版本的页面，且设置请求的<code>UA</code>(<code>User Agent</code>)，如下代码：</p>
+ <figure class="highlight clojure"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[[NSUserDefaults standardUserDefaults] registerDefaults:@&#123;@<span class="string">"UserAgent"</span> : @<span class="string">"    Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/10.0 Mobile/14A300 Safari/602.1"</span>&#125;]<span class="comment">;</span></div></pre></td></tr></table></figure>
+</li>
 </ol>
 ]]></content>
     
@@ -34,7 +38,7 @@
       &lt;hr&gt;
 &lt;h2 id=&quot;Tips&quot;&gt;&lt;a href=&quot;#Tips&quot; class=&quot;headerlink&quot; title=&quot;Tips&quot;&gt;&lt;/a&gt;Tips&lt;/h2&gt;&lt;hr&gt;
 &lt;ol&gt;
-&lt;li&gt;iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙盒，如果需要让
+&lt;li&gt;&lt;p&gt;iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙盒，如果
     
     </summary>
     
