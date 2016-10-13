@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="Python,MySQL," />
 
 
 
@@ -86,15 +86,25 @@
 
 
 
-<meta name="description" content="Keep thinking, keep coding!!!">
-<meta property="og:type" content="website">
-<meta property="og:title" content="钟武的技术博客">
-<meta property="og:url" content="https://zhongwuzw.github.io/tags/iOS开发-UI/index.html">
+<meta name="description" content="使用PyMySQL处理大结果集的方法
+最近公司项目需要向别的数据库中获取数据并同步到自己的数据库，由于是别人的库，所以没法直接使用Master-Slave同步，最终选择Python脚本来获取。
+选择了PyMySQL客户端库，按照其官方教程，代码比较简单，类似如下：
+12345678910111213141516171819import pymysql.cursors# Connect to the">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用PyMySQL处理大结果集的方法">
+<meta property="og:url" content="https://zhongwuzw.github.io/2016/10/13/使用PyMySQL处理大结果集的方法/index.html">
 <meta property="og:site_name" content="钟武的技术博客">
-<meta property="og:description" content="Keep thinking, keep coding!!!">
+<meta property="og:description" content="使用PyMySQL处理大结果集的方法
+最近公司项目需要向别的数据库中获取数据并同步到自己的数据库，由于是别人的库，所以没法直接使用Master-Slave同步，最终选择Python脚本来获取。
+选择了PyMySQL客户端库，按照其官方教程，代码比较简单，类似如下：
+12345678910111213141516171819import pymysql.cursors# Connect to the">
+<meta property="og:updated_time" content="2016-10-13T07:55:11.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="钟武的技术博客">
-<meta name="twitter:description" content="Keep thinking, keep coding!!!">
+<meta name="twitter:title" content="使用PyMySQL处理大结果集的方法">
+<meta name="twitter:description" content="使用PyMySQL处理大结果集的方法
+最近公司项目需要向别的数据库中获取数据并同步到自己的数据库，由于是别人的库，所以没法直接使用Master-Slave同步，最终选择Python脚本来获取。
+选择了PyMySQL客户端库，按照其官方教程，代码比较简单，类似如下：
+12345678910111213141516171819import pymysql.cursors# Connect to the">
 
 
 
@@ -112,7 +122,7 @@
   };
 </script>
 
-  <title> 标签: iOS开发-UI | 钟武的技术博客 </title>
+  <title> 使用PyMySQL处理大结果集的方法 | 钟武的技术博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -133,7 +143,7 @@
     
   
 
-  <div class="container one-collumn sidebar-position-left  ">
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -264,53 +274,196 @@
           <div id="content" class="content">
             
 
-  <div id="posts" class="posts-collapse">
-    <div class="collection-title">
-      <h2 >
-        iOS开发-UI
-        <small>标签</small>
-      </h2>
-    </div>
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
 
     
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                使用PyMySQL处理大结果集的方法
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-10-13T14:53:30+08:00" content="2016-10-13">
+              2016-10-13
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/10/13/使用PyMySQL处理大结果集的方法/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/13/使用PyMySQL处理大结果集的方法/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
       
 
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+      
+        <h2 id="使用PyMySQL处理大结果集的方法"><a href="#使用PyMySQL处理大结果集的方法" class="headerlink" title="使用PyMySQL处理大结果集的方法"></a>使用PyMySQL处理大结果集的方法</h2><hr>
+<p>最近公司项目需要向别的数据库中获取数据并同步到自己的数据库，由于是别人的库，所以没法直接使用<code>Master-Slave</code>同步，最终选择Python脚本来获取。</p>
+<p>选择了<a href="https://github.com/PyMySQL/PyMySQL" target="_blank" rel="external">PyMySQL</a>客户端库，按照其官方教程，代码比较简单，类似如下：</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">import pymysql.cursors</div><div class="line"></div><div class="line"><span class="comment"># Connect to the database</span></div><div class="line">connection = pymysql.connect(host=<span class="string">'localhost'</span>,</div><div class="line">                             user=<span class="string">'user'</span>,</div><div class="line">                             password=<span class="string">'passwd'</span>,</div><div class="line">                             db=<span class="string">'db'</span>,</div><div class="line">                             charset=<span class="string">'utf8mb4'</span>,</div><div class="line">                             cursorclass=pymysql.cursors.DictCursor)</div><div class="line"></div><div class="line"><span class="keyword">try</span>:</div><div class="line">    <span class="keyword">with</span> connection.cursor() <span class="keyword">as</span> cursor:</div><div class="line">        <span class="comment"># Read a single record</span></div><div class="line">        sql = <span class="string">"SELECT `id`, `password` FROM `users`"</span></div><div class="line">        cursor.execute(sql)</div><div class="line">        <span class="built_in">result</span> = cursor.fetchall()</div><div class="line">        print(<span class="built_in">result</span>)</div><div class="line"><span class="keyword">finally</span>:</div><div class="line">    connection.<span class="built_in">close</span>()</div></pre></td></tr></table></figure>
+<p><code>PyMySQL</code>在获取数据时提供了<code>fetchone()</code>和<code>fetchall()</code>函数来获取结果集，后来调试的时候，发现，不管是哪种方法，都会一次将所有结果获取到，这在数据量很大时将会消耗大量内存，所以有考虑是否还有别的方法，比如<code>one-by-one</code>的迭代获取。</p>
+<p>在查看<code>DictCursor</code>游标代码时，发现了<code>SSCursor</code>游标类，其注释如下，意在解决数据量大的问题，正合我意。</p>
+<figure class="highlight mizar"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">class SSCursor(Cursor):</div><div class="line">    """</div><div class="line">    Unbuffered Cursor, mainly useful <span class="keyword">for</span> queries <span class="keyword">that</span> return a lot <span class="keyword">of</span> data,</div><div class="line">    <span class="keyword">or</span> <span class="keyword">for</span> connections to remote servers over a slow network.</div><div class="line"></div><div class="line">    Instead <span class="keyword">of</span> copying every row <span class="keyword">of</span> data into a buffer, this will fetch</div><div class="line">    rows <span class="keyword">as</span> needed. The upside <span class="keyword">of</span> this, <span class="keyword">is</span> the client uses much less memory,</div><div class="line">    <span class="keyword">and</span> rows are returned much faster when traveling over a slow network,</div><div class="line">    <span class="keyword">or</span> if the result <span class="keyword">set</span> <span class="keyword">is</span> very big.</div><div class="line"></div><div class="line">    There are limitations, though. The MySQL protocol doesn't support</div><div class="line">    returning the total number <span class="keyword">of</span> rows, so the only way to tell how many rows</div><div class="line">    there are <span class="keyword">is</span> to iterate over every row returned. Also, it currently isn't</div><div class="line">    possible to scroll backwards, <span class="keyword">as</span> only the current row <span class="keyword">is</span> held <span class="keyword">in</span> memory.</div><div class="line">    """</div></pre></td></tr></table></figure>
+<p><code>DictCursor</code>游标类的方法返回都是一个迭代器，可以使用这个迭代器进行迭代获取，这样就不用一次将所有数据保存在内存中了。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">fetchall_unbuffered</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="string">"""</span></div><div class="line">    Fetch all, implemented as a generator, which isn't to standard,</div><div class="line">    however, it doesn't make sense to return everything in a list, as that</div><div class="line">    would use ridiculous memory for large result sets.</div><div class="line">    """</div><div class="line">    <span class="keyword">return</span> iter(self.fetchone, <span class="keyword">None</span>)</div></pre></td></tr></table></figure>
+<p>使用方法如下：</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">import pymysql.cursors</div><div class="line">src_pc_database = pymysql.connect(host=<span class="string">'192.168.39.51'</span>, port=<span class="number">5151</span>, user=<span class="string">'*'</span>, password=<span class="string">'*'</span>,</div><div class="line">                               db=<span class="string">'testdataanalyse'</span>,</div><div class="line">                               charset=<span class="string">'utf8mb4'</span>, cursorclass=pymysql.cursors.SSDictCursor)</div><div class="line"></div><div class="line"><span class="keyword">with</span> src_pc_database.cursor() <span class="keyword">as</span> src_cursor:</div><div class="line">    sql = <span class="string">"select * from user"</span></div><div class="line">    src_cursor.execute(sql)</div><div class="line">    <span class="built_in">result</span> = src_cursor.fetchone()</div><div class="line">    </div><div class="line">    <span class="keyword">while</span> <span class="built_in">result</span> is <span class="keyword">not</span> None:</div><div class="line">        <span class="built_in">result</span> = src_cursor.fetchone()</div><div class="line"></div><div class="line">src_pc_database.<span class="built_in">close</span>()</div></pre></td></tr></table></figure>
 
-      <h1 class="post-title">
+      
+    </div>
+
+    <div>
+      
         
-            <a class="post-title-link" href="/2016/09/12/iOS事件处理之Hit-Testing/" itemprop="url">
-              
-                <span itemprop="name">iOS事件处理之Hit-Testing</span>
-              
-            </a>
+      
+    </div>
+
+    <div>
+      
         
-      </h1>
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2016-09-12T12:25:12+08:00"
-              content="2016-09-12" >
-          09-12
-        </time>
-      </div>
+      
+    </div>
 
-    </header>
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Python/" rel="tag">#Python</a>
+          
+            <a href="/tags/MySQL/" rel="tag">#MySQL</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/10/iOS相关tips/" rel="next" title="iOS相关tips">
+                <i class="fa fa-chevron-left"></i> iOS相关tips
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </article>
 
 
-    
-  </div>
 
-  
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2016/10/13/使用PyMySQL处理大结果集的方法/"
+     data-title="使用PyMySQL处理大结果集的方法"
+     data-content=""
+     data-url="https://zhongwuzw.github.io/2016/10/13/使用PyMySQL处理大结果集的方法/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
 
 
           </div>
           
 
+  <p>热评文章</p>
+  <div class="ds-top-threads" data-range="weekly" data-num-items="4"></div>
+
 
           
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/10/13/使用PyMySQL处理大结果集的方法/"
+           data-title="使用PyMySQL处理大结果集的方法" data-url="https://zhongwuzw.github.io/2016/10/13/使用PyMySQL处理大结果集的方法/">
+      </div>
+    
+  </div>
+
 
         </div>
         
@@ -330,8 +483,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel  sidebar-panel-active ">
+      <section class="site-overview sidebar-panel ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.JPG"
@@ -417,6 +579,17 @@
 
       </section>
 
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用PyMySQL处理大结果集的方法"><span class="nav-number">1.</span> <span class="nav-text">使用PyMySQL处理大结果集的方法</span></a></li></ol></div>
+            
+          </div>
+        </section>
       
 
     </div>
@@ -520,6 +693,10 @@
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
 
   
 

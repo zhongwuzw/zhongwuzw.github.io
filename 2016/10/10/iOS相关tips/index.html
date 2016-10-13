@@ -100,7 +100,7 @@ iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙�
 iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙盒，如果需要让自己的应用能够通过其访问，必须在应用的info.plist中添加UIFileSharingEnabled关键字，并赋值为YES，这样，就能访问其Documents目录了(注意，其它目录还是无法访问)。
 
 使用UIWebView时，发现在首次加载网页时，加载时间异常的长，其原因是服务器需要花费一">
-<meta property="og:updated_time" content="2016-10-11T09:52:41.000Z">
+<meta property="og:updated_time" content="2016-10-12T08:39:17.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS相关tips">
 <meta name="twitter:description" content="Tips
@@ -372,7 +372,17 @@ iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙�
 <li><p>使用<code>UIWebView</code>时，发现在首次加载网页时，加载时间异常的长，其原因是服务器需要花费一定的时间来解析请求来自于哪个平台，比如<code>PC</code>、<code>iPhone</code>、<code>iPad</code>等，以针对不同的平台响应不同的页面布局，解决该问题的方法为客户端直接请求特定版本的页面，且设置请求的<code>UA</code>(<code>User Agent</code>)，如下代码：</p>
  <figure class="highlight clojure"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[[NSUserDefaults standardUserDefaults] registerDefaults:@&#123;@<span class="string">"UserAgent"</span> : @<span class="string">"    Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/10.0 Mobile/14A300 Safari/602.1"</span>&#125;]<span class="comment">;</span></div></pre></td></tr></table></figure>
 </li>
+<li><p>在使用<code>UIBarButtonItem</code>，并对其使用<code>UIImage</code>赋值时，iOS7之后会对<code>UIImage</code>设置<code>tintColor</code>，从而改变图片的原值色，如果需要保留图片原色，可以对<code>UIImage</code>进行如下代码设置：</p>
+ <figure class="highlight arduino"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">UIImage *<span class="built_in">image</span> = [UIImage imageNamed:@<span class="string">"myImage.png"</span>];</div><div class="line"><span class="built_in">image</span> = [<span class="built_in">image</span> imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];</div></pre></td></tr></table></figure>
+</li>
 </ol>
+<pre><code>&lt;!--more--&gt;
+</code></pre><ol>
+<li><p>iOS7之后，对于<code>UIViewController</code>的内容布局，默认会从屏幕顶部开始，这就会导致内容被状态栏所覆盖。<br>如果<code>UIViewController</code>包含在<code>UINavigationController</code>下且<code>navigationBar</code>是可见的，那么可以使用如下代码来使内容布局不被状态栏覆盖：</p>
+ <figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">self</span>.edgesForExtendedLayout = <span class="built_in">UIRectEdgeNone</span>;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>如果<code>navigationBar</code>不可见，那么就只能调整<code>UIVew</code>的位置了，向下移20 points。</p>
 
       
     </div>
@@ -412,6 +422,10 @@ iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙�
           </div>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/10/13/使用PyMySQL处理大结果集的方法/" rel="prev" title="使用PyMySQL处理大结果集的方法">
+                使用PyMySQL处理大结果集的方法 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -505,7 +519,7 @@ iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙�
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">16</span>
+              <span class="site-state-item-count">17</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -513,7 +527,7 @@ iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙�
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-count">10</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -522,7 +536,7 @@ iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙�
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">13</span>
+                <span class="site-state-item-count">15</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

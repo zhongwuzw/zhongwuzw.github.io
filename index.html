@@ -288,6 +288,136 @@
             
               
                 
+                <a class="post-title-link" href="/2016/10/13/使用PyMySQL处理大结果集的方法/" itemprop="url">
+                  使用PyMySQL处理大结果集的方法
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-10-13T14:53:30+08:00" content="2016-10-13">
+              2016-10-13
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/10/13/使用PyMySQL处理大结果集的方法/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/13/使用PyMySQL处理大结果集的方法/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="使用PyMySQL处理大结果集的方法"><a href="#使用PyMySQL处理大结果集的方法" class="headerlink" title="使用PyMySQL处理大结果集的方法"></a>使用PyMySQL处理大结果集的方法</h2><hr>
+<p>最近公司项目需要向别的数据库中获取数据并同步到自己的数据库，由于是别人的库，所以没法直接使用<code>Master-Slave</code>同步，最终选择Python脚本来获取。</p>
+<p>选择了<a href="https://github.com/PyMySQL/PyMySQL" target="_blank" rel="external">PyMySQL</a>客户端库，按照其官方教程，代码比较简单，类似如下：</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">import pymysql.cursors</div><div class="line"></div><div class="line"><span class="comment"># Connect to the database</span></div><div class="line">connection = pymysql.connect(host=<span class="string">'localhost'</span>,</div><div class="line">                             user=<span class="string">'user'</span>,</div><div class="line">                             password=<span class="string">'passwd'</span>,</div><div class="line">                             db=<span class="string">'db'</span>,</div><div class="line">                             charset=<span class="string">'utf8mb4'</span>,</div><div class="line">                             cursorclass=pymysql.cursors.DictCursor)</div><div class="line"></div><div class="line"><span class="keyword">try</span>:</div><div class="line">    <span class="keyword">with</span> connection.cursor() <span class="keyword">as</span> cursor:</div><div class="line">        <span class="comment"># Read a single record</span></div><div class="line">        sql = <span class="string">"SELECT `id`, `password` FROM `users`"</span></div><div class="line">        cursor.execute(sql)</div><div class="line">        <span class="built_in">result</span> = cursor.fetchall()</div><div class="line">        print(<span class="built_in">result</span>)</div><div class="line"><span class="keyword">finally</span>:</div><div class="line">    connection.<span class="built_in">close</span>()</div></pre></td></tr></table></figure>
+<p><code>PyMySQL</code>在获取数据时提供了<code>fetchone()</code>和<code>fetchall()</code>函数来获取结果集，后来调试的时候，发现，不管是哪种方法，都会一次将所有结果获取到，这在数据量很大时将会消耗大量内存，所以有考虑是否还有别的方法，比如<code>one-by-one</code>的迭代获取。</p>
+<p>在查看<code>DictCursor</code>游标代码时，发现了<code>SSCursor</code>游标类，其注释如下，意在解决数据量大的问题，正合我意。</p>
+<figure class="highlight mizar"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">class SSCursor(Cursor):</div><div class="line">    """</div><div class="line">    Unbuffered Cursor, mainly useful <span class="keyword">for</span> queries <span class="keyword">that</span> return a lot <span class="keyword">of</span> data,</div><div class="line">    <span class="keyword">or</span> <span class="keyword">for</span> connections to remote servers over a slow network.</div><div class="line"></div><div class="line">    Instead <span class="keyword">of</span> copying every row <span class="keyword">of</span> data into a buffer, this will fetch</div><div class="line">    rows <span class="keyword">as</span> needed. The upside <span class="keyword">of</span> this, <span class="keyword">is</span> the client uses much less memory,</div><div class="line">    <span class="keyword">and</span> rows are returned much faster when traveling over a slow network,</div><div class="line">    <span class="keyword">or</span> if the result <span class="keyword">set</span> <span class="keyword">is</span> very big.</div><div class="line"></div><div class="line">    There are limitations, though. The MySQL protocol doesn't support</div><div class="line">    returning the total number <span class="keyword">of</span> rows, so the only way to tell how many rows</div><div class="line">    there are <span class="keyword">is</span> to iterate over every row returned. Also, it currently isn't</div><div class="line">    possible to scroll backwards, <span class="keyword">as</span> only the current row <span class="keyword">is</span> held <span class="keyword">in</span> memory.</div><div class="line">    """</div></pre></td></tr></table></figure>
+<p><code>DictCursor</code>游标类的方法返回都是一个迭代器，可以使用这个迭代器进行迭代获取，这样就不用一次将所有数据保存在内存中了。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">fetchall_unbuffered</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="string">"""</span></div><div class="line">    Fetch all, implemented as a generator, which isn't to standard,</div><div class="line">    however, it doesn't make sense to return everything in a list, as that</div><div class="line">    would use ridiculous memory for large result sets.</div><div class="line">    """</div><div class="line">    <span class="keyword">return</span> iter(self.fetchone, <span class="keyword">None</span>)</div></pre></td></tr></table></figure>
+<p>使用方法如下：</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">import pymysql.cursors</div><div class="line">src_pc_database = pymysql.connect(host=<span class="string">'192.168.39.51'</span>, port=<span class="number">5151</span>, user=<span class="string">'*'</span>, password=<span class="string">'*'</span>,</div><div class="line">                               db=<span class="string">'testdataanalyse'</span>,</div><div class="line">                               charset=<span class="string">'utf8mb4'</span>, cursorclass=pymysql.cursors.SSDictCursor)</div><div class="line"></div><div class="line"><span class="keyword">with</span> src_pc_database.cursor() <span class="keyword">as</span> src_cursor:</div><div class="line">    sql = <span class="string">"select * from user"</span></div><div class="line">    src_cursor.execute(sql)</div><div class="line">    <span class="built_in">result</span> = src_cursor.fetchone()</div><div class="line">    </div><div class="line">    <span class="keyword">while</span> <span class="built_in">result</span> is <span class="keyword">not</span> None:</div><div class="line">        <span class="built_in">result</span> = src_cursor.fetchone()</div><div class="line"></div><div class="line">src_pc_database.<span class="built_in">close</span>()</div></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2016/10/10/iOS相关tips/" itemprop="url">
                   iOS相关tips
                 </a>
@@ -366,7 +496,17 @@
 <li><p>使用<code>UIWebView</code>时，发现在首次加载网页时，加载时间异常的长，其原因是服务器需要花费一定的时间来解析请求来自于哪个平台，比如<code>PC</code>、<code>iPhone</code>、<code>iPad</code>等，以针对不同的平台响应不同的页面布局，解决该问题的方法为客户端直接请求特定版本的页面，且设置请求的<code>UA</code>(<code>User Agent</code>)，如下代码：</p>
  <figure class="highlight clojure"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[[NSUserDefaults standardUserDefaults] registerDefaults:@&#123;@<span class="string">"UserAgent"</span> : @<span class="string">"    Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/10.0 Mobile/14A300 Safari/602.1"</span>&#125;]<span class="comment">;</span></div></pre></td></tr></table></figure>
 </li>
+<li><p>在使用<code>UIBarButtonItem</code>，并对其使用<code>UIImage</code>赋值时，iOS7之后会对<code>UIImage</code>设置<code>tintColor</code>，从而改变图片的原值色，如果需要保留图片原色，可以对<code>UIImage</code>进行如下代码设置：</p>
+ <figure class="highlight arduino"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">UIImage *<span class="built_in">image</span> = [UIImage imageNamed:@<span class="string">"myImage.png"</span>];</div><div class="line"><span class="built_in">image</span> = [<span class="built_in">image</span> imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];</div></pre></td></tr></table></figure>
+</li>
 </ol>
+<pre><code>&lt;!--more--&gt;
+</code></pre><ol>
+<li><p>iOS7之后，对于<code>UIViewController</code>的内容布局，默认会从屏幕顶部开始，这就会导致内容被状态栏所覆盖。<br>如果<code>UIViewController</code>包含在<code>UINavigationController</code>下且<code>navigationBar</code>是可见的，那么可以使用如下代码来使内容布局不被状态栏覆盖：</p>
+ <figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">self</span>.edgesForExtendedLayout = <span class="built_in">UIRectEdgeNone</span>;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>如果<code>navigationBar</code>不可见，那么就只能调整<code>UIVew</code>的位置了，向下移20 points。</p>
 
           
         
@@ -778,130 +918,6 @@
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/09/18/Nginx的架构设计/" itemprop="url">
-                  Nginx的架构设计
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-09-18T10:49:56+08:00" content="2016-09-18">
-              2016-09-18
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Nginx/" itemprop="url" rel="index">
-                    <span itemprop="name">Nginx</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/09/18/Nginx的架构设计/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/09/18/Nginx的架构设计/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="Nginx架构概述"><a href="#Nginx架构概述" class="headerlink" title="Nginx架构概述"></a>Nginx架构概述</h2><hr>
-<p>传统基于进程或线程的模型（<code>Apache</code>就采用这种模型）在处理并发连接时会为每一个连接建立一个单独的进程或线程，且在网络或者输入/输出操作时阻塞。这将导致内存和<code>CPU</code>的大量消耗，因为新起一个单独的进程或线程需要准备新的运行时环境，包括堆和栈内存的分配，以及新的执行上下文，当然，这些也会导致多余的<code>CPU</code>开销。最终，会由于过多的上下文切换而导致服务器性能变差。<br>反过来，我们来看Nginx的架构设计，总结起来，它是模块化的、基于事件驱动、异步、单线程且非阻塞。<br>Nginx大量使用多路复用和事件通知，Nginx会创建几个数量有限（比如<code>worker</code>的数量和<code>CPU</code>的核数相同）的<code>worker</code>进程，每个<code>worker</code>进程包含一个高效的Run-loop，来处理多个网络连接，每个<code>worker</code>进程每秒能处理成千的并发连接。</p>
-<h3 id="代码结构"><a href="#代码结构" class="headerlink" title="代码结构"></a>代码结构</h3><p><code>worker</code>进程负责维护Run-loop，并且在请求处理的每个阶段执行相应模块代码，Nginx包括很多模块，如事件模块，状态处理模块，协议模块，负载均衡等。Nginx并不支持动态加载模块，模块只能在Nginx编译时进行添加进来。<br>在接收，处理和管理网络请求时，Nginx会根据操作系统的不同，采用特定的事件模型和磁盘<code>I/O</code>，以达到更高的性能，如<code>Linux</code>，<code>Solaris</code>以及基于<code>BSD</code>的操作系统，采用<code>epoll</code>，<code>kqueue</code>，<code>event ports</code>。<br>Nginx的架构图如下：<br><img src="http://oc54pu02q.bkt.clouddn.com/QQ20160918-0@2x.png" alt=""></p>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/09/18/Nginx的架构设计/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -947,7 +963,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">16</span>
+              <span class="site-state-item-count">17</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -955,7 +971,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-count">10</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -964,7 +980,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">13</span>
+                <span class="site-state-item-count">15</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
