@@ -61,35 +61,41 @@
     <link href="https://zhongwuzw.github.io/2016/10/10/iOS%E7%9B%B8%E5%85%B3tips/"/>
     <id>https://zhongwuzw.github.io/2016/10/10/iOS相关tips/</id>
     <published>2016-10-10T10:50:03.000Z</published>
-    <updated>2016-10-12T08:39:17.000Z</updated>
+    <updated>2016-10-13T08:59:38.000Z</updated>
     
     <content type="html"><![CDATA[<hr>
 <h2 id="Tips"><a href="#Tips" class="headerlink" title="Tips"></a>Tips</h2><hr>
-<ol>
+<ul>
 <li><p>iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙盒，如果需要让自己的应用能够通过其访问，必须在应用的<code>info.plist</code>中添加<code>UIFileSharingEnabled</code>关键字，并赋值为<code>YES</code>，这样，就能访问其<code>Documents</code>目录了(注意，其它目录还是无法访问)。</p>
 </li>
 <li><p>使用<code>UIWebView</code>时，发现在首次加载网页时，加载时间异常的长，其原因是服务器需要花费一定的时间来解析请求来自于哪个平台，比如<code>PC</code>、<code>iPhone</code>、<code>iPad</code>等，以针对不同的平台响应不同的页面布局，解决该问题的方法为客户端直接请求特定版本的页面，且设置请求的<code>UA</code>(<code>User Agent</code>)，如下代码：</p>
- <figure class="highlight clojure"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[[NSUserDefaults standardUserDefaults] registerDefaults:@&#123;@<span class="string">"UserAgent"</span> : @<span class="string">"    Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/10.0 Mobile/14A300 Safari/602.1"</span>&#125;]<span class="comment">;</span></div></pre></td></tr></table></figure>
+  <figure class="highlight clojure"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[[NSUserDefaults standardUserDefaults] registerDefaults:@&#123;@<span class="string">"UserAgent"</span> : @<span class="string">"    Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/10.0 Mobile/14A300 Safari/602.1"</span>&#125;]<span class="comment">;</span></div></pre></td></tr></table></figure>
 </li>
 <li><p>在使用<code>UIBarButtonItem</code>，并对其使用<code>UIImage</code>赋值时，iOS7之后会对<code>UIImage</code>设置<code>tintColor</code>，从而改变图片的原值色，如果需要保留图片原色，可以对<code>UIImage</code>进行如下代码设置：</p>
- <figure class="highlight arduino"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">UIImage *<span class="built_in">image</span> = [UIImage imageNamed:@<span class="string">"myImage.png"</span>];</div><div class="line"><span class="built_in">image</span> = [<span class="built_in">image</span> imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];</div></pre></td></tr></table></figure>
+  <figure class="highlight arduino"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">UIImage *<span class="built_in">image</span> = [UIImage imageNamed:@<span class="string">"myImage.png"</span>];</div><div class="line"><span class="built_in">image</span> = [<span class="built_in">image</span> imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];</div></pre></td></tr></table></figure>
+<a id="more"></a>
 </li>
-</ol>
-<pre><code>&lt;!--more--&gt;
-</code></pre><ol>
-<li><p>iOS7之后，对于<code>UIViewController</code>的内容布局，默认会从屏幕顶部开始，这就会导致内容被状态栏所覆盖。<br>如果<code>UIViewController</code>包含在<code>UINavigationController</code>下且<code>navigationBar</code>是可见的，那么可以使用如下代码来使内容布局不被状态栏覆盖：</p>
- <figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">self</span>.edgesForExtendedLayout = <span class="built_in">UIRectEdgeNone</span>;</div></pre></td></tr></table></figure>
+</ul>
+<ul>
+<li><p>iOS7之后，对于<code>UIViewController</code>的内容布局，默认会从屏幕顶部开始，这就会导致内容被状态栏所覆盖。<br> 如果<code>UIViewController</code>包含在<code>UINavigationController</code>下且<code>navigationBar</code>是可见的，那么可以使用如下代码来使内容布局不被状态栏覆盖：</p>
+  <figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">self</span>.edgesForExtendedLayout = <span class="built_in">UIRectEdgeNone</span>;</div></pre></td></tr></table></figure>
+<p>  如果<code>navigationBar</code>不可见，那么就只能调整<code>UIVew</code>的位置了，向下移20 points。</p>
 </li>
-</ol>
-<p>如果<code>navigationBar</code>不可见，那么就只能调整<code>UIVew</code>的位置了，向下移20 points。</p>
+</ul>
 ]]></content>
     
     <summary type="html">
     
       &lt;hr&gt;
 &lt;h2 id=&quot;Tips&quot;&gt;&lt;a href=&quot;#Tips&quot; class=&quot;headerlink&quot; title=&quot;Tips&quot;&gt;&lt;/a&gt;Tips&lt;/h2&gt;&lt;hr&gt;
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙盒，如果
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙盒，如果需要让自己的应用能够通过其访问，必须在应用的&lt;code&gt;info.plist&lt;/code&gt;中添加&lt;code&gt;UIFileSharingEnabled&lt;/code&gt;关键字，并赋值为&lt;code&gt;YES&lt;/code&gt;，这样，就能访问其&lt;code&gt;Documents&lt;/code&gt;目录了(注意，其它目录还是无法访问)。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;使用&lt;code&gt;UIWebView&lt;/code&gt;时，发现在首次加载网页时，加载时间异常的长，其原因是服务器需要花费一定的时间来解析请求来自于哪个平台，比如&lt;code&gt;PC&lt;/code&gt;、&lt;code&gt;iPhone&lt;/code&gt;、&lt;code&gt;iPad&lt;/code&gt;等，以针对不同的平台响应不同的页面布局，解决该问题的方法为客户端直接请求特定版本的页面，且设置请求的&lt;code&gt;UA&lt;/code&gt;(&lt;code&gt;User Agent&lt;/code&gt;)，如下代码：&lt;/p&gt;
+  &lt;figure class=&quot;highlight clojure&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;[[NSUserDefaults standardUserDefaults] registerDefaults:@&amp;#123;@&lt;span class=&quot;string&quot;&gt;&quot;UserAgent&quot;&lt;/span&gt; : @&lt;span class=&quot;string&quot;&gt;&quot;    Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/10.0 Mobile/14A300 Safari/602.1&quot;&lt;/span&gt;&amp;#125;]&lt;span class=&quot;comment&quot;&gt;;&lt;/span&gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;在使用&lt;code&gt;UIBarButtonItem&lt;/code&gt;，并对其使用&lt;code&gt;UIImage&lt;/code&gt;赋值时，iOS7之后会对&lt;code&gt;UIImage&lt;/code&gt;设置&lt;code&gt;tintColor&lt;/code&gt;，从而改变图片的原值色，如果需要保留图片原色，可以对&lt;code&gt;UIImage&lt;/code&gt;进行如下代码设置：&lt;/p&gt;
+  &lt;figure class=&quot;highlight arduino&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;UIImage *&lt;span class=&quot;built_in&quot;&gt;image&lt;/span&gt; = [UIImage imageNamed:@&lt;span class=&quot;string&quot;&gt;&quot;myImage.png&quot;&lt;/span&gt;];&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;built_in&quot;&gt;image&lt;/span&gt; = [&lt;span class=&quot;built_in&quot;&gt;image&lt;/span&gt; imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
     
     </summary>
     

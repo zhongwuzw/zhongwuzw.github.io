@@ -26,23 +26,23 @@
       <url>https://zhongwuzw.github.io/2016/10/10/iOS%E7%9B%B8%E5%85%B3tips/</url>
       <content type="html"><![CDATA[<hr>
 <h2 id="Tips"><a href="#Tips" class="headerlink" title="Tips"></a>Tips</h2><hr>
-<ol>
+<ul>
 <li><p>iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙盒，如果需要让自己的应用能够通过其访问，必须在应用的<code>info.plist</code>中添加<code>UIFileSharingEnabled</code>关键字，并赋值为<code>YES</code>，这样，就能访问其<code>Documents</code>目录了(注意，其它目录还是无法访问)。</p>
 </li>
 <li><p>使用<code>UIWebView</code>时，发现在首次加载网页时，加载时间异常的长，其原因是服务器需要花费一定的时间来解析请求来自于哪个平台，比如<code>PC</code>、<code>iPhone</code>、<code>iPad</code>等，以针对不同的平台响应不同的页面布局，解决该问题的方法为客户端直接请求特定版本的页面，且设置请求的<code>UA</code>(<code>User Agent</code>)，如下代码：</p>
- <figure class="highlight clojure"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[[NSUserDefaults standardUserDefaults] registerDefaults:@&#123;@<span class="string">"UserAgent"</span> : @<span class="string">"    Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/10.0 Mobile/14A300 Safari/602.1"</span>&#125;]<span class="comment">;</span></div></pre></td></tr></table></figure>
+  <figure class="highlight clojure"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[[NSUserDefaults standardUserDefaults] registerDefaults:@&#123;@<span class="string">"UserAgent"</span> : @<span class="string">"    Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/10.0 Mobile/14A300 Safari/602.1"</span>&#125;]<span class="comment">;</span></div></pre></td></tr></table></figure>
 </li>
 <li><p>在使用<code>UIBarButtonItem</code>，并对其使用<code>UIImage</code>赋值时，iOS7之后会对<code>UIImage</code>设置<code>tintColor</code>，从而改变图片的原值色，如果需要保留图片原色，可以对<code>UIImage</code>进行如下代码设置：</p>
- <figure class="highlight arduino"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">UIImage *<span class="built_in">image</span> = [UIImage imageNamed:@<span class="string">"myImage.png"</span>];</div><div class="line"><span class="built_in">image</span> = [<span class="built_in">image</span> imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];</div></pre></td></tr></table></figure>
+  <figure class="highlight arduino"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">UIImage *<span class="built_in">image</span> = [UIImage imageNamed:@<span class="string">"myImage.png"</span>];</div><div class="line"><span class="built_in">image</span> = [<span class="built_in">image</span> imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];</div></pre></td></tr></table></figure>
+<a id="more"></a>
 </li>
-</ol>
-<pre><code>&lt;!--more--&gt;
-</code></pre><ol>
-<li><p>iOS7之后，对于<code>UIViewController</code>的内容布局，默认会从屏幕顶部开始，这就会导致内容被状态栏所覆盖。<br>如果<code>UIViewController</code>包含在<code>UINavigationController</code>下且<code>navigationBar</code>是可见的，那么可以使用如下代码来使内容布局不被状态栏覆盖：</p>
- <figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">self</span>.edgesForExtendedLayout = <span class="built_in">UIRectEdgeNone</span>;</div></pre></td></tr></table></figure>
+</ul>
+<ul>
+<li><p>iOS7之后，对于<code>UIViewController</code>的内容布局，默认会从屏幕顶部开始，这就会导致内容被状态栏所覆盖。<br> 如果<code>UIViewController</code>包含在<code>UINavigationController</code>下且<code>navigationBar</code>是可见的，那么可以使用如下代码来使内容布局不被状态栏覆盖：</p>
+  <figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">self</span>.edgesForExtendedLayout = <span class="built_in">UIRectEdgeNone</span>;</div></pre></td></tr></table></figure>
+<p>  如果<code>navigationBar</code>不可见，那么就只能调整<code>UIVew</code>的位置了，向下移20 points。</p>
 </li>
-</ol>
-<p>如果<code>navigationBar</code>不可见，那么就只能调整<code>UIVew</code>的位置了，向下移20 points。</p>
+</ul>
 ]]></content>
     </entry>
     
