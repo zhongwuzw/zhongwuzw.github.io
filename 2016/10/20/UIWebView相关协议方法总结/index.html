@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="iOS,UIWebView," />
 
 
 
@@ -86,15 +86,22 @@
 
 
 
-<meta name="description" content="Keep thinking, keep coding!!!">
-<meta property="og:type" content="website">
-<meta property="og:title" content="钟武的技术博客">
-<meta property="og:url" content="https://zhongwuzw.github.io/tags/Swift/index.html">
+<meta name="description" content="WebResourceLoadDelegate Protocol
+
+- (id)webView:(WebView *)sender identifierForInitialRequest:(NSURLRequest *)request fromDataSource:(WebDataSource *)dataSource  该方法返回一个标识符对象，网页中的每一个资源都会调用该方法。资源包括网页中嵌">
+<meta property="og:type" content="article">
+<meta property="og:title" content="UIWebView相关协议方法总结">
+<meta property="og:url" content="https://zhongwuzw.github.io/2016/10/20/UIWebView相关协议方法总结/index.html">
 <meta property="og:site_name" content="钟武的技术博客">
-<meta property="og:description" content="Keep thinking, keep coding!!!">
+<meta property="og:description" content="WebResourceLoadDelegate Protocol
+
+- (id)webView:(WebView *)sender identifierForInitialRequest:(NSURLRequest *)request fromDataSource:(WebDataSource *)dataSource  该方法返回一个标识符对象，网页中的每一个资源都会调用该方法。资源包括网页中嵌">
+<meta property="og:updated_time" content="2016-10-21T10:27:25.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="钟武的技术博客">
-<meta name="twitter:description" content="Keep thinking, keep coding!!!">
+<meta name="twitter:title" content="UIWebView相关协议方法总结">
+<meta name="twitter:description" content="WebResourceLoadDelegate Protocol
+
+- (id)webView:(WebView *)sender identifierForInitialRequest:(NSURLRequest *)request fromDataSource:(WebDataSource *)dataSource  该方法返回一个标识符对象，网页中的每一个资源都会调用该方法。资源包括网页中嵌">
 
 
 
@@ -112,7 +119,7 @@
   };
 </script>
 
-  <title> 标签: Swift | 钟武的技术博客 </title>
+  <title> UIWebView相关协议方法总结 | 钟武的技术博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -133,7 +140,7 @@
     
   
 
-  <div class="container one-collumn sidebar-position-left  ">
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -264,109 +271,194 @@
           <div id="content" class="content">
             
 
-  <div id="posts" class="posts-collapse">
-    <div class="collection-title">
-      <h2 >
-        Swift
-        <small>标签</small>
-      </h2>
-    </div>
-
+  <div id="posts" class="posts-expand">
     
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/2016/08/24/Swift之通过减少动态派发来提升性能/" itemprop="url">
-              
-                <span itemprop="name">Swift之通过减少动态派发来提升性能</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2016-08-24T23:23:01+08:00"
-              content="2016-08-24" >
-          08-24
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/2016/08/23/Swift中使用Objective-C的Runtime/" itemprop="url">
-              
-                <span itemprop="name">Swift中使用Objective-C的Runtime</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2016-08-23T15:41:47+08:00"
-              content="2016-08-23" >
-          08-23
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/2016/08/19/Swift的Designated和Convenience初始化器/" itemprop="url">
-              
-                <span itemprop="name">Swift的Designated和Convenience初始化器</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2016-08-19T15:46:48+08:00"
-              content="2016-08-19" >
-          08-19
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-  </div>
 
   
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                UIWebView相关协议方法总结
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-10-20T09:59:55+08:00" content="2016-10-20">
+              2016-10-20
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/iOS开发-网络/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发-网络</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/10/20/UIWebView相关协议方法总结/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/20/UIWebView相关协议方法总结/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="WebResourceLoadDelegate-Protocol"><a href="#WebResourceLoadDelegate-Protocol" class="headerlink" title="WebResourceLoadDelegate Protocol"></a>WebResourceLoadDelegate Protocol</h2><hr>
+<ul>
+<li><code>- (id)webView:(WebView *)sender identifierForInitialRequest:(NSURLRequest *)request fromDataSource:(WebDataSource *)dataSource</code><br>  该方法返回一个标识符对象，网页中的每一个资源都会调用该方法。资源包括网页中嵌入的图片、脚本、<code>CSS</code>、嵌入在<code>frame</code>中的页面。</li>
+</ul>
+<h2 id="UIWebViewDelegate-Protocol"><a href="#UIWebViewDelegate-Protocol" class="headerlink" title="UIWebViewDelegate Protocol"></a>UIWebViewDelegate Protocol</h2><hr>
+<ul>
+<li><code>- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType</code><br>  webView在加载一个frame之前会回调该方法，加载frame的情形包括加载新的页面、加载<code>iframe</code>的url时。<code>navigationType</code>变量是一个枚举值，标识用户的动作，如点击、提交表单、前进、重载、重新提交表单、以及其他，其他包括重定向等。</li>
+<li><code>- (void)webViewDidFinishLoad:(UIWebView *)webView</code><br>  注意，该方法并不是表示webView完成了网页的加载，而是表示完成了一个frame的加载。   </li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag">#iOS</a>
+          
+            <a href="/tags/UIWebView/" rel="tag">#UIWebView</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/13/使用PyMySQL处理大结果集的方法/" rel="next" title="使用PyMySQL处理大结果集的方法">
+                <i class="fa fa-chevron-left"></i> 使用PyMySQL处理大结果集的方法
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2016/10/20/UIWebView相关协议方法总结/"
+     data-title="UIWebView相关协议方法总结"
+     data-content=""
+     data-url="https://zhongwuzw.github.io/2016/10/20/UIWebView相关协议方法总结/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
 
 
           </div>
           
 
+  <p>热评文章</p>
+  <div class="ds-top-threads" data-range="weekly" data-num-items="4"></div>
+
 
           
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/10/20/UIWebView相关协议方法总结/"
+           data-title="UIWebView相关协议方法总结" data-url="https://zhongwuzw.github.io/2016/10/20/UIWebView相关协议方法总结/">
+      </div>
+    
+  </div>
+
 
         </div>
         
@@ -386,8 +478,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel  sidebar-panel-active ">
+      <section class="site-overview sidebar-panel ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.JPG"
@@ -473,6 +574,17 @@
 
       </section>
 
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#WebResourceLoadDelegate-Protocol"><span class="nav-number">1.</span> <span class="nav-text">WebResourceLoadDelegate Protocol</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UIWebViewDelegate-Protocol"><span class="nav-number">2.</span> <span class="nav-text">UIWebViewDelegate Protocol</span></a></li></ol></div>
+            
+          </div>
+        </section>
       
 
     </div>
@@ -576,6 +688,10 @@
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
 
   
 
