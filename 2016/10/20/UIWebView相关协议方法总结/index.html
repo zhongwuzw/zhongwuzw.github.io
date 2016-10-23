@@ -86,22 +86,25 @@
 
 
 
-<meta name="description" content="WebResourceLoadDelegate Protocol
+<meta name="description" content="UIWebView Private Method
 
-- (id)webView:(WebView *)sender identifierForInitialRequest:(NSURLRequest *)request fromDataSource:(WebDataSource *)dataSource  该方法返回一个标识符对象，网页中的每一个资源都会调用该方法。资源包括网页中嵌">
+UIWebView dump method:UIWebView.h
+设置UIWebView在WebThread线程下进行渲染，不占用主线程，代码如下：12[_webView performSelector:@selector(_setDrawInWebThread:) withObject:@YES];[_webView performSelec">
 <meta property="og:type" content="article">
 <meta property="og:title" content="UIWebView相关协议方法总结">
 <meta property="og:url" content="https://zhongwuzw.github.io/2016/10/20/UIWebView相关协议方法总结/index.html">
 <meta property="og:site_name" content="钟武的技术博客">
-<meta property="og:description" content="WebResourceLoadDelegate Protocol
+<meta property="og:description" content="UIWebView Private Method
 
-- (id)webView:(WebView *)sender identifierForInitialRequest:(NSURLRequest *)request fromDataSource:(WebDataSource *)dataSource  该方法返回一个标识符对象，网页中的每一个资源都会调用该方法。资源包括网页中嵌">
-<meta property="og:updated_time" content="2016-10-21T10:27:25.000Z">
+UIWebView dump method:UIWebView.h
+设置UIWebView在WebThread线程下进行渲染，不占用主线程，代码如下：12[_webView performSelector:@selector(_setDrawInWebThread:) withObject:@YES];[_webView performSelec">
+<meta property="og:updated_time" content="2016-10-23T03:22:51.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="UIWebView相关协议方法总结">
-<meta name="twitter:description" content="WebResourceLoadDelegate Protocol
+<meta name="twitter:description" content="UIWebView Private Method
 
-- (id)webView:(WebView *)sender identifierForInitialRequest:(NSURLRequest *)request fromDataSource:(WebDataSource *)dataSource  该方法返回一个标识符对象，网页中的每一个资源都会调用该方法。资源包括网页中嵌">
+UIWebView dump method:UIWebView.h
+设置UIWebView在WebThread线程下进行渲染，不占用主线程，代码如下：12[_webView performSelector:@selector(_setDrawInWebThread:) withObject:@YES];[_webView performSelec">
 
 
 
@@ -358,14 +361,21 @@
       
 
       
-        <h2 id="WebResourceLoadDelegate-Protocol"><a href="#WebResourceLoadDelegate-Protocol" class="headerlink" title="WebResourceLoadDelegate Protocol"></a>WebResourceLoadDelegate Protocol</h2><hr>
+        <h2 id="UIWebView-Private-Method"><a href="#UIWebView-Private-Method" class="headerlink" title="UIWebView Private Method"></a>UIWebView Private Method</h2><hr>
+<ul>
+<li>UIWebView dump method:<a href="https://github.com/nst/iOS-Runtime-Headers/blob/f7f2c13158ff4ecd15b92eefb5c5d365b126db05/Frameworks/UIKit.framework/UIWebView.h" target="_blank" rel="external">UIWebView.h</a></li>
+<li>设置<code>UIWebView</code>在<code>WebThread</code>线程下进行渲染，不占用主线程，代码如下：<figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[_webView <span class="string">performSelector:</span><span class="meta">@selector</span>(<span class="string">_setDrawInWebThread:</span>) <span class="string">withObject:</span><span class="meta">@YES</span>];</div><div class="line">[_webView <span class="string">performSelector:</span><span class="meta">@selector</span>(<span class="string">_setDrawsCheckeredPattern:</span>) <span class="string">withObject:</span><span class="meta">@YES</span>];</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="WebResourceLoadDelegate-Protocol"><a href="#WebResourceLoadDelegate-Protocol" class="headerlink" title="WebResourceLoadDelegate Protocol"></a>WebResourceLoadDelegate Protocol</h2><hr>
 <ul>
 <li><code>- (id)webView:(WebView *)sender identifierForInitialRequest:(NSURLRequest *)request fromDataSource:(WebDataSource *)dataSource</code><br>  该方法返回一个标识符对象，网页中的每一个资源都会调用该方法。资源包括网页中嵌入的图片、脚本、<code>CSS</code>、嵌入在<code>frame</code>中的页面。</li>
 </ul>
+<a id="more"></a>
 <h2 id="UIWebViewDelegate-Protocol"><a href="#UIWebViewDelegate-Protocol" class="headerlink" title="UIWebViewDelegate Protocol"></a>UIWebViewDelegate Protocol</h2><hr>
 <ul>
 <li><code>- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType</code><br>  webView在加载一个frame之前会回调该方法，加载frame的情形包括加载新的页面、加载<code>iframe</code>的url时。<code>navigationType</code>变量是一个枚举值，标识用户的动作，如点击、提交表单、前进、重载、重新提交表单、以及其他，其他包括重定向等。</li>
-<li><code>- (void)webViewDidFinishLoad:(UIWebView *)webView</code><br>  注意，该方法并不是表示webView完成了网页的加载，而是表示完成了一个frame的加载。   </li>
+<li><code>- (void)webViewDidFinishLoad:(UIWebView *)webView</code><br>  注意，该方法并不是表示webView完成了网页的加载，而是表示完成了一个frame的加载，所以可能会出现加载一个网页时被调用多次的情况。   </li>
 </ul>
 
       
@@ -581,7 +591,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#WebResourceLoadDelegate-Protocol"><span class="nav-number">1.</span> <span class="nav-text">WebResourceLoadDelegate Protocol</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UIWebViewDelegate-Protocol"><span class="nav-number">2.</span> <span class="nav-text">UIWebViewDelegate Protocol</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#UIWebView-Private-Method"><span class="nav-number">1.</span> <span class="nav-text">UIWebView Private Method</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WebResourceLoadDelegate-Protocol"><span class="nav-number">2.</span> <span class="nav-text">WebResourceLoadDelegate Protocol</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UIWebViewDelegate-Protocol"><span class="nav-number">3.</span> <span class="nav-text">UIWebViewDelegate Protocol</span></a></li></ol></div>
             
           </div>
         </section>
