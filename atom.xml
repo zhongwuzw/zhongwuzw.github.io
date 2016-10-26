@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://zhongwuzw.github.io/"/>
-  <updated>2016-10-23T03:22:51.000Z</updated>
+  <updated>2016-10-25T10:48:01.000Z</updated>
   <id>https://zhongwuzw.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://zhongwuzw.github.io/2016/10/20/UIWebView%E7%9B%B8%E5%85%B3%E5%8D%8F%E8%AE%AE%E6%96%B9%E6%B3%95%E6%80%BB%E7%BB%93/"/>
     <id>https://zhongwuzw.github.io/2016/10/20/UIWebView相关协议方法总结/</id>
     <published>2016-10-20T01:59:55.000Z</published>
-    <updated>2016-10-23T03:22:51.000Z</updated>
+    <updated>2016-10-25T10:48:01.000Z</updated>
     
     <content type="html"><![CDATA[<h2 id="UIWebView-Private-Method"><a href="#UIWebView-Private-Method" class="headerlink" title="UIWebView Private Method"></a>UIWebView Private Method</h2><hr>
 <ul>
@@ -30,13 +30,25 @@
 </ul>
 <h2 id="WebResourceLoadDelegate-Protocol"><a href="#WebResourceLoadDelegate-Protocol" class="headerlink" title="WebResourceLoadDelegate Protocol"></a>WebResourceLoadDelegate Protocol</h2><hr>
 <ul>
-<li><code>- (id)webView:(WebView *)sender identifierForInitialRequest:(NSURLRequest *)request fromDataSource:(WebDataSource *)dataSource</code><br>  该方法返回一个标识符对象，网页中的每一个资源都会调用该方法。资源包括网页中嵌入的图片、脚本、<code>CSS</code>、嵌入在<code>frame</code>中的页面。</li>
+<li><p><code>- (id)webView:(WebView *)sender identifierForInitialRequest:(NSURLRequest *)request fromDataSource:(WebDataSource *)dataSource</code></p>
+<p>  该方法返回一个标识符对象，网页中的每一个资源都会调用该方法。资源包括网页中嵌入的图片、脚本、<code>CSS</code>、嵌入在<code>frame</code>中的页面。</p>
+</li>
 </ul>
 <a id="more"></a>
 <h2 id="UIWebViewDelegate-Protocol"><a href="#UIWebViewDelegate-Protocol" class="headerlink" title="UIWebViewDelegate Protocol"></a>UIWebViewDelegate Protocol</h2><hr>
 <ul>
-<li><code>- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType</code><br>  webView在加载一个frame之前会回调该方法，加载frame的情形包括加载新的页面、加载<code>iframe</code>的url时。<code>navigationType</code>变量是一个枚举值，标识用户的动作，如点击、提交表单、前进、重载、重新提交表单、以及其他，其他包括重定向等。</li>
-<li><code>- (void)webViewDidFinishLoad:(UIWebView *)webView</code><br>  注意，该方法并不是表示webView完成了网页的加载，而是表示完成了一个frame的加载，所以可能会出现加载一个网页时被调用多次的情况。   </li>
+<li><p><code>- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType</code></p>
+<p>  webView在加载一个frame之前会回调该方法，加载frame的情形包括加载新的页面、加载<code>iframe</code>的url时。<code>navigationType</code>变量是一个枚举值，标识用户的动作，如点击、提交表单、前进、重载、重新提交表单、以及其他，其他包括重定向等。</p>
+</li>
+<li><p><code>- (void)webViewDidFinishLoad:(UIWebView *)webView</code></p>
+<p>  注意，该方法并不是表示webView完成了网页的加载，而是表示完成了一个frame的加载，所以可能会出现加载一个网页时被调用多次的情况。 </p>
+</li>
+</ul>
+<h2 id="WebFrameLoadDelegate-Protocol"><a href="#WebFrameLoadDelegate-Protocol" class="headerlink" title="WebFrameLoadDelegate Protocol"></a>WebFrameLoadDelegate Protocol</h2><hr>
+<ul>
+<li><p><code>- (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame</code></p>
+<p>  当<code>frame</code>完成时调用，既<code>frame</code>的所有资源都已经加载完成。<code>WebFrame</code>封装了一个单独的<code>frame</code>元素，而一个完整的页面则由一个<code>WebFrame</code>的层级树组成，根<code>WebFrame</code>称为<code>main frame</code>，每一个<code>WebFrame</code>都对应一个<code>WebFrameView</code>，其用来显示<code>frame</code>的内容。</p>
+</li>
 </ul>
 ]]></content>
     
@@ -50,7 +62,9 @@
 &lt;/ul&gt;
 &lt;h2 id=&quot;WebResourceLoadDelegate-Protocol&quot;&gt;&lt;a href=&quot;#WebResourceLoadDelegate-Protocol&quot; class=&quot;headerlink&quot; title=&quot;WebResourceLoadDelegate Protocol&quot;&gt;&lt;/a&gt;WebResourceLoadDelegate Protocol&lt;/h2&gt;&lt;hr&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;code&gt;- (id)webView:(WebView *)sender identifierForInitialRequest:(NSURLRequest *)request fromDataSource:(WebDataSource *)dataSource&lt;/code&gt;&lt;br&gt;  该方法返回一个标识符对象，网页中的每一个资源都会调用该方法。资源包括网页中嵌入的图片、脚本、&lt;code&gt;CSS&lt;/code&gt;、嵌入在&lt;code&gt;frame&lt;/code&gt;中的页面。&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;- (id)webView:(WebView *)sender identifierForInitialRequest:(NSURLRequest *)request fromDataSource:(WebDataSource *)dataSource&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;  该方法返回一个标识符对象，网页中的每一个资源都会调用该方法。资源包括网页中嵌入的图片、脚本、&lt;code&gt;CSS&lt;/code&gt;、嵌入在&lt;code&gt;frame&lt;/code&gt;中的页面。&lt;/p&gt;
+&lt;/li&gt;
 &lt;/ul&gt;
     
     </summary>

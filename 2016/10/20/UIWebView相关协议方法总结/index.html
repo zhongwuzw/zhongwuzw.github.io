@@ -98,7 +98,7 @@ UIWebView dump method:UIWebView.h
 
 UIWebView dump method:UIWebView.h
 设置UIWebView在WebThread线程下进行渲染，不占用主线程，代码如下：12[_webView performSelector:@selector(_setDrawInWebThread:) withObject:@YES];[_webView performSelec">
-<meta property="og:updated_time" content="2016-10-23T03:22:51.000Z">
+<meta property="og:updated_time" content="2016-10-25T10:48:01.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="UIWebView相关协议方法总结">
 <meta name="twitter:description" content="UIWebView Private Method
@@ -369,13 +369,25 @@ UIWebView dump method:UIWebView.h
 </ul>
 <h2 id="WebResourceLoadDelegate-Protocol"><a href="#WebResourceLoadDelegate-Protocol" class="headerlink" title="WebResourceLoadDelegate Protocol"></a>WebResourceLoadDelegate Protocol</h2><hr>
 <ul>
-<li><code>- (id)webView:(WebView *)sender identifierForInitialRequest:(NSURLRequest *)request fromDataSource:(WebDataSource *)dataSource</code><br>  该方法返回一个标识符对象，网页中的每一个资源都会调用该方法。资源包括网页中嵌入的图片、脚本、<code>CSS</code>、嵌入在<code>frame</code>中的页面。</li>
+<li><p><code>- (id)webView:(WebView *)sender identifierForInitialRequest:(NSURLRequest *)request fromDataSource:(WebDataSource *)dataSource</code></p>
+<p>  该方法返回一个标识符对象，网页中的每一个资源都会调用该方法。资源包括网页中嵌入的图片、脚本、<code>CSS</code>、嵌入在<code>frame</code>中的页面。</p>
+</li>
 </ul>
 <a id="more"></a>
 <h2 id="UIWebViewDelegate-Protocol"><a href="#UIWebViewDelegate-Protocol" class="headerlink" title="UIWebViewDelegate Protocol"></a>UIWebViewDelegate Protocol</h2><hr>
 <ul>
-<li><code>- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType</code><br>  webView在加载一个frame之前会回调该方法，加载frame的情形包括加载新的页面、加载<code>iframe</code>的url时。<code>navigationType</code>变量是一个枚举值，标识用户的动作，如点击、提交表单、前进、重载、重新提交表单、以及其他，其他包括重定向等。</li>
-<li><code>- (void)webViewDidFinishLoad:(UIWebView *)webView</code><br>  注意，该方法并不是表示webView完成了网页的加载，而是表示完成了一个frame的加载，所以可能会出现加载一个网页时被调用多次的情况。   </li>
+<li><p><code>- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType</code></p>
+<p>  webView在加载一个frame之前会回调该方法，加载frame的情形包括加载新的页面、加载<code>iframe</code>的url时。<code>navigationType</code>变量是一个枚举值，标识用户的动作，如点击、提交表单、前进、重载、重新提交表单、以及其他，其他包括重定向等。</p>
+</li>
+<li><p><code>- (void)webViewDidFinishLoad:(UIWebView *)webView</code></p>
+<p>  注意，该方法并不是表示webView完成了网页的加载，而是表示完成了一个frame的加载，所以可能会出现加载一个网页时被调用多次的情况。 </p>
+</li>
+</ul>
+<h2 id="WebFrameLoadDelegate-Protocol"><a href="#WebFrameLoadDelegate-Protocol" class="headerlink" title="WebFrameLoadDelegate Protocol"></a>WebFrameLoadDelegate Protocol</h2><hr>
+<ul>
+<li><p><code>- (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame</code></p>
+<p>  当<code>frame</code>完成时调用，既<code>frame</code>的所有资源都已经加载完成。<code>WebFrame</code>封装了一个单独的<code>frame</code>元素，而一个完整的页面则由一个<code>WebFrame</code>的层级树组成，根<code>WebFrame</code>称为<code>main frame</code>，每一个<code>WebFrame</code>都对应一个<code>WebFrameView</code>，其用来显示<code>frame</code>的内容。</p>
+</li>
 </ul>
 
       
@@ -591,7 +603,7 @@ UIWebView dump method:UIWebView.h
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#UIWebView-Private-Method"><span class="nav-number">1.</span> <span class="nav-text">UIWebView Private Method</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WebResourceLoadDelegate-Protocol"><span class="nav-number">2.</span> <span class="nav-text">WebResourceLoadDelegate Protocol</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UIWebViewDelegate-Protocol"><span class="nav-number">3.</span> <span class="nav-text">UIWebViewDelegate Protocol</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#UIWebView-Private-Method"><span class="nav-number">1.</span> <span class="nav-text">UIWebView Private Method</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WebResourceLoadDelegate-Protocol"><span class="nav-number">2.</span> <span class="nav-text">WebResourceLoadDelegate Protocol</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UIWebViewDelegate-Protocol"><span class="nav-number">3.</span> <span class="nav-text">UIWebViewDelegate Protocol</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WebFrameLoadDelegate-Protocol"><span class="nav-number">4.</span> <span class="nav-text">WebFrameLoadDelegate Protocol</span></a></li></ol></div>
             
           </div>
         </section>
