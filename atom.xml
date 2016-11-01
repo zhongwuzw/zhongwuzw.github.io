@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://zhongwuzw.github.io/"/>
-  <updated>2016-10-25T10:48:01.000Z</updated>
+  <updated>2016-11-01T03:47:45.000Z</updated>
   <id>https://zhongwuzw.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://zhongwuzw.github.io/2016/10/20/UIWebView%E7%9B%B8%E5%85%B3%E5%8D%8F%E8%AE%AE%E6%96%B9%E6%B3%95%E6%80%BB%E7%BB%93/"/>
     <id>https://zhongwuzw.github.io/2016/10/20/UIWebView相关协议方法总结/</id>
     <published>2016-10-20T01:59:55.000Z</published>
-    <updated>2016-10-25T10:48:01.000Z</updated>
+    <updated>2016-11-01T03:47:45.000Z</updated>
     
     <content type="html"><![CDATA[<h2 id="UIWebView-Private-Method"><a href="#UIWebView-Private-Method" class="headerlink" title="UIWebView Private Method"></a>UIWebView Private Method</h2><hr>
 <ul>
@@ -50,6 +50,15 @@
 <p>  当<code>frame</code>完成时调用，既<code>frame</code>的所有资源都已经加载完成。<code>WebFrame</code>封装了一个单独的<code>frame</code>元素，而一个完整的页面则由一个<code>WebFrame</code>的层级树组成，根<code>WebFrame</code>称为<code>main frame</code>，每一个<code>WebFrame</code>都对应一个<code>WebFrameView</code>，其用来显示<code>frame</code>的内容。</p>
 </li>
 </ul>
+<ul>
+<li><p><code>- (void)webView:(WebView *)sender didReceiveTitle:(NSString *)title forFrame:(WebFrame *)frame</code></p>
+<p>  当<code>frame</code>获取到<code>title</code>时调用，该方法可能会被调用多次，想要及时更新标题的话可以实现该方法。</p>
+</li>
+</ul>
+<h2 id="相关概念"><a href="#相关概念" class="headerlink" title="相关概念"></a>相关概念</h2><hr>
+<ol>
+<li>在请求资源数据时，由于是异步的，所以可能成功，也可能失败，因此<code>Data Sources</code>就分为<code>Provisional</code>和<code>Committed</code>。一开始，<code>data source</code>是<code>Provisional</code>的，因为还不知道页面是否会加载成功，只要有响应数据到来，<code>data source</code>就将变成<code>Committed</code>的。</li>
+</ol>
 ]]></content>
     
     <summary type="html">

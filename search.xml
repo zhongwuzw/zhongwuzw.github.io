@@ -34,6 +34,15 @@
 <p>  当<code>frame</code>完成时调用，既<code>frame</code>的所有资源都已经加载完成。<code>WebFrame</code>封装了一个单独的<code>frame</code>元素，而一个完整的页面则由一个<code>WebFrame</code>的层级树组成，根<code>WebFrame</code>称为<code>main frame</code>，每一个<code>WebFrame</code>都对应一个<code>WebFrameView</code>，其用来显示<code>frame</code>的内容。</p>
 </li>
 </ul>
+<ul>
+<li><p><code>- (void)webView:(WebView *)sender didReceiveTitle:(NSString *)title forFrame:(WebFrame *)frame</code></p>
+<p>  当<code>frame</code>获取到<code>title</code>时调用，该方法可能会被调用多次，想要及时更新标题的话可以实现该方法。</p>
+</li>
+</ul>
+<h2 id="相关概念"><a href="#相关概念" class="headerlink" title="相关概念"></a>相关概念</h2><hr>
+<ol>
+<li>在请求资源数据时，由于是异步的，所以可能成功，也可能失败，因此<code>Data Sources</code>就分为<code>Provisional</code>和<code>Committed</code>。一开始，<code>data source</code>是<code>Provisional</code>的，因为还不知道页面是否会加载成功，只要有响应数据到来，<code>data source</code>就将变成<code>Committed</code>的。</li>
+</ol>
 ]]></content>
     </entry>
     
