@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://zhongwuzw.github.io/"/>
-  <updated>2016-11-01T03:47:45.000Z</updated>
+  <updated>2016-11-02T09:02:35.000Z</updated>
   <id>https://zhongwuzw.github.io/</id>
   
   <author>
@@ -14,6 +14,54 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Hadoop相关总结</title>
+    <link href="https://zhongwuzw.github.io/2016/11/02/Hadoop%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93/"/>
+    <id>https://zhongwuzw.github.io/2016/11/02/Hadoop问题总结/</id>
+    <published>2016-11-02T07:57:22.000Z</published>
+    <updated>2016-11-02T09:02:35.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><hr>
+<ol>
+<li><p>命令行执行<code>Job</code>任务时，出现如下问题，原因为<code>MacOS</code>系统的文件系统大小写不敏感，导致在<code>unjar</code>包时报错，有命名冲突。</p>
+ <figure class="highlight stylus"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">Exception <span class="keyword">in</span> thread <span class="string">"main"</span> java<span class="selector-class">.io</span><span class="selector-class">.IOException</span>: Mkdirs failed to create /var/folders/zz/zyxvpxvq6csfxvn_n0000000000000/T/hadoop-unjar3745345762036287746/license</div><div class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.hadoop</span><span class="selector-class">.util</span><span class="selector-class">.RunJar</span><span class="selector-class">.ensureDirectory</span>(RunJar<span class="selector-class">.java</span>:<span class="number">128</span>)</div><div class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.hadoop</span><span class="selector-class">.util</span><span class="selector-class">.RunJar</span><span class="selector-class">.unJar</span>(RunJar<span class="selector-class">.java</span>:<span class="number">104</span>)</div><div class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.hadoop</span><span class="selector-class">.util</span><span class="selector-class">.RunJar</span><span class="selector-class">.unJar</span>(RunJar<span class="selector-class">.java</span>:<span class="number">81</span>)</div><div class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.hadoop</span><span class="selector-class">.util</span><span class="selector-class">.RunJar</span><span class="selector-class">.run</span>(RunJar<span class="selector-class">.java</span>:<span class="number">209</span>)</div><div class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.hadoop</span><span class="selector-class">.util</span><span class="selector-class">.RunJar</span><span class="selector-class">.main</span>(RunJar<span class="selector-class">.java</span>:<span class="number">136</span>)</div></pre></td></tr></table></figure>
+<p> 解决方法为执行如下命令，删除<code>jar</code>文件中的这两个文件。</p>
+ <figure class="highlight stata"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">zip</span> -<span class="keyword">d</span> Documents/<span class="keyword">Test</span>.jar LICENSE</div><div class="line"><span class="keyword">zip</span> -<span class="keyword">d</span> Documents/<span class="keyword">Test</span>.jar META-<span class="keyword">INF</span>/LICENSE</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<ol>
+<li>使用<code>Eclipse</code>导出可供<code>Hadoop</code>执行的<code>jar</code>包时，导出的类型应选择<code>Runnable JAR file</code>。</li>
+</ol>
+<a id="more"></a>
+<h2 id="用法"><a href="#用法" class="headerlink" title="用法"></a>用法</h2><hr>
+<ol>
+<li>使用<code>Hadoop</code>命令执行<code>Job</code>示例：<br> <code>hadoop jar Documents/Test.jar hdfs://localhost:9000/user/zhongwu/sample.txt hdfs://localhost:9000/user/zhongwu/output111</code></li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;问题&quot;&gt;&lt;a href=&quot;#问题&quot; class=&quot;headerlink&quot; title=&quot;问题&quot;&gt;&lt;/a&gt;问题&lt;/h2&gt;&lt;hr&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;命令行执行&lt;code&gt;Job&lt;/code&gt;任务时，出现如下问题，原因为&lt;code&gt;MacOS&lt;/code&gt;系统的文件系统大小写不敏感，导致在&lt;code&gt;unjar&lt;/code&gt;包时报错，有命名冲突。&lt;/p&gt;
+ &lt;figure class=&quot;highlight stylus&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;Exception &lt;span class=&quot;keyword&quot;&gt;in&lt;/span&gt; thread &lt;span class=&quot;string&quot;&gt;&quot;main&quot;&lt;/span&gt; java&lt;span class=&quot;selector-class&quot;&gt;.io&lt;/span&gt;&lt;span class=&quot;selector-class&quot;&gt;.IOException&lt;/span&gt;: Mkdirs failed to create /var/folders/zz/zyxvpxvq6csfxvn_n0000000000000/T/hadoop-unjar3745345762036287746/license&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;	at org&lt;span class=&quot;selector-class&quot;&gt;.apache&lt;/span&gt;&lt;span class=&quot;selector-class&quot;&gt;.hadoop&lt;/span&gt;&lt;span class=&quot;selector-class&quot;&gt;.util&lt;/span&gt;&lt;span class=&quot;selector-class&quot;&gt;.RunJar&lt;/span&gt;&lt;span class=&quot;selector-class&quot;&gt;.ensureDirectory&lt;/span&gt;(RunJar&lt;span class=&quot;selector-class&quot;&gt;.java&lt;/span&gt;:&lt;span class=&quot;number&quot;&gt;128&lt;/span&gt;)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;	at org&lt;span class=&quot;selector-class&quot;&gt;.apache&lt;/span&gt;&lt;span class=&quot;selector-class&quot;&gt;.hadoop&lt;/span&gt;&lt;span class=&quot;selector-class&quot;&gt;.util&lt;/span&gt;&lt;span class=&quot;selector-class&quot;&gt;.RunJar&lt;/span&gt;&lt;span class=&quot;selector-class&quot;&gt;.unJar&lt;/span&gt;(RunJar&lt;span class=&quot;selector-class&quot;&gt;.java&lt;/span&gt;:&lt;span class=&quot;number&quot;&gt;104&lt;/span&gt;)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;	at org&lt;span class=&quot;selector-class&quot;&gt;.apache&lt;/span&gt;&lt;span class=&quot;selector-class&quot;&gt;.hadoop&lt;/span&gt;&lt;span class=&quot;selector-class&quot;&gt;.util&lt;/span&gt;&lt;span class=&quot;selector-class&quot;&gt;.RunJar&lt;/span&gt;&lt;span class=&quot;selector-class&quot;&gt;.unJar&lt;/span&gt;(RunJar&lt;span class=&quot;selector-class&quot;&gt;.java&lt;/span&gt;:&lt;span class=&quot;number&quot;&gt;81&lt;/span&gt;)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;	at org&lt;span class=&quot;selector-class&quot;&gt;.apache&lt;/span&gt;&lt;span class=&quot;selector-class&quot;&gt;.hadoop&lt;/span&gt;&lt;span class=&quot;selector-class&quot;&gt;.util&lt;/span&gt;&lt;span class=&quot;selector-class&quot;&gt;.RunJar&lt;/span&gt;&lt;span class=&quot;selector-class&quot;&gt;.run&lt;/span&gt;(RunJar&lt;span class=&quot;selector-class&quot;&gt;.java&lt;/span&gt;:&lt;span class=&quot;number&quot;&gt;209&lt;/span&gt;)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;	at org&lt;span class=&quot;selector-class&quot;&gt;.apache&lt;/span&gt;&lt;span class=&quot;selector-class&quot;&gt;.hadoop&lt;/span&gt;&lt;span class=&quot;selector-class&quot;&gt;.util&lt;/span&gt;&lt;span class=&quot;selector-class&quot;&gt;.RunJar&lt;/span&gt;&lt;span class=&quot;selector-class&quot;&gt;.main&lt;/span&gt;(RunJar&lt;span class=&quot;selector-class&quot;&gt;.java&lt;/span&gt;:&lt;span class=&quot;number&quot;&gt;136&lt;/span&gt;)&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt; 解决方法为执行如下命令，删除&lt;code&gt;jar&lt;/code&gt;文件中的这两个文件。&lt;/p&gt;
+ &lt;figure class=&quot;highlight stata&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;zip&lt;/span&gt; -&lt;span class=&quot;keyword&quot;&gt;d&lt;/span&gt; Documents/&lt;span class=&quot;keyword&quot;&gt;Test&lt;/span&gt;.jar LICENSE&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;zip&lt;/span&gt; -&lt;span class=&quot;keyword&quot;&gt;d&lt;/span&gt; Documents/&lt;span class=&quot;keyword&quot;&gt;Test&lt;/span&gt;.jar META-&lt;span class=&quot;keyword&quot;&gt;INF&lt;/span&gt;/LICENSE&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ol&gt;
+&lt;li&gt;使用&lt;code&gt;Eclipse&lt;/code&gt;导出可供&lt;code&gt;Hadoop&lt;/code&gt;执行的&lt;code&gt;jar&lt;/code&gt;包时，导出的类型应选择&lt;code&gt;Runnable JAR file&lt;/code&gt;。&lt;/li&gt;
+&lt;/ol&gt;
+    
+    </summary>
+    
+      <category term="Hadoop" scheme="https://zhongwuzw.github.io/categories/Hadoop/"/>
+    
+    
+      <category term="Hadoop" scheme="https://zhongwuzw.github.io/tags/Hadoop/"/>
+    
+  </entry>
   
   <entry>
     <title>UIWebView相关协议方法总结</title>

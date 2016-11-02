@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="Hadoop," />
 
 
 
@@ -86,15 +86,25 @@
 
 
 
-<meta name="description" content="Keep thinking, keep coding!!!">
-<meta property="og:type" content="website">
-<meta property="og:title" content="钟武的技术博客">
-<meta property="og:url" content="https://zhongwuzw.github.io/categories/Python/index.html">
+<meta name="description" content="问题
+
+命令行执行Job任务时，出现如下问题，原因为MacOS系统的文件系统大小写不敏感，导致在unjar包时报错，有命名冲突。
+ 123456Exception in thread &quot;main&quot; java.io.IOException: Mkdirs failed to create /var/folders/zz/zyxvpxvq6csfxvn_n0000000000000/T/hadoop-">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hadoop相关总结">
+<meta property="og:url" content="https://zhongwuzw.github.io/2016/11/02/Hadoop问题总结/index.html">
 <meta property="og:site_name" content="钟武的技术博客">
-<meta property="og:description" content="Keep thinking, keep coding!!!">
+<meta property="og:description" content="问题
+
+命令行执行Job任务时，出现如下问题，原因为MacOS系统的文件系统大小写不敏感，导致在unjar包时报错，有命名冲突。
+ 123456Exception in thread &quot;main&quot; java.io.IOException: Mkdirs failed to create /var/folders/zz/zyxvpxvq6csfxvn_n0000000000000/T/hadoop-">
+<meta property="og:updated_time" content="2016-11-02T09:02:35.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="钟武的技术博客">
-<meta name="twitter:description" content="Keep thinking, keep coding!!!">
+<meta name="twitter:title" content="Hadoop相关总结">
+<meta name="twitter:description" content="问题
+
+命令行执行Job任务时，出现如下问题，原因为MacOS系统的文件系统大小写不敏感，导致在unjar包时报错，有命名冲突。
+ 123456Exception in thread &quot;main&quot; java.io.IOException: Mkdirs failed to create /var/folders/zz/zyxvpxvq6csfxvn_n0000000000000/T/hadoop-">
 
 
 
@@ -112,7 +122,7 @@
   };
 </script>
 
-  <title> 分类: Python | 钟武的技术博客 </title>
+  <title> Hadoop相关总结 | 钟武的技术博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -133,7 +143,7 @@
     
   
 
-  <div class="container one-collumn sidebar-position-left  ">
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -264,54 +274,199 @@
           <div id="content" class="content">
             
 
-  <section id="posts" class="posts-collapse">
-    <div class="collection-title">
-      <h2 >
-        Python
-        <small>分类</small>
-      </h2>
-    </div>
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
 
     
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Hadoop相关总结
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-11-02T15:57:22+08:00" content="2016-11-02">
+              2016-11-02
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Hadoop/" itemprop="url" rel="index">
+                    <span itemprop="name">Hadoop</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/11/02/Hadoop问题总结/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/11/02/Hadoop问题总结/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
       
 
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+      
+        <h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><hr>
+<ol>
+<li><p>命令行执行<code>Job</code>任务时，出现如下问题，原因为<code>MacOS</code>系统的文件系统大小写不敏感，导致在<code>unjar</code>包时报错，有命名冲突。</p>
+ <figure class="highlight stylus"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">Exception <span class="keyword">in</span> thread <span class="string">"main"</span> java<span class="selector-class">.io</span><span class="selector-class">.IOException</span>: Mkdirs failed to create /var/folders/zz/zyxvpxvq6csfxvn_n0000000000000/T/hadoop-unjar3745345762036287746/license</div><div class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.hadoop</span><span class="selector-class">.util</span><span class="selector-class">.RunJar</span><span class="selector-class">.ensureDirectory</span>(RunJar<span class="selector-class">.java</span>:<span class="number">128</span>)</div><div class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.hadoop</span><span class="selector-class">.util</span><span class="selector-class">.RunJar</span><span class="selector-class">.unJar</span>(RunJar<span class="selector-class">.java</span>:<span class="number">104</span>)</div><div class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.hadoop</span><span class="selector-class">.util</span><span class="selector-class">.RunJar</span><span class="selector-class">.unJar</span>(RunJar<span class="selector-class">.java</span>:<span class="number">81</span>)</div><div class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.hadoop</span><span class="selector-class">.util</span><span class="selector-class">.RunJar</span><span class="selector-class">.run</span>(RunJar<span class="selector-class">.java</span>:<span class="number">209</span>)</div><div class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.hadoop</span><span class="selector-class">.util</span><span class="selector-class">.RunJar</span><span class="selector-class">.main</span>(RunJar<span class="selector-class">.java</span>:<span class="number">136</span>)</div></pre></td></tr></table></figure>
+<p> 解决方法为执行如下命令，删除<code>jar</code>文件中的这两个文件。</p>
+ <figure class="highlight stata"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">zip</span> -<span class="keyword">d</span> Documents/<span class="keyword">Test</span>.jar LICENSE</div><div class="line"><span class="keyword">zip</span> -<span class="keyword">d</span> Documents/<span class="keyword">Test</span>.jar META-<span class="keyword">INF</span>/LICENSE</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<ol>
+<li>使用<code>Eclipse</code>导出可供<code>Hadoop</code>执行的<code>jar</code>包时，导出的类型应选择<code>Runnable JAR file</code>。</li>
+</ol>
+<a id="more"></a>
+<h2 id="用法"><a href="#用法" class="headerlink" title="用法"></a>用法</h2><hr>
+<ol>
+<li>使用<code>Hadoop</code>命令执行<code>Job</code>示例：<br> <code>hadoop jar Documents/Test.jar hdfs://localhost:9000/user/zhongwu/sample.txt hdfs://localhost:9000/user/zhongwu/output111</code></li>
+</ol>
 
-      <h1 class="post-title">
+      
+    </div>
+
+    <div>
+      
         
-            <a class="post-title-link" href="/2016/10/13/使用PyMySQL处理大结果集的方法/" itemprop="url">
-              
-                <span itemprop="name">使用PyMySQL处理大结果集的方法</span>
-              
-            </a>
+      
+    </div>
+
+    <div>
+      
         
-      </h1>
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2016-10-13T14:53:30+08:00"
-              content="2016-10-13" >
-          10-13
-        </time>
-      </div>
+      
+    </div>
 
-    </header>
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Hadoop/" rel="tag">#Hadoop</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/20/UIWebView相关协议方法总结/" rel="next" title="UIWebView相关协议方法总结">
+                <i class="fa fa-chevron-left"></i> UIWebView相关协议方法总结
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </article>
 
 
-    
-  </section>
 
-  
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2016/11/02/Hadoop问题总结/"
+     data-title="Hadoop相关总结"
+     data-content=""
+     data-url="https://zhongwuzw.github.io/2016/11/02/Hadoop问题总结/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
 
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
 
 
           </div>
           
 
+  <p>热评文章</p>
+  <div class="ds-top-threads" data-range="weekly" data-num-items="4"></div>
+
 
           
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/11/02/Hadoop问题总结/"
+           data-title="Hadoop相关总结" data-url="https://zhongwuzw.github.io/2016/11/02/Hadoop问题总结/">
+      </div>
+    
+  </div>
+
 
         </div>
         
@@ -331,8 +486,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel  sidebar-panel-active ">
+      <section class="site-overview sidebar-panel ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.JPG"
@@ -418,6 +582,17 @@
 
       </section>
 
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题"><span class="nav-number">1.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#用法"><span class="nav-number">2.</span> <span class="nav-text">用法</span></a></li></ol></div>
+            
+          </div>
+        </section>
       
 
     </div>
@@ -521,6 +696,10 @@
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
 
   
 
