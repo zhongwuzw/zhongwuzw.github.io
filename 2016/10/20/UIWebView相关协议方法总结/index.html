@@ -98,7 +98,7 @@ UIWebView dump method:UIWebView.h
 
 UIWebView dump method:UIWebView.h
 设置UIWebView在WebThread线程下进行渲染，不占用主线程，代码如下：12[_webView performSelector:@selector(_setDrawInWebThread:) withObject:@YES];[_webView performSelec">
-<meta property="og:updated_time" content="2016-11-01T03:47:45.000Z">
+<meta property="og:updated_time" content="2016-11-06T07:37:12.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="UIWebView相关协议方法总结">
 <meta name="twitter:description" content="UIWebView Private Method
@@ -381,6 +381,9 @@ UIWebView dump method:UIWebView.h
 </li>
 <li><p><code>- (void)webViewDidFinishLoad:(UIWebView *)webView</code></p>
 <p>  注意，该方法并不是表示webView完成了网页的加载，而是表示完成了一个frame的加载，所以可能会出现加载一个网页时被调用多次的情况。 </p>
+</li>
+<li><p><code>- (void)webViewDidStartLoad:(UIWebView *)webView</code></p>
+<p>  当webView开始加载<code>frame</code>时调用，注意，该方法不管加载是否成功都会调用。</p>
 </li>
 </ul>
 <h2 id="WebFrameLoadDelegate-Protocol"><a href="#WebFrameLoadDelegate-Protocol" class="headerlink" title="WebFrameLoadDelegate Protocol"></a>WebFrameLoadDelegate Protocol</h2><hr>

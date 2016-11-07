@@ -100,7 +100,7 @@ iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙�
 iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙盒，如果需要让自己的应用能够通过其访问，必须在应用的info.plist中添加UIFileSharingEnabled关键字，并赋值为YES，这样，就能访问其Documents目录了(注意，其它目录还是无法访问)。
 
 使用UIWebView时，发现在首次加载网页时，加载时间异常的长，其原因是服务器需要花费一">
-<meta property="og:updated_time" content="2016-10-17T08:48:42.000Z">
+<meta property="og:updated_time" content="2016-11-06T08:01:16.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS相关tips">
 <meta name="twitter:description" content="Tips
@@ -383,6 +383,8 @@ iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙�
 <p>  如果<code>navigationBar</code>不可见，那么就只能调整<code>UIVew</code>的位置了，向下移20 points。</p>
 </li>
 <li><p><code>UIWebView</code>加载页面时底部出现黑条问题解决方法：设置<code>UIWebView</code>的<code>backgroundColor</code>为<code>clearColor</code>，<code>opaque</code>为<code>NO</code>即可。</p>
+</li>
+<li><p>当我们使用<a href="https://github.com/Carthage/Carthage" target="_blank" rel="external">Carthage</a>作为依赖管理器时，安装库时，经常会执行<code>carthage update</code>命令，此时，不同的库，可能会生成多个平台的<code>frameworks</code>，如<code>iOS</code>，<code>macOS</code>，<code>watchOS</code>，<code>tvOS</code>，所以，如果我们的项目只需要使用到<code>iOS</code>的<code>framework</code>，那么可以在执行<code>update</code>命令时加上参数，如<code>carthage update --platform iOS</code></p>
 </li>
 </ul>
 
