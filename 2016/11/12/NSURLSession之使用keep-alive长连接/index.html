@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="iOS,NSURLSession,网络," />
 
 
 
@@ -86,15 +86,22 @@
 
 
 
-<meta name="description" content="Keep thinking, keep coding!!!">
-<meta property="og:type" content="website">
-<meta property="og:title" content="钟武的技术博客">
-<meta property="og:url" content="https://zhongwuzw.github.io/tags/iOS开发-UI/index.html">
+<meta name="description" content="HTTP Keep-Alive
+HTTP的Keep-Alive，是HTTP 1.1默认的功能（HTTP 1.0可以在请求头中设置Keep-Alive来显式开启），其表示持久连接，以前我们所使用的HTTP请求，当发出请求并接收完响应后，将关闭TCP连接，所以，如果我们短时间内进行大量的HTTP请求的话，会导致过多的TCP连接建立、关闭消耗.
+HTTP Keep-Alive vs TCP KeepAl">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NSURLSession之使用Keep-Alive长连接">
+<meta property="og:url" content="https://zhongwuzw.github.io/2016/11/12/NSURLSession之使用keep-alive长连接/index.html">
 <meta property="og:site_name" content="钟武的技术博客">
-<meta property="og:description" content="Keep thinking, keep coding!!!">
+<meta property="og:description" content="HTTP Keep-Alive
+HTTP的Keep-Alive，是HTTP 1.1默认的功能（HTTP 1.0可以在请求头中设置Keep-Alive来显式开启），其表示持久连接，以前我们所使用的HTTP请求，当发出请求并接收完响应后，将关闭TCP连接，所以，如果我们短时间内进行大量的HTTP请求的话，会导致过多的TCP连接建立、关闭消耗.
+HTTP Keep-Alive vs TCP KeepAl">
+<meta property="og:updated_time" content="2016-11-12T15:28:54.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="钟武的技术博客">
-<meta name="twitter:description" content="Keep thinking, keep coding!!!">
+<meta name="twitter:title" content="NSURLSession之使用Keep-Alive长连接">
+<meta name="twitter:description" content="HTTP Keep-Alive
+HTTP的Keep-Alive，是HTTP 1.1默认的功能（HTTP 1.0可以在请求头中设置Keep-Alive来显式开启），其表示持久连接，以前我们所使用的HTTP请求，当发出请求并接收完响应后，将关闭TCP连接，所以，如果我们短时间内进行大量的HTTP请求的话，会导致过多的TCP连接建立、关闭消耗.
+HTTP Keep-Alive vs TCP KeepAl">
 
 
 
@@ -112,7 +119,7 @@
   };
 </script>
 
-  <title> 标签: iOS开发-UI | 钟武的技术博客 </title>
+  <title> NSURLSession之使用Keep-Alive长连接 | 钟武的技术博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -133,7 +140,7 @@
     
   
 
-  <div class="container one-collumn sidebar-position-left  ">
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -264,53 +271,212 @@
           <div id="content" class="content">
             
 
-  <div id="posts" class="posts-collapse">
-    <div class="collection-title">
-      <h2 >
-        iOS开发-UI
-        <small>标签</small>
-      </h2>
-    </div>
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
 
     
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                NSURLSession之使用Keep-Alive长连接
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-11-12T22:13:57+08:00" content="2016-11-12">
+              2016-11-12
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/iOS开发-网络/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发-网络</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/11/12/NSURLSession之使用keep-alive长连接/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/11/12/NSURLSession之使用keep-alive长连接/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
       
 
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+      
+        <h2 id="HTTP-Keep-Alive"><a href="#HTTP-Keep-Alive" class="headerlink" title="HTTP Keep-Alive"></a>HTTP Keep-Alive</h2><hr>
+<p><code>HTTP</code>的<code>Keep-Alive</code>，是<code>HTTP 1.1</code>默认的功能（<code>HTTP 1.0</code>可以在请求头中设置<code>Keep-Alive</code>来显式开启），其表示持久连接，以前我们所使用的<code>HTTP</code>请求，当发出请求并接收完响应后，将关闭<code>TCP</code>连接，所以，如果我们短时间内进行大量的<code>HTTP</code>请求的话，会导致过多的<code>TCP</code>连接建立、关闭消耗.</p>
+<h2 id="HTTP-Keep-Alive-vs-TCP-KeepAlive"><a href="#HTTP-Keep-Alive-vs-TCP-KeepAlive" class="headerlink" title="HTTP Keep-Alive vs TCP KeepAlive"></a>HTTP Keep-Alive vs TCP KeepAlive</h2><hr>
+<p>注意，我们目前说的都是<code>HTTP</code>的<code>Keep-Alive</code>，其实，<code>TCP</code>也有<code>KeepAlive</code>的概念，它解决的主要问题是，当连接建立后，如果没有数据传输，或者隔一段时间才发送一次数据时，如何来确定<code>Client</code>是否在线，连接是否需要保持，<code>TCP</code>解决方法为，当超过一段时间后，<code>TCP</code>会自动发送一个数据为空的报文给<code>Client</code>，如果对方回应了，则连接继续保持，否则，在重试多次无果后将关闭连接。</p>
+<h2 id="Pipeline"><a href="#Pipeline" class="headerlink" title="Pipeline"></a>Pipeline</h2><hr>
+<p><code>HTTP 1.1</code>引入了<code>Pipeline</code>,其基于<code>Keep-Alive</code>，既利用一个连接做多次请求，当<code>Client</code>提交多个请求时，不需要等第一个请求的响应接收完就能发起第二个请求，既实现类似于流水作业的功能。目前主流服务器都支持<code>Keep-Alive</code>和<code>Pipeline</code>。</p>
+<h2 id="使用NSURLSession开启Keep-Alive、Pipeline"><a href="#使用NSURLSession开启Keep-Alive、Pipeline" class="headerlink" title="使用NSURLSession开启Keep-Alive、Pipeline"></a>使用NSURLSession开启Keep-Alive、Pipeline</h2><hr>
+<a id="more"></a>
+<ul>
+<li><p>开启<code>NSURLSession</code>配置<code>NSURLSessionConfiguration</code>的<code>HTTPShouldUsePipelining</code>属性为<code>YES</code>。</p>
+</li>
+<li><p>开启<code>NSMutableURLRequest</code>的<code>HTTPShouldUsePipelining</code>为<code>YES</code>。（<code>NSMutableURLRequest</code>可以继承<code>NSURLSessionConfiguration</code>的配置，所以如果<code>NSURLSession</code>配置了，则每个请求就不再需要单独配置可。）</p>
+</li>
+<li><p>确保发出的请求在同一个<code>NSURLSession</code>中，因为每一个<code>NSURLSession</code>使用单独的连接池，所以如果<code>NSURLSession</code>不同，那么就无法利用<code>Keep-Alive</code>、<code>Pipeline</code>了。</p>
+</li>
+<li><p>如果请求开启了认证，则相同的认证才能利用<code>Keep-Alive</code>、<code>Pipeline</code>。</p>
+</li>
+</ul>
+<h2 id="附"><a href="#附" class="headerlink" title="附"></a>附</h2><hr>
+<ul>
+<li><p>使用<code>SDWebImage</code>库的类别<code>UIImageView+WebCache</code>加载图片时，默认使用的共享的<code>NSURLSession</code>，且开启了<code>HTTPShouldUsePipelining</code>。</p>
+</li>
+<li><p>使用<code>AFNetworking</code>库时，每个<code>AFHTTPSessionManager</code>都会创建一个单独的<code>NSURLSession</code>。</p>
+</li>
+</ul>
 
-      <h1 class="post-title">
+      
+    </div>
+
+    <div>
+      
         
-            <a class="post-title-link" href="/2016/09/12/iOS事件处理之Hit-Testing/" itemprop="url">
-              
-                <span itemprop="name">iOS事件处理之Hit-Testing</span>
-              
-            </a>
+      
+    </div>
+
+    <div>
+      
         
-      </h1>
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2016-09-12T12:25:12+08:00"
-              content="2016-09-12" >
-          09-12
-        </time>
-      </div>
+      
+    </div>
 
-    </header>
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag">#iOS</a>
+          
+            <a href="/tags/NSURLSession/" rel="tag">#NSURLSession</a>
+          
+            <a href="/tags/网络/" rel="tag">#网络</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/11/02/Hadoop问题总结/" rel="next" title="Hadoop相关总结">
+                <i class="fa fa-chevron-left"></i> Hadoop相关总结
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </article>
 
 
-    
-  </div>
 
-  
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2016/11/12/NSURLSession之使用keep-alive长连接/"
+     data-title="NSURLSession之使用Keep-Alive长连接"
+     data-content=""
+     data-url="https://zhongwuzw.github.io/2016/11/12/NSURLSession之使用keep-alive长连接/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
 
 
           </div>
           
 
+  <p>热评文章</p>
+  <div class="ds-top-threads" data-range="weekly" data-num-items="4"></div>
+
 
           
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/11/12/NSURLSession之使用keep-alive长连接/"
+           data-title="NSURLSession之使用Keep-Alive长连接" data-url="https://zhongwuzw.github.io/2016/11/12/NSURLSession之使用keep-alive长连接/">
+      </div>
+    
+  </div>
+
 
         </div>
         
@@ -330,8 +496,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel  sidebar-panel-active ">
+      <section class="site-overview sidebar-panel ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.JPG"
@@ -417,6 +592,17 @@
 
       </section>
 
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-Keep-Alive"><span class="nav-number">1.</span> <span class="nav-text">HTTP Keep-Alive</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-Keep-Alive-vs-TCP-KeepAlive"><span class="nav-number">2.</span> <span class="nav-text">HTTP Keep-Alive vs TCP KeepAlive</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pipeline"><span class="nav-number">3.</span> <span class="nav-text">Pipeline</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用NSURLSession开启Keep-Alive、Pipeline"><span class="nav-number">4.</span> <span class="nav-text">使用NSURLSession开启Keep-Alive、Pipeline</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#附"><span class="nav-number">5.</span> <span class="nav-text">附</span></a></li></ol></div>
+            
+          </div>
+        </section>
       
 
     </div>
@@ -520,6 +706,10 @@
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
 
   
 

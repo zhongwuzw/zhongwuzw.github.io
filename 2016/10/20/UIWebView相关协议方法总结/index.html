@@ -98,7 +98,7 @@ UIWebView dump method:UIWebView.h
 
 UIWebView dump method:UIWebView.h
 设置UIWebView在WebThread线程下进行渲染，不占用主线程，代码如下：12[_webView performSelector:@selector(_setDrawInWebThread:) withObject:@YES];[_webView performSelec">
-<meta property="og:updated_time" content="2016-11-06T07:37:12.000Z">
+<meta property="og:updated_time" content="2016-11-08T16:02:24.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="UIWebView相关协议方法总结">
 <meta name="twitter:description" content="UIWebView Private Method
@@ -377,7 +377,7 @@ UIWebView dump method:UIWebView.h
 <h2 id="UIWebViewDelegate-Protocol"><a href="#UIWebViewDelegate-Protocol" class="headerlink" title="UIWebViewDelegate Protocol"></a>UIWebViewDelegate Protocol</h2><hr>
 <ul>
 <li><p><code>- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType</code></p>
-<p>  webView在加载一个frame之前会回调该方法，加载frame的情形包括加载新的页面、加载<code>iframe</code>的url时。<code>navigationType</code>变量是一个枚举值，标识用户的动作，如点击、提交表单、前进、重载、重新提交表单、以及其他，其他包括重定向等。</p>
+<p>  webView在加载一个frame之前会回调该方法，加载frame的情形包括加载新的页面、加载<code>iframe</code>的url时。<code>navigationType</code>变量是一个枚举值，标识用户的动作，如点击、提交表单、前进、重载、重新提交表单、以及其他，其他包括重定向等。（注意，调用该方法，并不代表会发生真正的服务器请求，比如<code>fragment</code>）</p>
 </li>
 <li><p><code>- (void)webViewDidFinishLoad:(UIWebView *)webView</code></p>
 <p>  注意，该方法并不是表示webView完成了网页的加载，而是表示完成了一个frame的加载，所以可能会出现加载一个网页时被调用多次的情况。 </p>
@@ -537,7 +537,7 @@ UIWebView dump method:UIWebView.h
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">19</span>
+              <span class="site-state-item-count">20</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -554,7 +554,7 @@ UIWebView dump method:UIWebView.h
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-count">19</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

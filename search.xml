@@ -4,6 +4,37 @@
   
     
     <entry>
+      <title><![CDATA[NSURLSession之使用Keep-Alive长连接]]></title>
+      <url>https://zhongwuzw.github.io/2016/11/12/NSURLSession%E4%B9%8B%E4%BD%BF%E7%94%A8keep-alive%E9%95%BF%E8%BF%9E%E6%8E%A5/</url>
+      <content type="html"><![CDATA[<h2 id="HTTP-Keep-Alive"><a href="#HTTP-Keep-Alive" class="headerlink" title="HTTP Keep-Alive"></a>HTTP Keep-Alive</h2><hr>
+<p><code>HTTP</code>的<code>Keep-Alive</code>，是<code>HTTP 1.1</code>默认的功能（<code>HTTP 1.0</code>可以在请求头中设置<code>Keep-Alive</code>来显式开启），其表示持久连接，以前我们所使用的<code>HTTP</code>请求，当发出请求并接收完响应后，将关闭<code>TCP</code>连接，所以，如果我们短时间内进行大量的<code>HTTP</code>请求的话，会导致过多的<code>TCP</code>连接建立、关闭消耗.</p>
+<h2 id="HTTP-Keep-Alive-vs-TCP-KeepAlive"><a href="#HTTP-Keep-Alive-vs-TCP-KeepAlive" class="headerlink" title="HTTP Keep-Alive vs TCP KeepAlive"></a>HTTP Keep-Alive vs TCP KeepAlive</h2><hr>
+<p>注意，我们目前说的都是<code>HTTP</code>的<code>Keep-Alive</code>，其实，<code>TCP</code>也有<code>KeepAlive</code>的概念，它解决的主要问题是，当连接建立后，如果没有数据传输，或者隔一段时间才发送一次数据时，如何来确定<code>Client</code>是否在线，连接是否需要保持，<code>TCP</code>解决方法为，当超过一段时间后，<code>TCP</code>会自动发送一个数据为空的报文给<code>Client</code>，如果对方回应了，则连接继续保持，否则，在重试多次无果后将关闭连接。</p>
+<h2 id="Pipeline"><a href="#Pipeline" class="headerlink" title="Pipeline"></a>Pipeline</h2><hr>
+<p><code>HTTP 1.1</code>引入了<code>Pipeline</code>,其基于<code>Keep-Alive</code>，既利用一个连接做多次请求，当<code>Client</code>提交多个请求时，不需要等第一个请求的响应接收完就能发起第二个请求，既实现类似于流水作业的功能。目前主流服务器都支持<code>Keep-Alive</code>和<code>Pipeline</code>。</p>
+<h2 id="使用NSURLSession开启Keep-Alive、Pipeline"><a href="#使用NSURLSession开启Keep-Alive、Pipeline" class="headerlink" title="使用NSURLSession开启Keep-Alive、Pipeline"></a>使用NSURLSession开启Keep-Alive、Pipeline</h2><hr>
+<a id="more"></a>
+<ul>
+<li><p>开启<code>NSURLSession</code>配置<code>NSURLSessionConfiguration</code>的<code>HTTPShouldUsePipelining</code>属性为<code>YES</code>。</p>
+</li>
+<li><p>开启<code>NSMutableURLRequest</code>的<code>HTTPShouldUsePipelining</code>为<code>YES</code>。（<code>NSMutableURLRequest</code>可以继承<code>NSURLSessionConfiguration</code>的配置，所以如果<code>NSURLSession</code>配置了，则每个请求就不再需要单独配置可。）</p>
+</li>
+<li><p>确保发出的请求在同一个<code>NSURLSession</code>中，因为每一个<code>NSURLSession</code>使用单独的连接池，所以如果<code>NSURLSession</code>不同，那么就无法利用<code>Keep-Alive</code>、<code>Pipeline</code>了。</p>
+</li>
+<li><p>如果请求开启了认证，则相同的认证才能利用<code>Keep-Alive</code>、<code>Pipeline</code>。</p>
+</li>
+</ul>
+<h2 id="附"><a href="#附" class="headerlink" title="附"></a>附</h2><hr>
+<ul>
+<li><p>使用<code>SDWebImage</code>库的类别<code>UIImageView+WebCache</code>加载图片时，默认使用的共享的<code>NSURLSession</code>，且开启了<code>HTTPShouldUsePipelining</code>。</p>
+</li>
+<li><p>使用<code>AFNetworking</code>库时，每个<code>AFHTTPSessionManager</code>都会创建一个单独的<code>NSURLSession</code>。</p>
+</li>
+</ul>
+]]></content>
+    </entry>
+    
+    <entry>
       <title><![CDATA[Hadoop相关总结]]></title>
       <url>https://zhongwuzw.github.io/2016/11/02/Hadoop%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93/</url>
       <content type="html"><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><hr>
@@ -65,7 +96,7 @@
 <h2 id="UIWebViewDelegate-Protocol"><a href="#UIWebViewDelegate-Protocol" class="headerlink" title="UIWebViewDelegate Protocol"></a>UIWebViewDelegate Protocol</h2><hr>
 <ul>
 <li><p><code>- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType</code></p>
-<p>  webView在加载一个frame之前会回调该方法，加载frame的情形包括加载新的页面、加载<code>iframe</code>的url时。<code>navigationType</code>变量是一个枚举值，标识用户的动作，如点击、提交表单、前进、重载、重新提交表单、以及其他，其他包括重定向等。</p>
+<p>  webView在加载一个frame之前会回调该方法，加载frame的情形包括加载新的页面、加载<code>iframe</code>的url时。<code>navigationType</code>变量是一个枚举值，标识用户的动作，如点击、提交表单、前进、重载、重新提交表单、以及其他，其他包括重定向等。（注意，调用该方法，并不代表会发生真正的服务器请求，比如<code>fragment</code>）</p>
 </li>
 <li><p><code>- (void)webViewDidFinishLoad:(UIWebView *)webView</code></p>
 <p>  注意，该方法并不是表示webView完成了网页的加载，而是表示完成了一个frame的加载，所以可能会出现加载一个网页时被调用多次的情况。 </p>
@@ -134,6 +165,17 @@
 <li><p><code>UIWebView</code>加载页面时底部出现黑条问题解决方法：设置<code>UIWebView</code>的<code>backgroundColor</code>为<code>clearColor</code>，<code>opaque</code>为<code>NO</code>即可。</p>
 </li>
 <li><p>当我们使用<a href="https://github.com/Carthage/Carthage" target="_blank" rel="external">Carthage</a>作为依赖管理器时，安装库时，经常会执行<code>carthage update</code>命令，此时，不同的库，可能会生成多个平台的<code>frameworks</code>，如<code>iOS</code>，<code>macOS</code>，<code>watchOS</code>，<code>tvOS</code>，所以，如果我们的项目只需要使用到<code>iOS</code>的<code>framework</code>，那么可以在执行<code>update</code>命令时加上参数，如<code>carthage update --platform iOS</code></p>
+</li>
+<li><p>当在<code>UIWebView</code>中播放<code>audio</code>时，默认在应用进入后台或锁定等情况时，<code>audio</code>会暂停。解决方法为：</p>
+<ol>
+<li><p>在<code>info.plist</code>中加入键值对如下：</p>
+ <figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">    	&lt;key&gt;UIBackgroundModes&lt;/key&gt;</div><div class="line">    	&lt;array&gt;</div><div class="line">		&lt;string&gt;audio&lt;/string&gt;</div><div class="line">    	&lt;/array&gt;</div><div class="line">    ```     </div><div class="line"><span class="number">2</span>. 设置`Audio Session`的类别，默认类别为`AVAudioSessionCategorySoloAmbient`,将类别设置为`AVAudioSessionCategoryPlayback`，代码如下：</div></pre></td></tr></table></figure>
+<p> #import <avfoundation avfoundation.h=""><br> #import <audiotoolbox audiotoolbox.h=""></audiotoolbox></avfoundation></p>
+<p> AVAudioSession *audioSession = [AVAudioSession  sharedInstance];</p>
+<p> NSError <em>setCategoryError = nil;<br> BOOL success = [audioSession setCategory:AVAudioSessionCategoryPlayback error:&amp;setCategoryError];<br> if (!success) { /</em> handle the error condition */ }</p>
+<p> NSError <em>activationError = nil;<br> success = [audioSession setActive:YES error:&amp;activationError];<br> if (!success) { /</em> handle the error condition */ }<br> ```</p>
+</li>
+</ol>
 </li>
 </ul>
 ]]></content>

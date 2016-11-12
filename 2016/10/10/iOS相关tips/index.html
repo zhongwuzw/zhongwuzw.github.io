@@ -100,7 +100,7 @@ iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙�
 iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙盒，如果需要让自己的应用能够通过其访问，必须在应用的info.plist中添加UIFileSharingEnabled关键字，并赋值为YES，这样，就能访问其Documents目录了(注意，其它目录还是无法访问)。
 
 使用UIWebView时，发现在首次加载网页时，加载时间异常的长，其原因是服务器需要花费一">
-<meta property="og:updated_time" content="2016-11-06T08:01:16.000Z">
+<meta property="og:updated_time" content="2016-11-10T04:13:53.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS相关tips">
 <meta name="twitter:description" content="Tips
@@ -386,6 +386,17 @@ iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙�
 </li>
 <li><p>当我们使用<a href="https://github.com/Carthage/Carthage" target="_blank" rel="external">Carthage</a>作为依赖管理器时，安装库时，经常会执行<code>carthage update</code>命令，此时，不同的库，可能会生成多个平台的<code>frameworks</code>，如<code>iOS</code>，<code>macOS</code>，<code>watchOS</code>，<code>tvOS</code>，所以，如果我们的项目只需要使用到<code>iOS</code>的<code>framework</code>，那么可以在执行<code>update</code>命令时加上参数，如<code>carthage update --platform iOS</code></p>
 </li>
+<li><p>当在<code>UIWebView</code>中播放<code>audio</code>时，默认在应用进入后台或锁定等情况时，<code>audio</code>会暂停。解决方法为：</p>
+<ol>
+<li><p>在<code>info.plist</code>中加入键值对如下：</p>
+ <figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">    	&lt;key&gt;UIBackgroundModes&lt;/key&gt;</div><div class="line">    	&lt;array&gt;</div><div class="line">		&lt;string&gt;audio&lt;/string&gt;</div><div class="line">    	&lt;/array&gt;</div><div class="line">    ```     </div><div class="line"><span class="number">2</span>. 设置`Audio Session`的类别，默认类别为`AVAudioSessionCategorySoloAmbient`,将类别设置为`AVAudioSessionCategoryPlayback`，代码如下：</div></pre></td></tr></table></figure>
+<p> #import <avfoundation avfoundation.h=""><br> #import <audiotoolbox audiotoolbox.h=""></audiotoolbox></avfoundation></p>
+<p> AVAudioSession *audioSession = [AVAudioSession  sharedInstance];</p>
+<p> NSError <em>setCategoryError = nil;<br> BOOL success = [audioSession setCategory:AVAudioSessionCategoryPlayback error:&amp;setCategoryError];<br> if (!success) { /</em> handle the error condition */ }</p>
+<p> NSError <em>activationError = nil;<br> success = [audioSession setActive:YES error:&amp;activationError];<br> if (!success) { /</em> handle the error condition */ }<br> ```</p>
+</li>
+</ol>
+</li>
 </ul>
 
       
@@ -523,7 +534,7 @@ iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙�
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">19</span>
+              <span class="site-state-item-count">20</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -540,7 +551,7 @@ iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙�
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-count">19</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

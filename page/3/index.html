@@ -288,6 +288,136 @@
             
               
                 
+                <a class="post-title-link" href="/2016/09/11/iOS越狱相关基础知识/" itemprop="url">
+                  iOS越狱相关基础知识
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-09-11T19:01:59+08:00" content="2016-09-11">
+              2016-09-11
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/iOS开发-越狱/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发-越狱</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/09/11/iOS越狱相关基础知识/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/09/11/iOS越狱相关基础知识/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h2><hr>
+<ul>
+<li><code>dylib</code>的权限由它寄生的那个App决定，同一个<code>dylib</code>寄生在系统App和用户App里时的授权是不同的。</li>
+<li>越狱之后，我们就可以拥有daemon的概念了，给用户提供各种“守护”。</li>
+<li><a href="http://stevenygard.com/projects/class-dump/" target="_blank" rel="external">Class-dump</a>处理的对象是<code>Mach-O</code>格式的二进制文件，如<code>Framework</code>的库文件和App的可执行文件。</li>
+<li>采用<code>arm64</code>架构的App不兼容<code>armv7/armv7s</code>架构。</li>
+</ul>
+<h2 id="命令"><a href="#命令" class="headerlink" title="命令"></a>命令</h2><hr>
+<ul>
+<li>查看app文件的可执行文件(对于<code>App Store</code>上下载的App，经过了加密，所以需要先砸壳才能获取到)：<code>plutil -p Info.plist | grep CFBundleExecutable</code></li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2016/09/08/源码分析之SDWebImage/" itemprop="url">
                   源码分析之SDWebImage
                 </a>
@@ -766,139 +896,6 @@
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/08/24/Swift之通过减少动态派发来提升性能/" itemprop="url">
-                  Swift之通过减少动态派发来提升性能
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-08-24T23:23:01+08:00" content="2016-08-24">
-              2016-08-24
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/iOS开发-语言/" itemprop="url" rel="index">
-                    <span itemprop="name">iOS开发-语言</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/08/24/Swift之通过减少动态派发来提升性能/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/24/Swift之通过减少动态派发来提升性能/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>Swift是OO（面向对象）的语言，所以少不了方法和属性的重载等特性，程序只能在运行时来确定具体的方法或属性来间接调用或间接访问，这就叫做动态派发。从性能上考虑，对于动态派发的方法，会有常量时间的运行时开销。接下来将介绍三种方法来移除这样的动态性，<code>final</code>，<code>private</code>，全模块优化（Whole Module Optimization），以此提升性能。</p>
-<p>考虑下面的例子：</p>
-<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">ParticleModel</span> </span>&#123;</div><div class="line">	<span class="keyword">var</span> point = ( <span class="number">0.0</span>, <span class="number">0.0</span> )</div><div class="line">	<span class="keyword">var</span> velocity = <span class="number">100.0</span></div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">func</span> <span class="title">updatePoint</span><span class="params">(newPoint: <span class="params">(Double, Double)</span></span></span>, newVelocity: <span class="type">Double</span>) &#123;</div><div class="line">		point = newPoint</div><div class="line">		velocity = newVelocity</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">func</span> <span class="title">update</span><span class="params">(newP: <span class="params">(Double, Double)</span></span></span>, newV: <span class="type">Double</span>) &#123;</div><div class="line">		updatePoint(newP, newVelocity: newV)</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">var</span> p = <span class="type">ParticleModel</span>()</div><div class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">stride</span>(from: <span class="number">0.0</span>, through: <span class="number">360</span>, by: <span class="number">1.0</span>) &#123;</div><div class="line">	p.update((i * sin(i), i), newV:i*<span class="number">1000</span>)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>如上述代码所示，调用过程为：</p>
-<ol>
-<li>调用变量<code>p</code>的<code>update</code>方法。</li>
-<li>调用<code>p</code>的<code>updatePoint</code>方法。</li>
-<li>获取<code>p</code>的元组类型变量<code>point</code>。</li>
-<li>获取<code>p</code>的属性velocity。</li>
-</ol>
-<p>由于<code>ParticleModel</code>可以被子类，所以其方法和属性就能被重载，这就不可避免的需要使用动态调用。</p>
-<p>在Swift中，动态调用是通过在一个方法表中找到方法然后执行间接的调用（类似于C++的虚函数表），对于这种先查找再调用的过程，其效率是要低于方法的直接调用，而且间接调用会阻止许多编译器优化，这将加重间接调用的开销。接下来将列举一些技巧来禁用动态派发的行为，以达到提升性能的目的。</p>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/08/24/Swift之通过减少动态派发来提升性能/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -944,7 +941,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">19</span>
+              <span class="site-state-item-count">20</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -961,7 +958,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-count">19</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
