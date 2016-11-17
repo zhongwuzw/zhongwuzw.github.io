@@ -100,7 +100,7 @@ iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙�
 iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙盒，如果需要让自己的应用能够通过其访问，必须在应用的info.plist中添加UIFileSharingEnabled关键字，并赋值为YES，这样，就能访问其Documents目录了(注意，其它目录还是无法访问)。
 
 使用UIWebView时，发现在首次加载网页时，加载时间异常的长，其原因是服务器需要花费一">
-<meta property="og:updated_time" content="2016-11-10T04:13:53.000Z">
+<meta property="og:updated_time" content="2016-11-17T16:07:15.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS相关tips">
 <meta name="twitter:description" content="Tips
@@ -393,7 +393,11 @@ iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙�
 <p> #import <avfoundation avfoundation.h=""><br> #import <audiotoolbox audiotoolbox.h=""></audiotoolbox></avfoundation></p>
 <p> AVAudioSession *audioSession = [AVAudioSession  sharedInstance];</p>
 <p> NSError <em>setCategoryError = nil;<br> BOOL success = [audioSession setCategory:AVAudioSessionCategoryPlayback error:&amp;setCategoryError];<br> if (!success) { /</em> handle the error condition */ }</p>
-<p> NSError <em>activationError = nil;<br> success = [audioSession setActive:YES error:&amp;activationError];<br> if (!success) { /</em> handle the error condition */ }<br> ```</p>
+<p> NSError <em>activationError = nil;<br> success = [audioSession setActive:YES error:&amp;activationError];<br> if (!success) { /</em> handle the error condition */ }</p>
+ <figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="bullet">* </span><span class="strong">*非越狱*</span>下获取设备安装的所有应用：</div></pre></td></tr></table></figure>
+<p> Class c = NSClassFromString(@”LSApplicationWorkspace”);<br>id s = [(id)c performSelector:NSSelectorFromString(@”defaultWorkspace”)];</p>
+<p>NSArray *arr = [s performSelector:NSSelectorFromString(@”allInstalledApplications”)];</p>
+<p>for (id item in arr) {<br> NSLog(@”%@”,[item performSelector:NSSelectorFromString(@”applicationIdentifier”)]);<br> NSLog(@”%@”,[item performSelector:NSSelectorFromString(@”bundleVersion”)]);<br> NSLog(@”%@”,[item performSelector:NSSelectorFromString(@”shortVersionString”)]);<br>}<br>```</p>
 </li>
 </ol>
 </li>

@@ -173,7 +173,11 @@
 <p> #import <avfoundation avfoundation.h=""><br> #import <audiotoolbox audiotoolbox.h=""></audiotoolbox></avfoundation></p>
 <p> AVAudioSession *audioSession = [AVAudioSession  sharedInstance];</p>
 <p> NSError <em>setCategoryError = nil;<br> BOOL success = [audioSession setCategory:AVAudioSessionCategoryPlayback error:&amp;setCategoryError];<br> if (!success) { /</em> handle the error condition */ }</p>
-<p> NSError <em>activationError = nil;<br> success = [audioSession setActive:YES error:&amp;activationError];<br> if (!success) { /</em> handle the error condition */ }<br> ```</p>
+<p> NSError <em>activationError = nil;<br> success = [audioSession setActive:YES error:&amp;activationError];<br> if (!success) { /</em> handle the error condition */ }</p>
+ <figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="bullet">* </span><span class="strong">*非越狱*</span>下获取设备安装的所有应用：</div></pre></td></tr></table></figure>
+<p> Class c = NSClassFromString(@”LSApplicationWorkspace”);<br>id s = [(id)c performSelector:NSSelectorFromString(@”defaultWorkspace”)];</p>
+<p>NSArray *arr = [s performSelector:NSSelectorFromString(@”allInstalledApplications”)];</p>
+<p>for (id item in arr) {<br> NSLog(@”%@”,[item performSelector:NSSelectorFromString(@”applicationIdentifier”)]);<br> NSLog(@”%@”,[item performSelector:NSSelectorFromString(@”bundleVersion”)]);<br> NSLog(@”%@”,[item performSelector:NSSelectorFromString(@”shortVersionString”)]);<br>}<br>```</p>
 </li>
 </ol>
 </li>
