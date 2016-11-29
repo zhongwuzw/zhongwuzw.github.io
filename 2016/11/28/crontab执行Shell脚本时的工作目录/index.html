@@ -94,7 +94,7 @@
 <meta property="og:site_name" content="钟武的技术博客">
 <meta property="og:description" content="crontab执行Shell脚本时的工作目录
 由于工作需要，创建了一个crontab定时任务，用来在每天固定时间执行一个Shell脚本，在Shell脚本中，有对该脚本所在目录的相关文件进行操作的逻辑，在一开始实现时，对当前目录的文件操作时都是使用的相对目录，即./*。在终端直接sh执行时没有任何问题，正常结束，而一旦在crontab中定时执行时，就出现问题，如提示file not found等错误">
-<meta property="og:updated_time" content="2016-11-28T09:52:10.000Z">
+<meta property="og:updated_time" content="2016-11-29T07:06:11.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="crontab执行Shell脚本时的工作目录">
 <meta name="twitter:description" content="crontab执行Shell脚本时的工作目录
@@ -364,6 +364,8 @@
 <li>将相对路径替换为绝对路径。（ps：如脚本中包含某些<code>Shell</code>命令，且命令的某些参数为默认当前目录的，都需要显式的给出绝对路径）</li>
 <li>在操作相对路径之前，使用<code>cd /....../</code>，在执行脚本时强制进入到该目录。</li>
 </ol>
+<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><hr>
+<p>系统在执行定时任务时，是不会加载任何环境变量的，所以当脚本需要<code>Java</code>或其他环境变量时，可以通过在脚本中添加<code>source /etc/profile</code>命令来使配置生效。</p>
 
       
     </div>
@@ -578,7 +580,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#crontab执行Shell脚本时的工作目录"><span class="nav-number">1.</span> <span class="nav-text">crontab执行Shell脚本时的工作目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决工作目录问题"><span class="nav-number">2.</span> <span class="nav-text">解决工作目录问题</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#crontab执行Shell脚本时的工作目录"><span class="nav-number">1.</span> <span class="nav-text">crontab执行Shell脚本时的工作目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决工作目录问题"><span class="nav-number">2.</span> <span class="nav-text">解决工作目录问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#附录"><span class="nav-number">3.</span> <span class="nav-text">附录</span></a></li></ol></div>
             
           </div>
         </section>

@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://zhongwuzw.github.io/"/>
-  <updated>2016-11-28T09:52:10.000Z</updated>
+  <updated>2016-11-29T07:06:11.000Z</updated>
   <id>https://zhongwuzw.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://zhongwuzw.github.io/2016/11/28/crontab%E6%89%A7%E8%A1%8CShell%E8%84%9A%E6%9C%AC%E6%97%B6%E7%9A%84%E5%B7%A5%E4%BD%9C%E7%9B%AE%E5%BD%95/"/>
     <id>https://zhongwuzw.github.io/2016/11/28/crontab执行Shell脚本时的工作目录/</id>
     <published>2016-11-28T09:30:00.000Z</published>
-    <updated>2016-11-28T09:52:10.000Z</updated>
+    <updated>2016-11-29T07:06:11.000Z</updated>
     
     <content type="html"><![CDATA[<h2 id="crontab执行Shell脚本时的工作目录"><a href="#crontab执行Shell脚本时的工作目录" class="headerlink" title="crontab执行Shell脚本时的工作目录"></a>crontab执行Shell脚本时的工作目录</h2><hr>
 <p>由于工作需要，创建了一个<code>crontab</code>定时任务，用来在每天固定时间执行一个<code>Shell</code>脚本，在<code>Shell</code>脚本中，有对该脚本所在目录的相关文件进行操作的逻辑，在一开始实现时，对当前目录的文件操作时都是使用的相对目录，即<code>./*</code>。在终端直接<code>sh</code>执行时没有任何问题，正常结束，而一旦在<code>crontab</code>中定时执行时，就出现问题，如提示<code>file not found</code>等错误。</p>
@@ -31,6 +31,8 @@
 <li>将相对路径替换为绝对路径。（ps：如脚本中包含某些<code>Shell</code>命令，且命令的某些参数为默认当前目录的，都需要显式的给出绝对路径）</li>
 <li>在操作相对路径之前，使用<code>cd /....../</code>，在执行脚本时强制进入到该目录。</li>
 </ol>
+<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><hr>
+<p>系统在执行定时任务时，是不会加载任何环境变量的，所以当脚本需要<code>Java</code>或其他环境变量时，可以通过在脚本中添加<code>source /etc/profile</code>命令来使配置生效。</p>
 ]]></content>
     
     <summary type="html">
