@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://zhongwuzw.github.io/"/>
-  <updated>2016-12-11T15:28:29.000Z</updated>
+  <updated>2016-12-11T15:30:12.000Z</updated>
   <id>https://zhongwuzw.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://zhongwuzw.github.io/2016/12/11/Swift%E4%B9%8B%E7%B1%BB%E5%9E%8B%E5%BC%95%E7%94%A8/"/>
     <id>https://zhongwuzw.github.io/2016/12/11/Swift之类型引用/</id>
     <published>2016-12-11T13:58:35.000Z</published>
-    <updated>2016-12-11T15:28:29.000Z</updated>
+    <updated>2016-12-11T15:30:12.000Z</updated>
     
     <content type="html"><![CDATA[<h2 id="类型引用"><a href="#类型引用" class="headerlink" title="类型引用"></a>类型引用</h2><hr>
 <p>在开发中，我们经常用到实例的类型，希望实例与其真正的对象类型关联，既动态性。接下来将通过一个例子来进行讨论，比如，定义一个<code>Dog</code>类，用来描述狗，如下：</p>
@@ -34,7 +34,9 @@
 <p>有时候，需要传递一个对象类型作为参数：</p>
 <ul>
 <li>声明对象的类型时，可以使用类型名加<code>.</code>再加关键字<code>Type</code>。</li>
-<li>如果使用一个对象作为值时，比如，将类型赋值给一个变量或者作为参数值传递给函数时，可以使用类型名加<code>self</code>关键字，或者<code>type(of:)</code>方法。</li>
+<li><p>如果使用一个对象作为值时，比如，将类型赋值给一个变量或者作为参数值传递给函数时，可以使用类型名加<code>self</code>关键字，或者<code>type(of:)</code>方法。</p>
+<a id="more"></a>
+</li>
 </ul>
 <p>例如，有一个函数<code>dogTypeExpecter</code>，接收<code>Dog</code>类型作为参数：</p>
 <figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">dogTypeExpecter</span><span class="params">(<span class="number">_</span> whattype:Dog.<span class="keyword">Type</span>)</span></span> &#123;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
@@ -61,7 +63,18 @@
     <summary type="html">
     
       &lt;h2 id=&quot;类型引用&quot;&gt;&lt;a href=&quot;#类型引用&quot; class=&quot;headerlink&quot; title=&quot;类型引用&quot;&gt;&lt;/a&gt;类型引用&lt;/h2&gt;&lt;hr&gt;
-&lt;p&gt;在开发中，我们经常用到实例的类型，希望实例与其真正的对象类型关联，既动态性。接下来将通过一个例子来进行讨论，比如，
+&lt;p&gt;在开发中，我们经常用到实例的类型，希望实例与其真正的对象类型关联，既动态性。接下来将通过一个例子来进行讨论，比如，定义一个&lt;code&gt;Dog&lt;/code&gt;类，用来描述狗，如下：&lt;/p&gt;
+&lt;figure class=&quot;highlight swift&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;Dog&lt;/span&gt; &lt;/span&gt;&amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;whatDogsSay&lt;/span&gt; : &lt;span class=&quot;title&quot;&gt;String&lt;/span&gt; &lt;/span&gt;&amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;&quot;Woof&quot;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;func&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;bark&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;()&lt;/span&gt;&lt;/span&gt; &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &lt;span class=&quot;built_in&quot;&gt;print&lt;/span&gt;(&lt;span class=&quot;type&quot;&gt;Dog&lt;/span&gt;.whatDogsSay)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;&lt;code&gt;bark&lt;/code&gt;方法中直接硬编码&lt;code&gt;Dog.whatDogsSay&lt;/code&gt;，这种方法会很不灵活，尤其是其如果作为父类。&lt;/p&gt;
+&lt;p&gt;在&lt;code&gt;Swift&lt;/code&gt;中，可以使用&lt;code&gt;type(of:)&lt;/code&gt;方法来访问对象实际的类型，既会返回实例对象真正的类型，所以，可以对之前的&lt;code&gt;Dog&lt;/code&gt;进行改进，如下：&lt;/p&gt;
+&lt;figure class=&quot;highlight kotlin&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;Dog&lt;/span&gt; &lt;/span&gt;&amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;whatDogsSay&lt;/span&gt; : &lt;span class=&quot;type&quot;&gt;String &amp;#123;&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;&quot;Woof&quot;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    func bark() &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        print(type(of:self).whatDogsSay)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;NoisyDog&lt;/span&gt; : &lt;span class=&quot;type&quot;&gt;Dog &amp;#123;&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;override&lt;/span&gt; &lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;whatDogsSay&lt;/span&gt; : &lt;span class=&quot;type&quot;&gt;String &amp;#123;&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;&quot;Woof woof woof&quot;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;如上定义，结果如下：&lt;/p&gt;
+&lt;figure class=&quot;highlight ceylon&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;let&lt;/span&gt; nd = NoisyDog()&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;nd.bark() &lt;span class=&quot;comment&quot;&gt;// Woof woof woof&lt;/span&gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;如果向&lt;code&gt;NoisyDog&lt;/code&gt;实例发送&lt;code&gt;bark&lt;/code&gt;消息，结果为”Woof woof woof”。这就是&lt;code&gt;type(of:)&lt;/code&gt;方法的作用，他会指向实例真正的类型。&lt;code&gt;self&lt;/code&gt;表示实例，类型为&lt;code&gt;NoisyDog&lt;/code&gt;，所以&lt;code&gt;type(of:self)&lt;/code&gt;返回&lt;code&gt;NoisyDog&lt;/code&gt;类，所以会调用&lt;code&gt;NoisyDog&lt;/code&gt;类的&lt;code&gt;whatDogsSay&lt;/code&gt;类属性。&lt;/p&gt;
+&lt;p&gt;有时候，需要传递一个对象类型作为参数：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;声明对象的类型时，可以使用类型名加&lt;code&gt;.&lt;/code&gt;再加关键字&lt;code&gt;Type&lt;/code&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;如果使用一个对象作为值时，比如，将类型赋值给一个变量或者作为参数值传递给函数时，可以使用类型名加&lt;code&gt;self&lt;/code&gt;关键字，或者&lt;code&gt;type(of:)&lt;/code&gt;方法。&lt;/p&gt;
     
     </summary>
     

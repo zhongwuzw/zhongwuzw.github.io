@@ -96,7 +96,7 @@
 <meta property="og:description" content="类型引用
 在开发中，我们经常用到实例的类型，希望实例与其真正的对象类型关联，既动态性。接下来将通过一个例子来进行讨论，比如，定义一个Dog类，用来描述狗，如下：
 12345678class Dog &amp;#123;    class var whatDogsSay : String &amp;#123;        return &quot;Woof&quot;    &amp;#125;    func bark() &amp;#123;">
-<meta property="og:updated_time" content="2016-12-11T15:28:29.000Z">
+<meta property="og:updated_time" content="2016-12-11T15:30:12.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Swift之类型引用">
 <meta name="twitter:description" content="类型引用
@@ -370,7 +370,9 @@
 <p>有时候，需要传递一个对象类型作为参数：</p>
 <ul>
 <li>声明对象的类型时，可以使用类型名加<code>.</code>再加关键字<code>Type</code>。</li>
-<li>如果使用一个对象作为值时，比如，将类型赋值给一个变量或者作为参数值传递给函数时，可以使用类型名加<code>self</code>关键字，或者<code>type(of:)</code>方法。</li>
+<li><p>如果使用一个对象作为值时，比如，将类型赋值给一个变量或者作为参数值传递给函数时，可以使用类型名加<code>self</code>关键字，或者<code>type(of:)</code>方法。</p>
+<a id="more"></a>
+</li>
 </ul>
 <p>例如，有一个函数<code>dogTypeExpecter</code>，接收<code>Dog</code>类型作为参数：</p>
 <figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">dogTypeExpecter</span><span class="params">(<span class="number">_</span> whattype:Dog.<span class="keyword">Type</span>)</span></span> &#123;</div><div class="line">&#125;</div></pre></td></tr></table></figure>

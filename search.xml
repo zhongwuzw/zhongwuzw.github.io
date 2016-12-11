@@ -18,7 +18,9 @@
 <p>有时候，需要传递一个对象类型作为参数：</p>
 <ul>
 <li>声明对象的类型时，可以使用类型名加<code>.</code>再加关键字<code>Type</code>。</li>
-<li>如果使用一个对象作为值时，比如，将类型赋值给一个变量或者作为参数值传递给函数时，可以使用类型名加<code>self</code>关键字，或者<code>type(of:)</code>方法。</li>
+<li><p>如果使用一个对象作为值时，比如，将类型赋值给一个变量或者作为参数值传递给函数时，可以使用类型名加<code>self</code>关键字，或者<code>type(of:)</code>方法。</p>
+<a id="more"></a>
+</li>
 </ul>
 <p>例如，有一个函数<code>dogTypeExpecter</code>，接收<code>Dog</code>类型作为参数：</p>
 <figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">dogTypeExpecter</span><span class="params">(<span class="number">_</span> whattype:Dog.<span class="keyword">Type</span>)</span></span> &#123;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
