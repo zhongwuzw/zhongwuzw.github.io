@@ -288,6 +288,138 @@
             
               
                 
+                <a class="post-title-link" href="/2016/08/19/Swift的Designated和Convenience初始化器/" itemprop="url">
+                  Swift的Designated和Convenience初始化器
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-08-19T15:46:48+08:00" content="2016-08-19">
+              2016-08-19
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/iOS开发-语言/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发-语言</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/08/19/Swift的Designated和Convenience初始化器/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/19/Swift的Designated和Convenience初始化器/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在Swift中，为了确保类的存储属性都能有一个初始值，提供了几种初始化的方法，接下来将讨论一下Desinated(指定)、Convenience（便捷）初始化器。</p>
+<h1 id="Designated（指定）初始化器"><a href="#Designated（指定）初始化器" class="headerlink" title="Designated（指定）初始化器"></a>Designated（指定）初始化器</h1><ul>
+<li><p>之前使用过Objective-C的应该比较了解指定初始化器，很多类都提供了指定初始化器，如UIViewController的为：<code>- (instancetype)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle</code>,UIView的<code>- (instancetype)initWithFrame:(CGRect)aRect</code>，其作用是该类或者其子类在初始化的过程中都会调用指定初始化器。</p>
+</li>
+<li><p>当在类中定义指定初始化器时，该初始化器会初始化该类的所有存储属性，且当该类是有父类时，<strong>必须</strong>调用父类的<strong>指定</strong>初始化器，注意顺序，先初始化该类自己定义的存储属性，再使用super来调用父类的指定初始化器，跌倒过来编译器会报错。</p>
+</li>
+</ul>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">RecipeIngredient</span>: <span class="title">Food</span> </span>&#123;</div><div class="line">    <span class="keyword">var</span> quantity: <span class="type">Int</span></div><div class="line">    <span class="comment">//指定初始化器</span></div><div class="line">    <span class="keyword">init</span>(name: <span class="type">String</span>, quantity: <span class="type">Int</span>) &#123;</div><div class="line">        <span class="keyword">self</span>.quantity = quantity</div><div class="line">        <span class="keyword">super</span>.<span class="keyword">init</span>(name: name) <span class="comment">//放在该类存储属性初始化之后</span></div><div class="line">    &#125;</div><div class="line">    <span class="keyword">override</span> <span class="keyword">convenience</span> <span class="keyword">init</span>(name: <span class="type">String</span>) &#123;</div><div class="line">        <span class="keyword">self</span>.<span class="keyword">init</span>(name: name, quantity: <span class="number">1</span>)</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>每一个类都必须至少有一个指定初始化器。</li>
+</ul>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/08/19/Swift的Designated和Convenience初始化器/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2016/08/18/知乎日报iOS/" itemprop="url">
                   知乎日报iOS
                 </a>
@@ -557,7 +689,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-count">23</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
