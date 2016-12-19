@@ -4,12 +4,26 @@
   
     
     <entry>
+      <title><![CDATA[源码分析之Alamofire]]></title>
+      <url>https://zhongwuzw.github.io/2016/12/14/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B9%8BAlamofire/</url>
+      <content type="html"><![CDATA[<h2 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h2><hr>
+<p><code>Alamofire</code>是对<code>URLSession</code>的封装，针对普通请求，上传、下载等操作，提供对应的<code>Request</code>，其对象关系如下：</p>
+<p> <img src="http://oc54pu02q.bkt.clouddn.com/25E6C99A-FDF4-4314-A41A-03E746BBA401.png" width="500" height="254" alt="" align="center"></p>
+<p>每一个<code>Request</code>关联一个<code>TaskDelegate</code>，<code>TaskDelegate</code>用来处理<code>URLSessionTask</code>使用过程中的网络回调，<code>TaskDelegate</code>有一个<code>queue</code>成员，用来执行<code>task</code>完成后的回调处理，<code>completionHandler</code>默认会在主线程回调。<code>Alamofire</code>有一个<code>SessionDelegate</code>，对<code>Session</code>的所有网络回调做处理，并调用每一个<code>task</code>的<code>TaskDelegate</code>，正因为<code>SessionDelegate</code>只有一个实例，所以会涉及到线程安全的问题，对某些关键属性需要做竟态处理，如管理<code>Request</code>的字典。委托处理流程如下图所示：</p>
+<p> <img src="http://oc54pu02q.bkt.clouddn.com/05A842ED-9D20-47AA-8609-282B95A36E7B.png" width="500" height="254" alt="" align="center"></p>
+<a id="more"></a>
+<p><code>TaskDelegate</code>是一个基类，<code>Alamofire</code>针对<code>HTTP</code>普通请求、下载、上传提供了相应的子类来进行处理。</p>
+<p><code>Alamofire</code>实现过程中使用了大量的协议、泛型，来实现通用性，代码非常优雅。</p>
+]]></content>
+    </entry>
+    
+    <entry>
       <title><![CDATA[Swift之类型引用]]></title>
       <url>https://zhongwuzw.github.io/2016/12/11/Swift%E4%B9%8B%E7%B1%BB%E5%9E%8B%E5%BC%95%E7%94%A8/</url>
       <content type="html"><![CDATA[<h2 id="类型引用"><a href="#类型引用" class="headerlink" title="类型引用"></a>类型引用</h2><hr>
-<p>在开发中，我们经常用到实例的类型，希望实例与其真正的对象类型关联，既动态性。接下来将通过一个例子来进行讨论，比如，定义一个<code>Dog</code>类，用来描述狗，如下：</p>
+<p>在开发中，我们经常用到实例的类型，希望实例与其真正的对象类型关联，既面向对象中的多态性。接下来将通过一个例子来进行讨论，比如，定义一个<code>Dog</code>类，用来描述狗，如下：</p>
 <figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dog</span> </span>&#123;</div><div class="line">    <span class="class"><span class="keyword">class</span> <span class="title">var</span> <span class="title">whatDogsSay</span> : <span class="title">String</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="string">"Woof"</span></div><div class="line">    &#125;</div><div class="line">    <span class="function"><span class="keyword">func</span> <span class="title">bark</span><span class="params">()</span></span> &#123;</div><div class="line">        <span class="built_in">print</span>(<span class="type">Dog</span>.whatDogsSay)</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><code>bark</code>方法中直接硬编码<code>Dog.whatDogsSay</code>，这种方法会很不灵活，尤其是其如果作为父类。</p>
+<p><code>Dog</code>类的<code>bark</code>为狗叫所定义的方法，实现中直接硬编码<code>Dog.whatDogsSay</code>，这种方法会很不灵活，尤其是其如果作为父类被子类时。</p>
 <p>在<code>Swift</code>中，可以使用<code>type(of:)</code>方法来访问对象实际的类型，既会返回实例对象真正的类型，所以，可以对之前的<code>Dog</code>进行改进，如下：</p>
 <figure class="highlight kotlin"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dog</span> </span>&#123;</div><div class="line">    <span class="class"><span class="keyword">class</span> <span class="title">var</span> <span class="title">whatDogsSay</span> : <span class="type">String &#123;</span></span></div><div class="line">        <span class="keyword">return</span> <span class="string">"Woof"</span></div><div class="line">    &#125;</div><div class="line">    func bark() &#123;</div><div class="line">        print(type(of:self).whatDogsSay)</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">NoisyDog</span> : <span class="type">Dog &#123;</span></span></div><div class="line">    <span class="keyword">override</span> <span class="class"><span class="keyword">class</span> <span class="title">var</span> <span class="title">whatDogsSay</span> : <span class="type">String &#123;</span></span></div><div class="line">        <span class="keyword">return</span> <span class="string">"Woof woof woof"</span></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>如上定义，结果如下：</p>
@@ -41,7 +55,7 @@
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><hr>
 <p><code>type(of:)</code>：返回对象实例所指向的真正对象类型。<br><code>.Type</code>：在类型声明时使用，比如，在函数参数声明时，期望参数为<code>Dog</code>类型或其子类类型，可以写成<code>Dog.Type</code>。<br><code>.self</code>：代表一个类型，如，函数参数需要<code>Dog.Type</code>类型时，可以传递<code>Dog.self</code>。<br><code>Self</code>：在方法声明时，在返回类型中使用<code>Self</code>关键字，具有动态性。</p>
 <h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><hr>
-<p>在<code>Swift</code>中，静态变量、静态方法可以使用<code>static</code>、<code>class</code>两种关键字，但是需要注意的是，<code>static</code>声明的无法重载，但是<code>class</code>关键字可以，不过<code>class</code>只能使用在类中。</p>
+<p>在<code>Swift</code>中，静态变量、静态方法可以使用<code>static</code>、<code>class</code>两种关键字，但是需要注意的是，<code>static</code>声明的无法重载，但是<code>class</code>关键字可以，不过<code>class</code>只能使用在类中，不能用在结构体、枚举等中。</p>
 ]]></content>
     </entry>
     
@@ -584,21 +598,21 @@
 <li><p>之前使用过Objective-C的应该比较了解指定初始化器，很多类都提供了指定初始化器，如UIViewController的为：<code>- (instancetype)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle</code>,UIView的<code>- (instancetype)initWithFrame:(CGRect)aRect</code>，其作用是该类或者其子类在初始化的过程中都会调用指定初始化器。</p>
 </li>
 <li><p>当在类中定义指定初始化器时，该初始化器会初始化该类的所有存储属性，且当该类是有父类时，<strong>必须</strong>调用父类的<strong>指定</strong>初始化器，注意顺序，先初始化该类自己定义的存储属性，再使用super来调用父类的指定初始化器，跌倒过来编译器会报错。</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">RecipeIngredient</span>: <span class="title">Food</span> </span>&#123;</div><div class="line">   <span class="keyword">var</span> quantity: <span class="type">Int</span></div><div class="line">   <span class="comment">//指定初始化器</span></div><div class="line">   <span class="keyword">init</span>(name: <span class="type">String</span>, quantity: <span class="type">Int</span>) &#123;</div><div class="line">       <span class="keyword">self</span>.quantity = quantity</div><div class="line">       <span class="keyword">super</span>.<span class="keyword">init</span>(name: name) <span class="comment">//放在该类存储属性初始化之后</span></div><div class="line">   &#125;</div><div class="line">   <span class="keyword">override</span> <span class="keyword">convenience</span> <span class="keyword">init</span>(name: <span class="type">String</span>) &#123;</div><div class="line">       <span class="keyword">self</span>.<span class="keyword">init</span>(name: name, quantity: <span class="number">1</span>)</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 </li>
-</ul>
-<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">RecipeIngredient</span>: <span class="title">Food</span> </span>&#123;</div><div class="line">    <span class="keyword">var</span> quantity: <span class="type">Int</span></div><div class="line">    <span class="comment">//指定初始化器</span></div><div class="line">    <span class="keyword">init</span>(name: <span class="type">String</span>, quantity: <span class="type">Int</span>) &#123;</div><div class="line">        <span class="keyword">self</span>.quantity = quantity</div><div class="line">        <span class="keyword">super</span>.<span class="keyword">init</span>(name: name) <span class="comment">//放在该类存储属性初始化之后</span></div><div class="line">    &#125;</div><div class="line">    <span class="keyword">override</span> <span class="keyword">convenience</span> <span class="keyword">init</span>(name: <span class="type">String</span>) &#123;</div><div class="line">        <span class="keyword">self</span>.<span class="keyword">init</span>(name: name, quantity: <span class="number">1</span>)</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li>每一个类都必须至少有一个指定初始化器。</li>
+<li><p>每一个类都必须至少有一个指定初始化器。</p>
+</li>
 </ul>
 <a id="more"></a>
 <h1 id="Convenience（便捷）初始化器"><a href="#Convenience（便捷）初始化器" class="headerlink" title="Convenience（便捷）初始化器"></a>Convenience（便捷）初始化器</h1><ul>
-<li>便捷初始化器需要带一个convenience修饰符，如下代码,在便捷初始化器的定义中，<strong>必须先调用其他的初始化器之后，再赋类的存储属性值</strong>。</li>
-</ul>
-<figure class="highlight less"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="selector-tag">convenience</span> <span class="selector-tag">init</span>(parameters) &#123;</div><div class="line">    statements</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
+<li><p>便捷初始化器需要带一个convenience修饰符，如下代码,在便捷初始化器的定义中，<strong>必须先调用其他的初始化器之后，再赋类的存储属性值</strong>。</p>
+  <figure class="highlight less"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="selector-tag">convenience</span> <span class="selector-tag">init</span>(parameters) &#123;</div><div class="line">    statements</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
 <li><p>便捷初始化器如果重载了父类的指定初始化器，则必须使用override修饰符。</p>
 </li>
 <li><p>如果子类提供了其父类的<strong>所有</strong>（注意：必须是所有的）指定初始化器的实现，实现有两种，一种是子类的存储属性都提供了默认值，且没有定义指定初始化器，则会自动集成父类的指定初始化器；另一种是在子类中重新定义，子类中重新定义的方法可以是便捷初始化器，既子类中的便捷初始化器可以重载父类的指定初始化器。这样子类就会自动继承父类的便捷初始化器。</p>
+</li>
+<li><p>在Extensions中只能添加便捷初始化器。</p>
 </li>
 </ul>
 <h1 id="指定初始化器和便捷初始化器之间的关系"><a href="#指定初始化器和便捷初始化器之间的关系" class="headerlink" title="指定初始化器和便捷初始化器之间的关系"></a>指定初始化器和便捷初始化器之间的关系</h1><p>指定初始化器和便捷初始化器之间的3个法则：</p>

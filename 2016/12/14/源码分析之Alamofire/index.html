@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="iOS,源码分析,Alamofire," />
 
 
 
@@ -86,15 +86,28 @@
 
 
 
-<meta name="description" content="Keep thinking, keep coding!!!">
-<meta property="og:type" content="website">
-<meta property="og:title" content="钟武的技术博客">
-<meta property="og:url" content="https://zhongwuzw.github.io/tags/源码分析/index.html">
+<meta name="description" content="源码分析
+Alamofire是对URLSession的封装，针对普通请求，上传、下载等操作，提供对应的Request，其对象关系如下：
+ 
+每一个Request关联一个TaskDelegate，TaskDelegate用来处理URLSessionTask使用过程中的网络回调，TaskDelegate有一个queue成员，用来执行task完成后的回调处理，completionHandler默认会在主">
+<meta property="og:type" content="article">
+<meta property="og:title" content="源码分析之Alamofire">
+<meta property="og:url" content="https://zhongwuzw.github.io/2016/12/14/源码分析之Alamofire/index.html">
 <meta property="og:site_name" content="钟武的技术博客">
-<meta property="og:description" content="Keep thinking, keep coding!!!">
+<meta property="og:description" content="源码分析
+Alamofire是对URLSession的封装，针对普通请求，上传、下载等操作，提供对应的Request，其对象关系如下：
+ 
+每一个Request关联一个TaskDelegate，TaskDelegate用来处理URLSessionTask使用过程中的网络回调，TaskDelegate有一个queue成员，用来执行task完成后的回调处理，completionHandler默认会在主">
+<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/25E6C99A-FDF4-4314-A41A-03E746BBA401.png">
+<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/05A842ED-9D20-47AA-8609-282B95A36E7B.png">
+<meta property="og:updated_time" content="2016-12-19T09:38:31.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="钟武的技术博客">
-<meta name="twitter:description" content="Keep thinking, keep coding!!!">
+<meta name="twitter:title" content="源码分析之Alamofire">
+<meta name="twitter:description" content="源码分析
+Alamofire是对URLSession的封装，针对普通请求，上传、下载等操作，提供对应的Request，其对象关系如下：
+ 
+每一个Request关联一个TaskDelegate，TaskDelegate用来处理URLSessionTask使用过程中的网络回调，TaskDelegate有一个queue成员，用来执行task完成后的回调处理，completionHandler默认会在主">
+<meta name="twitter:image" content="http://oc54pu02q.bkt.clouddn.com/25E6C99A-FDF4-4314-A41A-03E746BBA401.png">
 
 
 
@@ -112,7 +125,7 @@
   };
 </script>
 
-  <title> 标签: 源码分析 | 钟武的技术博客 </title>
+  <title> 源码分析之Alamofire | 钟武的技术博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -133,7 +146,7 @@
     
   
 
-  <div class="container one-collumn sidebar-position-left  ">
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -264,81 +277,195 @@
           <div id="content" class="content">
             
 
-  <div id="posts" class="posts-collapse">
-    <div class="collection-title">
-      <h2 >
-        源码分析
-        <small>标签</small>
-      </h2>
-    </div>
-
+  <div id="posts" class="posts-expand">
     
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/2016/12/14/源码分析之Alamofire/" itemprop="url">
-              
-                <span itemprop="name">源码分析之Alamofire</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2016-12-14T17:26:46+08:00"
-              content="2016-12-14" >
-          12-14
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h1 class="post-title">
-        
-            <a class="post-title-link" href="/2016/09/08/源码分析之SDWebImage/" itemprop="url">
-              
-                <span itemprop="name">源码分析之SDWebImage</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2016-09-08T16:02:49+08:00"
-              content="2016-09-08" >
-          09-08
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-  </div>
 
   
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                源码分析之Alamofire
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-12-14T17:26:46+08:00" content="2016-12-14">
+              2016-12-14
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/iOS开发-网络/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发-网络</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/12/14/源码分析之Alamofire/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/12/14/源码分析之Alamofire/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h2><hr>
+<p><code>Alamofire</code>是对<code>URLSession</code>的封装，针对普通请求，上传、下载等操作，提供对应的<code>Request</code>，其对象关系如下：</p>
+<p> <img src="http://oc54pu02q.bkt.clouddn.com/25E6C99A-FDF4-4314-A41A-03E746BBA401.png" width="500" height="254" alt="" align="center"></p>
+<p>每一个<code>Request</code>关联一个<code>TaskDelegate</code>，<code>TaskDelegate</code>用来处理<code>URLSessionTask</code>使用过程中的网络回调，<code>TaskDelegate</code>有一个<code>queue</code>成员，用来执行<code>task</code>完成后的回调处理，<code>completionHandler</code>默认会在主线程回调。<code>Alamofire</code>有一个<code>SessionDelegate</code>，对<code>Session</code>的所有网络回调做处理，并调用每一个<code>task</code>的<code>TaskDelegate</code>，正因为<code>SessionDelegate</code>只有一个实例，所以会涉及到线程安全的问题，对某些关键属性需要做竟态处理，如管理<code>Request</code>的字典。委托处理流程如下图所示：</p>
+<p> <img src="http://oc54pu02q.bkt.clouddn.com/05A842ED-9D20-47AA-8609-282B95A36E7B.png" width="500" height="254" alt="" align="center"></p>
+<a id="more"></a>
+<p><code>TaskDelegate</code>是一个基类，<code>Alamofire</code>针对<code>HTTP</code>普通请求、下载、上传提供了相应的子类来进行处理。</p>
+<p><code>Alamofire</code>实现过程中使用了大量的协议、泛型，来实现通用性，代码非常优雅。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag">#iOS</a>
+          
+            <a href="/tags/源码分析/" rel="tag">#源码分析</a>
+          
+            <a href="/tags/Alamofire/" rel="tag">#Alamofire</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/11/Swift之类型引用/" rel="next" title="Swift之类型引用">
+                <i class="fa fa-chevron-left"></i> Swift之类型引用
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2016/12/14/源码分析之Alamofire/"
+     data-title="源码分析之Alamofire"
+     data-content=""
+     data-url="https://zhongwuzw.github.io/2016/12/14/源码分析之Alamofire/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
 
 
           </div>
           
 
+  <p>热评文章</p>
+  <div class="ds-top-threads" data-range="weekly" data-num-items="4"></div>
+
 
           
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/12/14/源码分析之Alamofire/"
+           data-title="源码分析之Alamofire" data-url="https://zhongwuzw.github.io/2016/12/14/源码分析之Alamofire/">
+      </div>
+    
+  </div>
+
 
         </div>
         
@@ -358,8 +485,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel  sidebar-panel-active ">
+      <section class="site-overview sidebar-panel ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.JPG"
@@ -445,6 +581,17 @@
 
       </section>
 
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#源码分析"><span class="nav-number">1.</span> <span class="nav-text">源码分析</span></a></li></ol></div>
+            
+          </div>
+        </section>
       
 
     </div>
@@ -548,6 +695,10 @@
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
 
   
 

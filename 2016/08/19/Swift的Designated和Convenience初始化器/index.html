@@ -97,7 +97,7 @@ Designated（指定）初始化器
 Designated（指定）初始化器
 之前使用过Objective-C的应该比较了解指定初始化器，很多类都提供了指定初始化器，如UIViewController的为：- (instancetype)initWithNibName:(">
 <meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/QQ20160819-0@2x.png">
-<meta property="og:updated_time" content="2016-09-19T09:26:52.000Z">
+<meta property="og:updated_time" content="2016-12-16T03:32:51.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Swift的Designated和Convenience初始化器">
 <meta name="twitter:description" content="前言在Swift中，为了确保类的存储属性都能有一个初始值，提供了几种初始化的方法，接下来将讨论一下Desinated(指定)、Convenience（便捷）初始化器。
@@ -365,21 +365,21 @@ Designated（指定）初始化器
 <li><p>之前使用过Objective-C的应该比较了解指定初始化器，很多类都提供了指定初始化器，如UIViewController的为：<code>- (instancetype)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle</code>,UIView的<code>- (instancetype)initWithFrame:(CGRect)aRect</code>，其作用是该类或者其子类在初始化的过程中都会调用指定初始化器。</p>
 </li>
 <li><p>当在类中定义指定初始化器时，该初始化器会初始化该类的所有存储属性，且当该类是有父类时，<strong>必须</strong>调用父类的<strong>指定</strong>初始化器，注意顺序，先初始化该类自己定义的存储属性，再使用super来调用父类的指定初始化器，跌倒过来编译器会报错。</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">RecipeIngredient</span>: <span class="title">Food</span> </span>&#123;</div><div class="line">   <span class="keyword">var</span> quantity: <span class="type">Int</span></div><div class="line">   <span class="comment">//指定初始化器</span></div><div class="line">   <span class="keyword">init</span>(name: <span class="type">String</span>, quantity: <span class="type">Int</span>) &#123;</div><div class="line">       <span class="keyword">self</span>.quantity = quantity</div><div class="line">       <span class="keyword">super</span>.<span class="keyword">init</span>(name: name) <span class="comment">//放在该类存储属性初始化之后</span></div><div class="line">   &#125;</div><div class="line">   <span class="keyword">override</span> <span class="keyword">convenience</span> <span class="keyword">init</span>(name: <span class="type">String</span>) &#123;</div><div class="line">       <span class="keyword">self</span>.<span class="keyword">init</span>(name: name, quantity: <span class="number">1</span>)</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 </li>
-</ul>
-<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">RecipeIngredient</span>: <span class="title">Food</span> </span>&#123;</div><div class="line">    <span class="keyword">var</span> quantity: <span class="type">Int</span></div><div class="line">    <span class="comment">//指定初始化器</span></div><div class="line">    <span class="keyword">init</span>(name: <span class="type">String</span>, quantity: <span class="type">Int</span>) &#123;</div><div class="line">        <span class="keyword">self</span>.quantity = quantity</div><div class="line">        <span class="keyword">super</span>.<span class="keyword">init</span>(name: name) <span class="comment">//放在该类存储属性初始化之后</span></div><div class="line">    &#125;</div><div class="line">    <span class="keyword">override</span> <span class="keyword">convenience</span> <span class="keyword">init</span>(name: <span class="type">String</span>) &#123;</div><div class="line">        <span class="keyword">self</span>.<span class="keyword">init</span>(name: name, quantity: <span class="number">1</span>)</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li>每一个类都必须至少有一个指定初始化器。</li>
+<li><p>每一个类都必须至少有一个指定初始化器。</p>
+</li>
 </ul>
 <a id="more"></a>
 <h1 id="Convenience（便捷）初始化器"><a href="#Convenience（便捷）初始化器" class="headerlink" title="Convenience（便捷）初始化器"></a>Convenience（便捷）初始化器</h1><ul>
-<li>便捷初始化器需要带一个convenience修饰符，如下代码,在便捷初始化器的定义中，<strong>必须先调用其他的初始化器之后，再赋类的存储属性值</strong>。</li>
-</ul>
-<figure class="highlight less"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="selector-tag">convenience</span> <span class="selector-tag">init</span>(parameters) &#123;</div><div class="line">    statements</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
+<li><p>便捷初始化器需要带一个convenience修饰符，如下代码,在便捷初始化器的定义中，<strong>必须先调用其他的初始化器之后，再赋类的存储属性值</strong>。</p>
+  <figure class="highlight less"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="selector-tag">convenience</span> <span class="selector-tag">init</span>(parameters) &#123;</div><div class="line">    statements</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
 <li><p>便捷初始化器如果重载了父类的指定初始化器，则必须使用override修饰符。</p>
 </li>
 <li><p>如果子类提供了其父类的<strong>所有</strong>（注意：必须是所有的）指定初始化器的实现，实现有两种，一种是子类的存储属性都提供了默认值，且没有定义指定初始化器，则会自动集成父类的指定初始化器；另一种是在子类中重新定义，子类中重新定义的方法可以是便捷初始化器，既子类中的便捷初始化器可以重载父类的指定初始化器。这样子类就会自动继承父类的便捷初始化器。</p>
+</li>
+<li><p>在Extensions中只能添加便捷初始化器。</p>
 </li>
 </ul>
 <h1 id="指定初始化器和便捷初始化器之间的关系"><a href="#指定初始化器和便捷初始化器之间的关系" class="headerlink" title="指定初始化器和便捷初始化器之间的关系"></a>指定初始化器和便捷初始化器之间的关系</h1><p>指定初始化器和便捷初始化器之间的3个法则：</p>
@@ -525,7 +525,7 @@ Designated（指定）初始化器
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">23</span>
+              <span class="site-state-item-count">24</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -542,7 +542,7 @@ Designated（指定）初始化器
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">22</span>
+                <span class="site-state-item-count">23</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
