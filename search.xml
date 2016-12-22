@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title><![CDATA[iOS设置shadow*带来的离屏渲染]]></title>
+      <url>https://zhongwuzw.github.io/2016/12/22/iOS%E8%AE%BE%E7%BD%AEshadow-%E5%B8%A6%E6%9D%A5%E7%9A%84%E7%A6%BB%E5%B1%8F%E6%B8%B2%E6%9F%93/</url>
+      <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><hr>
+<p>在项目中，当我们想要设置<code>View</code>的阴影效果时，可以通过<code>shadow*</code>相关方法实现，如：</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">self.layer.<span class="keyword">shadowOffset </span>= CGSizeMake(<span class="number">4</span>, -<span class="number">2</span>)<span class="comment">;</span></div><div class="line">self.layer.<span class="keyword">shadowOpacity </span>= <span class="number">0</span>.<span class="number">5</span><span class="comment">;</span></div><div class="line">self.layer.<span class="keyword">shadowColor </span>= [[UIColor <span class="keyword">blackColor] </span>colorWithAlphaComponent:<span class="number">0</span>.<span class="number">5</span>].CGColor<span class="comment">;</span></div></pre></td></tr></table></figure>
+<p>实现效果如下：<br><img src="http://oc54pu02q.bkt.clouddn.com/shadow.png" width="500" height="" alt="" align="center"></p>
+<p>如上实现方式，有些情况下，你并不会发现有什么问题，但是一旦将其用在如<code>UITableViewCell</code>、<code>UICollectionViewCell</code>等时，你会发现，滑动时会导致大量掉帧的情况，其主要原因为，<code>shadow*</code>方法的使用将导致<code>Core Animation</code>进行离屏渲染，为了确定这一点，可以通过<code>Instruments</code>工具，选择<code>Core Animation</code>模板，选择开启<code>Color Offscreen-Rendered Yellow</code> <code>Debug</code>选项，当我们滑动<code>CollectionView</code>时，其帧率如下，产生了大量掉帧的情况，且正如我们所料，使用<code>shadow*</code>方法的视图被标黄，既使用了离屏渲染。</p>
+<p><img src="http://oc54pu02q.bkt.clouddn.com/bad-frame.png" width="500" height="" alt="" align="center"></p>
+<p>帧率情况如上，可以看到丢帧率很高。</p>
+<a id="more"></a>
+<p><img src="http://oc54pu02q.bkt.clouddn.com/IMG_4639.PNG" width="500" height="" alt="" align="center"></p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><hr>
+<p>有一种很简单的方式来解决该问题，既直接向<code>Core Animation</code>提供阴影形状，通过调用<code>setShadowPath</code>来提供一个<code>CGPath</code>给视图的<code>Layer</code>，（<code>CGPath</code>为任意你想生成的阴影的形状)，如：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[myView.layer setShadowPath:<span class="string">[[UIBezierPath </span></div><div class="line">    bezierPathWithRect:myView.bounds] CGPath]];</div></pre></td></tr></table></figure>
+<p>再次运行<code>Instruments</code>的<code>Core Animation</code>模板，能够看到，基本没有掉帧，滑动很流畅，且没有使用离屏渲染。</p>
+<p><img src="http://oc54pu02q.bkt.clouddn.com/good-frame.png" width="500" height="" alt="" align="center"></p>
+<p><img src="http://oc54pu02q.bkt.clouddn.com/IMG_4638.PNG" width="500" height="" alt="" align="center"></p>
+<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><hr>
+<ul>
+<li>当使用阴影的视图形状发生变化时，可以将阴影的设置代码放入<code>setFrame</code>、<code>layoutSubviews</code>等方法里。</li>
+<li>当对视图的<code>bounds</code>进行动画时，默认其阴影是不会跟随进行动画的，但是可以通过如<code>CAKeyframeAnimation</code>来对其进行动画，因为我们已经知道了新旧两个<code>CGPath</code>。</li>
+<li>能引发离屏渲染的情况除了设置<code>shadow</code>，还有很多，如<code>layer.mask</code>、<code>layer.shouldRasterize = YES</code>等，当然，除了离屏渲染，还有很多影响绘图性能的问题，如<code>Blending</code>、<code>Layout</code>，等。<br>详细情况可参考： <a href="http://stackoverflow.com/a/13649143/3552084" target="_blank" rel="external">http://stackoverflow.com/questions/13158796/what-triggers-offscreen-rendering-blending-and-layoutsubviews-in-ios</a></li>
+</ul>
+]]></content>
+    </entry>
+    
+    <entry>
       <title><![CDATA[源码分析之Alamofire]]></title>
       <url>https://zhongwuzw.github.io/2016/12/14/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B9%8BAlamofire/</url>
       <content type="html"><![CDATA[<h2 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h2><hr>
