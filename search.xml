@@ -21,6 +21,7 @@
 <p>接下来，接介绍一下<code>CAS</code>系统。</p>
 <h3 id="CAS-系统组成"><a href="#CAS-系统组成" class="headerlink" title="CAS 系统组成"></a>CAS 系统组成</h3><hr>
 <p><code>CAS</code>系统架构由两部分组成，<code>CAS Server</code>、<code>CAS Clients</code>，两者可以通过多种协议进行通信。</p>
+<a id="more"></a>
 <h4 id="CAS-Server"><a href="#CAS-Server" class="headerlink" title="CAS Server"></a>CAS Server</h4><hr>
 <p><code>CAS Server</code>是一个构建在<code>Spring Framework</code>上的<code>Java servlet</code>，通过分配和诊断<code>tickets</code>，负责认证用户以及授权。</p>
 <h4 id="CAS-Clients"><a href="#CAS-Clients" class="headerlink" title="CAS Clients"></a>CAS Clients</h4><hr>

@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://zhongwuzw.github.io/"/>
-  <updated>2016-12-29T03:10:33.000Z</updated>
+  <updated>2016-12-29T03:12:45.000Z</updated>
   <id>https://zhongwuzw.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://zhongwuzw.github.io/2016/12/27/SSO%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%E4%B9%8BCAS-Server/"/>
     <id>https://zhongwuzw.github.io/2016/12/27/SSO单点登录之CAS-Server/</id>
     <published>2016-12-27T10:15:15.000Z</published>
-    <updated>2016-12-29T03:10:33.000Z</updated>
+    <updated>2016-12-29T03:12:45.000Z</updated>
     
     <content type="html"><![CDATA[<h2 id="Prerequisites"><a href="#Prerequisites" class="headerlink" title="Prerequisites"></a>Prerequisites</h2><hr>
 <ul>
@@ -37,6 +37,7 @@
 <p>接下来，接介绍一下<code>CAS</code>系统。</p>
 <h3 id="CAS-系统组成"><a href="#CAS-系统组成" class="headerlink" title="CAS 系统组成"></a>CAS 系统组成</h3><hr>
 <p><code>CAS</code>系统架构由两部分组成，<code>CAS Server</code>、<code>CAS Clients</code>，两者可以通过多种协议进行通信。</p>
+<a id="more"></a>
 <h4 id="CAS-Server"><a href="#CAS-Server" class="headerlink" title="CAS Server"></a>CAS Server</h4><hr>
 <p><code>CAS Server</code>是一个构建在<code>Spring Framework</code>上的<code>Java servlet</code>，通过分配和诊断<code>tickets</code>，负责认证用户以及授权。</p>
 <h4 id="CAS-Clients"><a href="#CAS-Clients" class="headerlink" title="CAS Clients"></a>CAS Clients</h4><hr>
@@ -90,7 +91,19 @@
     
       &lt;h2 id=&quot;Prerequisites&quot;&gt;&lt;a href=&quot;#Prerequisites&quot; class=&quot;headerlink&quot; title=&quot;Prerequisites&quot;&gt;&lt;/a&gt;Prerequisites&lt;/h2&gt;&lt;hr&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;code&gt;CAS Serve
+&lt;li&gt;&lt;code&gt;CAS Server 3.5.x.&lt;/code&gt;，下文以&lt;code&gt;$CAS-SERVER&lt;/code&gt;表示。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;CAS Client 3.3.x.&lt;/code&gt;，下文以&lt;code&gt;$CAS-CLIENT&lt;/code&gt;表示。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Tomcat 7.x&lt;/code&gt;，下文以&lt;code&gt;$CAS_TOMCAT_HOME&lt;/code&gt;表示。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;GateIn-3.8.1.Final-tomcat-7&lt;/code&gt;，下文以&lt;code&gt;$GATEIN_HOME&lt;/code&gt;表示。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;最近公司需要对之前的多个Web应用系统进行整合，希望用户在登录某个应用系统时，能直接访问其他的Web应用系统，且不需要再次登录。既我们经常说的单点登录，最后，我选择了&lt;a href=&quot;https://www.apereo.org/projects/cas/download-cas&quot;&gt;&lt;code&gt;CAS&lt;/code&gt;&lt;/a&gt;，并将其整合进了&lt;a href=&quot;http://gatein.jboss.org/&quot;&gt;GateIn portal&lt;/a&gt;。接下来，将整理一下原理和整合步骤。&lt;br&gt;所有项目代码示例可在&lt;a href=&quot;https://github.com/CAS-GateInPortal&quot;&gt;github&lt;/a&gt;上下载。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;CAS介绍&quot;&gt;&lt;a href=&quot;#CAS介绍&quot; class=&quot;headerlink&quot; title=&quot;CAS介绍&quot;&gt;&lt;/a&gt;CAS介绍&lt;/h2&gt;&lt;hr&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.apereo.org/projects/cas/download-cas&quot;&gt;&lt;code&gt;CAS&lt;/code&gt;&lt;/a&gt;（Central Authentication Service）是&lt;code&gt;Yale&lt;/code&gt;大学发起的一个开源项目，旨在为&lt;code&gt;Web&lt;/code&gt;应用系统提供一种可靠的单点登录。单点登录，既在多个应用系统中，用户只需登录一次就可以访问所有相互信任的应用系统。&lt;code&gt;CAS Client&lt;/code&gt;支持非常多的客户端，包括&lt;code&gt;JAVA、PHP、Ruby&lt;/code&gt;等。&lt;/p&gt;
+&lt;p&gt;接下来，接介绍一下&lt;code&gt;CAS&lt;/code&gt;系统。&lt;/p&gt;
+&lt;h3 id=&quot;CAS-系统组成&quot;&gt;&lt;a href=&quot;#CAS-系统组成&quot; class=&quot;headerlink&quot; title=&quot;CAS 系统组成&quot;&gt;&lt;/a&gt;CAS 系统组成&lt;/h3&gt;&lt;hr&gt;
+&lt;p&gt;&lt;code&gt;CAS&lt;/code&gt;系统架构由两部分组成，&lt;code&gt;CAS Server&lt;/code&gt;、&lt;code&gt;CAS Clients&lt;/code&gt;，两者可以通过多种协议进行通信。&lt;/p&gt;
     
     </summary>
     
