@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://zhongwuzw.github.io/"/>
-  <updated>2017-01-12T10:46:01.000Z</updated>
+  <updated>2017-01-19T07:44:19.000Z</updated>
   <id>https://zhongwuzw.github.io/</id>
   
   <author>
@@ -16,11 +16,79 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Objective-C之performSelector编译器内存泄露警告</title>
+    <link href="https://zhongwuzw.github.io/2017/01/19/Objective-C%E4%B9%8BperformSelector%E7%BC%96%E8%AF%91%E5%99%A8%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2%E8%AD%A6%E5%91%8A/"/>
+    <id>https://zhongwuzw.github.io/2017/01/19/Objective-C之performSelector编译器内存泄露警告/</id>
+    <published>2017-01-19T06:23:10.000Z</published>
+    <updated>2017-01-19T07:44:19.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><hr>
+<blockquote>
+<p>performSelector may cause a leak because its selector is unknown</p>
+</blockquote>
+<p>在<code>ARC</code>环境下，我们使用<code>-(id)performSelector:</code>方法时，编译器会提示可能导致内存泄露的警告。大家如果一直使用<code>ARC</code>进行<code>iOS</code>开发，没有经历<code>MRC</code>时期的话，可能心里会有疑问，为什么<code>Apple</code>提供的<code>API</code>会报警告呢，又为什么会报内存泄露的警告？接下来，将详细讨论该问题。</p>
+<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><hr>
+<p>其实，产生该问题的原因是<code>ARC</code>,运行时系统需要知道调用方法的返回值类型，我们知道，方法的返回值包括：<code>void</code>,<code>int</code>,<code>NSString *</code>,<code>id</code>等，<code>ARC</code>通常可以通过定义实例方法对象的头中获取信息。</p>
+<p><code>ARC</code>对于返回值有3种处理情况：</p>
+<ol>
+<li>忽略非对象类型（<code>void</code>,<code>int</code>等）</li>
+<li>当新建对象值不再需要时<code>release</code>（如<code>init</code>,<code>copy</code>或带有<code>ns_returns_retained</code>属性的方法）</li>
+<li>不做任何处理，且假设返回的对象值会在局部作用域内有效（在最里层的<code>autorelease pool</code>结束之前都有效)</li>
+</ol>
+<p>调用<code>-(id)performSelector:</code>，编译器会假设调用方法的返回值是一个对象，且不会对返回值进行<code>retain</code>/<code>release</code>，所以，如果你调用如上讨论的第2种情况下的方法，将导致内存泄露，因为，调用的方法会返回一个新的对象。</p>
+<p>如果<code>#SEL</code>返回值类型为<code>void</code>或非对象类型，是可以安全的使用<code>-(id)performSelector:</code>的。</p>
+<a id="more"></a>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><hr>
+<ol>
+<li><p>使用编译器指令移除警告。(注意，该方法治标不治本，对于上面讨论的内存泄露情况，仍然存在）</p>
+<figure class="highlight sqf"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">pragma</span> clang diagnostic push</span></div><div class="line"><span class="meta">#<span class="meta-keyword">pragma</span> clang diagnostic ignored <span class="meta-string">"-Warc-performSelector-leaks"</span></span></div><div class="line">[self performSelector: NSSelectorFromString(@<span class="string">"someMethod"</span>) withObject: <span class="literal">nil</span>];</div><div class="line"><span class="meta">#<span class="meta-keyword">pragma</span> clang diagnostic pop</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>使用<code>NSInvocation</code>封装方法调用。</p>
+</li>
+<li><p>对于返回值为<code>void</code>,<code>int</code>等值类型，可以使用<code>- performSelector:withObject:afterDelay:</code>来执行，由于它不会在当前<code>RunLoop</code>时调用，所以会立即返回，且在接下来的某个<code>RunLoop</code>中执行，也就没有了返回值。也可以使用运行时方法<code>objc_msgSend(self, NSSelectorFromString(@&quot;someMethod&quot;));</code>。</p>
+</li>
+</ol>
+<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><hr>
+<ol>
+<li><code>Swift</code>已经废弃了<code>-(id)performSelector:</code>方法。</li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;hr&gt;
+&lt;blockquote&gt;
+&lt;p&gt;performSelector may cause a leak because its selector is unknown&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;在&lt;code&gt;ARC&lt;/code&gt;环境下，我们使用&lt;code&gt;-(id)performSelector:&lt;/code&gt;方法时，编译器会提示可能导致内存泄露的警告。大家如果一直使用&lt;code&gt;ARC&lt;/code&gt;进行&lt;code&gt;iOS&lt;/code&gt;开发，没有经历&lt;code&gt;MRC&lt;/code&gt;时期的话，可能心里会有疑问，为什么&lt;code&gt;Apple&lt;/code&gt;提供的&lt;code&gt;API&lt;/code&gt;会报警告呢，又为什么会报内存泄露的警告？接下来，将详细讨论该问题。&lt;/p&gt;
+&lt;h2 id=&quot;原因&quot;&gt;&lt;a href=&quot;#原因&quot; class=&quot;headerlink&quot; title=&quot;原因&quot;&gt;&lt;/a&gt;原因&lt;/h2&gt;&lt;hr&gt;
+&lt;p&gt;其实，产生该问题的原因是&lt;code&gt;ARC&lt;/code&gt;,运行时系统需要知道调用方法的返回值类型，我们知道，方法的返回值包括：&lt;code&gt;void&lt;/code&gt;,&lt;code&gt;int&lt;/code&gt;,&lt;code&gt;NSString *&lt;/code&gt;,&lt;code&gt;id&lt;/code&gt;等，&lt;code&gt;ARC&lt;/code&gt;通常可以通过定义实例方法对象的头中获取信息。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;ARC&lt;/code&gt;对于返回值有3种处理情况：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;忽略非对象类型（&lt;code&gt;void&lt;/code&gt;,&lt;code&gt;int&lt;/code&gt;等）&lt;/li&gt;
+&lt;li&gt;当新建对象值不再需要时&lt;code&gt;release&lt;/code&gt;（如&lt;code&gt;init&lt;/code&gt;,&lt;code&gt;copy&lt;/code&gt;或带有&lt;code&gt;ns_returns_retained&lt;/code&gt;属性的方法）&lt;/li&gt;
+&lt;li&gt;不做任何处理，且假设返回的对象值会在局部作用域内有效（在最里层的&lt;code&gt;autorelease pool&lt;/code&gt;结束之前都有效)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;调用&lt;code&gt;-(id)performSelector:&lt;/code&gt;，编译器会假设调用方法的返回值是一个对象，且不会对返回值进行&lt;code&gt;retain&lt;/code&gt;/&lt;code&gt;release&lt;/code&gt;，所以，如果你调用如上讨论的第2种情况下的方法，将导致内存泄露，因为，调用的方法会返回一个新的对象。&lt;/p&gt;
+&lt;p&gt;如果&lt;code&gt;#SEL&lt;/code&gt;返回值类型为&lt;code&gt;void&lt;/code&gt;或非对象类型，是可以安全的使用&lt;code&gt;-(id)performSelector:&lt;/code&gt;的。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="iOS开发-语言" scheme="https://zhongwuzw.github.io/categories/iOS%E5%BC%80%E5%8F%91-%E8%AF%AD%E8%A8%80/"/>
+    
+    
+      <category term="iOS" scheme="https://zhongwuzw.github.io/tags/iOS/"/>
+    
+      <category term="Objective-C" scheme="https://zhongwuzw.github.io/tags/Objective-C/"/>
+    
+  </entry>
+  
+  <entry>
     <title>SSO单点登录之CAS-Server</title>
     <link href="https://zhongwuzw.github.io/2016/12/27/SSO%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%E4%B9%8BCAS-Server/"/>
     <id>https://zhongwuzw.github.io/2016/12/27/SSO单点登录之CAS-Server/</id>
     <published>2016-12-27T10:15:15.000Z</published>
-    <updated>2017-01-12T10:46:01.000Z</updated>
+    <updated>2017-01-12T10:50:29.000Z</updated>
     
     <content type="html"><![CDATA[<h2 id="Prerequisites"><a href="#Prerequisites" class="headerlink" title="Prerequisites"></a>Prerequisites</h2><hr>
 <ul>
@@ -1061,43 +1129,6 @@
       <category term="iOS" scheme="https://zhongwuzw.github.io/tags/iOS/"/>
     
       <category term="越狱" scheme="https://zhongwuzw.github.io/tags/%E8%B6%8A%E7%8B%B1/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>NSURLProtocol无法截获NSURLSession解决方案</title>
-    <link href="https://zhongwuzw.github.io/2016/08/31/NSURLProtocol%E6%97%A0%E6%B3%95%E6%88%AA%E8%8E%B7NSURLSession%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/"/>
-    <id>https://zhongwuzw.github.io/2016/08/31/NSURLProtocol无法截获NSURLSession解决方案/</id>
-    <published>2016-08-31T03:27:20.000Z</published>
-    <updated>2016-09-19T09:26:19.000Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在做<a href="https://github.com/zhongwuzw/ZhihuDaily" target="_blank" rel="external">知乎日报</a>的项目时，在其设置界面中有一个选项，当开启时，可以在移动网络状况下不下载图片。这个需求的解决方案有两种，一种是在每一个使用网络图片的地方，在下载前进行判断，如果当前网络为移动蜂窝网络，且开启了<code>在移动网络状况下不下载图片</code>的选项时，放弃图片的下载；还有一种方案就是直接在<code>NSURLProtocol</code>中进行截获，在<code>+ (BOOL)canInitWithRequest:(NSURLRequest *)request</code>中进行判断，当<code>request.URL</code>请求为图片，并开启不下载图片选项，且当前为移动网络状况下，截获该请求。在<a href="https://github.com/zhongwuzw/ZhihuDaily" target="_blank" rel="external">知乎日报</a>项目中，我使用的第二种，既子类<code>NSURLProtocol</code>来实现请求拦截。</p>
-<h2 id="NSURLProtocol实现图片下载拦截"><a href="#NSURLProtocol实现图片下载拦截" class="headerlink" title="NSURLProtocol实现图片下载拦截"></a>NSURLProtocol实现图片下载拦截</h2><p>一开始，觉得思路很简单，直接创建<code>PictureBlockURLProtocol</code>类，其是<code>NSURLProtocol</code>的子类,在<code>Implement</code>实现中定义如下：</p>
-<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//获取当前网络状态</span></div><div class="line">+ (<span class="built_in">BOOL</span>)isBlockPictureDownload&#123;</div><div class="line">    Reachability *reachability = ((AppDelegate *)[[<span class="built_in">UIApplication</span> sharedApplication] delegate]).reachability;</div><div class="line">    </div><div class="line">    NetworkStatus netStatus = [reachability currentReachabilityStatus];</div><div class="line">    </div><div class="line">    <span class="built_in">BOOL</span> isBlock = netStatus == ReachableViaWWAN?<span class="literal">YES</span> : <span class="literal">NO</span>;</div><div class="line">    </div><div class="line">    <span class="keyword">return</span> isBlock;</div><div class="line">&#125;</div><div class="line"></div><div class="line">+ (<span class="built_in">BOOL</span>)canInitWithRequest:(<span class="built_in">NSURLRequest</span> *)request</div><div class="line">&#123;</div><div class="line">    <span class="keyword">if</span> ([<span class="built_in">NSURLProtocol</span> propertyForKey:HybridResourceProtocolKey inRequest:request]) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="literal">NO</span>;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="comment">//满足条件时直接截获请求</span></div><div class="line">    <span class="keyword">if</span> ([[UserConfig sharedInstance] isBlockPicture] &amp;&amp; ([request.URL.pathExtension caseInsensitiveCompare:<span class="string">@"jpg"</span>] == <span class="built_in">NSOrderedSame</span> || [request.URL.pathExtension caseInsensitiveCompare:<span class="string">@"png"</span>] == <span class="built_in">NSOrderedSame</span>) &amp;&amp; [<span class="keyword">self</span> isBlockPictureDownload]) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="literal">YES</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="literal">NO</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line">+ (<span class="built_in">NSURLRequest</span> *)canonicalRequestForRequest:(<span class="built_in">NSURLRequest</span> *)request</div><div class="line">&#123;</div><div class="line">    <span class="keyword">return</span> request;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//没有实现内容，request会以请求超时的方式结束</span></div><div class="line">- (<span class="keyword">void</span>)startLoading&#123;&#125;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)stopLoading&#123;&#125;</div></pre></td></tr></table></figure>
- <a id="more"></a>
-<p> 定义完<code>PictureBlockURLProtocol</code>类后，在<code>AppDelegate</code>类的<code>- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions</code>方法中调用<code>[NSURLProtocol registerClass:[PictureBlockURLProtocol class]]</code>方法进行注册，运行一下，看看效果，发现，当使用AFNetwork、SDWebImageCache等第三方库的图片请求并没有被截获到，而<code>UIWebView</code>可以，这就奇怪了，不过一想，<code>UIWebView</code>使用的是<code>NSURLConnection</code>，而<code>AFNetWork</code>、<code>SDWebCache</code>等已经废弃使用<code>NSURLConnection</code>，转而使用<code>NSURLSession</code>，难道是由于这个问题造成的？</p>
-<p> 在查看<code>NSURLSession</code>相关类的文档时（如下图），从文档可以看到，如果需要支持自定义的<code>NSURLProtocol</code>，需要将自定义的<code>NSURLProtocol</code>子类赋给<code>NSURLSessionConfiguration</code>的<code>protocolClasses</code>属性。所以，如果需要<code>NSURLProtocol</code>来截获<code>NSURLSession</code>发出的请求，需要每一个<code>NSURLSession</code>在创建时配置的<code>NSURLSessionConfiguration</code>类的<code>protocolClasses</code>属性附上自定义的<code>NSURLProtocol</code>。<br>  <img src="http://oc54pu02q.bkt.clouddn.com/QQ20160831-0@2x.png" width="500" height="" alt="" align="center"></p>
-<p> <em>根据上图的文档，注意到，对于后台Sessions，是不支持自定义的<code>NSURLProtocol</code>的。</em></p>
-<p> 通过查看AFNetwork、SDWebImageCache的源代码，其创建的Session时关联的<code>NSURLSessionConfiguration</code>为<code>defaultSessionConfiguration</code>。这样，解决方案就有两种，一种是直接改AFNetwork、SDWebImageCache等库的源代码，在其创建的<code>NSURLSessionConfiguration</code>实例中将自定义的<code>NSURLProtocol</code>赋给其<code>protocolClasses</code>属性；另一种方案，使用Method Swizzling方法，由于AFNetwork、SDWebImageCache在创建时使用的是<code>[NSURLSessionConfiguration defaultSessionConfiguration]</code>，所以可以替换<code>defaultSessionConfiguration</code>实现。首先，创建<code>NSURLSessionConfiguration</code>的类别，代码如下：</p>
- <figure class="highlight monkey"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">+ (NSURLSessionConfiguration *)zw_defaultSessionConfiguration&#123;</div><div class="line">    NSURLSessionConfiguration *configuration = [<span class="built_in">self</span> zw_defaultSessionConfiguration];</div><div class="line">    NSArray *protocolClasses = @[[PictureBlockURLProtocol <span class="class"><span class="keyword">class</span>]];</span></div><div class="line">    configuration.protocolClasses = protocolClasses;</div><div class="line">    </div><div class="line">    <span class="keyword">return</span> configuration;</div><div class="line">&#125;</div><div class="line"></div><div class="line">+ (void)load&#123;</div><div class="line">    <span class="function"><span class="keyword">Method</span> <span class="title">systemMethod</span> =</span> class_getClassMethod([NSURLSessionConfiguration <span class="class"><span class="keyword">class</span>], @<span class="title">selector</span>(<span class="title">defaultSessionConfiguration</span>));</span></div><div class="line">    <span class="function"><span class="keyword">Method</span> <span class="title">zwMethod</span> =</span> class_getClassMethod([<span class="built_in">self</span> <span class="class"><span class="keyword">class</span>], @<span class="title">selector</span>(<span class="title">zw_defaultSessionConfiguration</span>));</span></div><div class="line">    method_exchangeImplementations(systemMethod, zwMethod);</div><div class="line">    </div><div class="line">    [NSURLProtocol registerClass:[PictureBlockURLProtocol <span class="class"><span class="keyword">class</span>]];</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p> 如上代码所示，在创建的每一个<code>NSURLSessionConfiguration</code>实例中，添加自定义的<code>NSURLProtocol</code>类到其<code>protocolClasses</code>属性，运行后，发现问题解决了，可以截获<code>NSURLSession</code>发出的请求了。</p>
-<p> Done！！！！</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;在做&lt;a href=&quot;https://github.com/zhongwuzw/ZhihuDaily&quot;&gt;知乎日报&lt;/a&gt;的项目时，在其设置界面中有一个选项，当开启时，可以在移动网络状况下不下载图片。这个需求的解决方案有两种，一种是在每一个使用网络图片的地方，在下载前进行判断，如果当前网络为移动蜂窝网络，且开启了&lt;code&gt;在移动网络状况下不下载图片&lt;/code&gt;的选项时，放弃图片的下载；还有一种方案就是直接在&lt;code&gt;NSURLProtocol&lt;/code&gt;中进行截获，在&lt;code&gt;+ (BOOL)canInitWithRequest:(NSURLRequest *)request&lt;/code&gt;中进行判断，当&lt;code&gt;request.URL&lt;/code&gt;请求为图片，并开启不下载图片选项，且当前为移动网络状况下，截获该请求。在&lt;a href=&quot;https://github.com/zhongwuzw/ZhihuDaily&quot;&gt;知乎日报&lt;/a&gt;项目中，我使用的第二种，既子类&lt;code&gt;NSURLProtocol&lt;/code&gt;来实现请求拦截。&lt;/p&gt;
-&lt;h2 id=&quot;NSURLProtocol实现图片下载拦截&quot;&gt;&lt;a href=&quot;#NSURLProtocol实现图片下载拦截&quot; class=&quot;headerlink&quot; title=&quot;NSURLProtocol实现图片下载拦截&quot;&gt;&lt;/a&gt;NSURLProtocol实现图片下载拦截&lt;/h2&gt;&lt;p&gt;一开始，觉得思路很简单，直接创建&lt;code&gt;PictureBlockURLProtocol&lt;/code&gt;类，其是&lt;code&gt;NSURLProtocol&lt;/code&gt;的子类,在&lt;code&gt;Implement&lt;/code&gt;实现中定义如下：&lt;/p&gt;
-&lt;figure class=&quot;highlight objectivec&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;19&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;20&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;21&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;22&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;23&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;24&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;25&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;26&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;27&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;28&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;29&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;30&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;31&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;32&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;33&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;//获取当前网络状态&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;+ (&lt;span class=&quot;built_in&quot;&gt;BOOL&lt;/span&gt;)isBlockPictureDownload&amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    Reachability *reachability = ((AppDelegate *)[[&lt;span class=&quot;built_in&quot;&gt;UIApplication&lt;/span&gt; sharedApplication] delegate]).reachability;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    NetworkStatus netStatus = [reachability currentReachabilityStatus];&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;built_in&quot;&gt;BOOL&lt;/span&gt; isBlock = netStatus == ReachableViaWWAN?&lt;span class=&quot;literal&quot;&gt;YES&lt;/span&gt; : &lt;span class=&quot;literal&quot;&gt;NO&lt;/span&gt;;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; isBlock;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;+ (&lt;span class=&quot;built_in&quot;&gt;BOOL&lt;/span&gt;)canInitWithRequest:(&lt;span class=&quot;built_in&quot;&gt;NSURLRequest&lt;/span&gt; *)request&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;if&lt;/span&gt; ([&lt;span class=&quot;built_in&quot;&gt;NSURLProtocol&lt;/span&gt; propertyForKey:HybridResourceProtocolKey inRequest:request]) &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;literal&quot;&gt;NO&lt;/span&gt;;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;comment&quot;&gt;//满足条件时直接截获请求&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;if&lt;/span&gt; ([[UserConfig sharedInstance] isBlockPicture] &amp;amp;&amp;amp; ([request.URL.pathExtension caseInsensitiveCompare:&lt;span class=&quot;string&quot;&gt;@&quot;jpg&quot;&lt;/span&gt;] == &lt;span class=&quot;built_in&quot;&gt;NSOrderedSame&lt;/span&gt; || [request.URL.pathExtension caseInsensitiveCompare:&lt;span class=&quot;string&quot;&gt;@&quot;png&quot;&lt;/span&gt;] == &lt;span class=&quot;built_in&quot;&gt;NSOrderedSame&lt;/span&gt;) &amp;amp;&amp;amp; [&lt;span class=&quot;keyword&quot;&gt;self&lt;/span&gt; isBlockPictureDownload]) &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;literal&quot;&gt;YES&lt;/span&gt;;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;literal&quot;&gt;NO&lt;/span&gt;;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;+ (&lt;span class=&quot;built_in&quot;&gt;NSURLRequest&lt;/span&gt; *)canonicalRequestForRequest:(&lt;span class=&quot;built_in&quot;&gt;NSURLRequest&lt;/span&gt; *)request&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; request;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;//没有实现内容，request会以请求超时的方式结束&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;- (&lt;span class=&quot;keyword&quot;&gt;void&lt;/span&gt;)startLoading&amp;#123;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;- (&lt;span class=&quot;keyword&quot;&gt;void&lt;/span&gt;)stopLoading&amp;#123;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-    
-    </summary>
-    
-      <category term="iOS开发-网络" scheme="https://zhongwuzw.github.io/categories/iOS%E5%BC%80%E5%8F%91-%E7%BD%91%E7%BB%9C/"/>
-    
-    
-      <category term="iOS" scheme="https://zhongwuzw.github.io/tags/iOS/"/>
-    
-      <category term="Objective-C" scheme="https://zhongwuzw.github.io/tags/Objective-C/"/>
     
   </entry>
   
