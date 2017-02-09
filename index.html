@@ -288,6 +288,133 @@
             
               
                 
+                <a class="post-title-link" href="/2017/02/09/AppDelegate解耦之JSDecoupledAppDelegate/" itemprop="url">
+                  AppDelegate解耦之JSDecoupledAppDelegate
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-02-09T14:52:34+08:00" content="2017-02-09">
+              2017-02-09
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/iOS开发-项目/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发-项目</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/02/09/AppDelegate解耦之JSDecoupledAppDelegate/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/02/09/AppDelegate解耦之JSDecoupledAppDelegate/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h2 id="AppDelegate解耦"><a href="#AppDelegate解耦" class="headerlink" title="AppDelegate解耦"></a>AppDelegate解耦</h2><hr>
+<p>说到<code>AppDelegate</code>，大家想必都不陌生，它作为应用(<code>UIApplication</code>)的委托对象，在<code>UIApplicationMain</code>方法中被创建，当发生应用相关事件时，提供开发者响应的机会。</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span> main(<span class="keyword">int</span> argc, <span class="keyword">char</span> * argv[]) &#123;</div><div class="line">    <span class="keyword">@autoreleasepool</span> &#123;</div><div class="line">        <span class="keyword">return</span> <span class="built_in">UIApplicationMain</span>(argc, argv, <span class="literal">nil</span>, <span class="built_in">NSStringFromClass</span>([AppDelegate <span class="keyword">class</span>]));</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>AppDelegate</code>是<code>UIResponder</code>的子类，应用将<code>AppDelegate</code>加入响应链中。<code>UIApplication</code>作为响应链中的最上层，当<code>UIApplication</code>任然无法处理特定事件时，会将事件转发给<code>AppDelegate</code>来处理。</p>
+<p><img src="http://oc54pu02q.bkt.clouddn.com/iOS_and_OSX_responder_chain_2x.png" width = "500" height = "" alt="" align=center /></p>
+<p>当然，<code>AppDelegate</code>的主要职责还是响应应用事件，它满足<code>UIApplicationDelegate</code>协议，<code>UIApplicationDelegate</code>协议包含大量的委托方法，包括处理应用状态、状态恢复、后台下载数据、通知、URL Route等很多方面，这就会导致，随着程序的开发，<code>AppDelegate</code>将变得越来越臃肿，为了解决该问题，就需要进行解耦。</p>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2017/02/09/AppDelegate解耦之JSDecoupledAppDelegate/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2017/01/19/Objective-C之performSelector编译器内存泄露警告/" itemprop="url">
                   Objective-C之performSelector编译器内存泄露警告
                 </a>
@@ -793,140 +920,6 @@
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/12/11/Swift之类型引用/" itemprop="url">
-                  Swift之类型引用
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-12-11T21:58:35+08:00" content="2016-12-11">
-              2016-12-11
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/iOS开发-语言/" itemprop="url" rel="index">
-                    <span itemprop="name">iOS开发-语言</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/12/11/Swift之类型引用/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/12/11/Swift之类型引用/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="类型引用"><a href="#类型引用" class="headerlink" title="类型引用"></a>类型引用</h2><hr>
-<p>在开发中，我们经常用到实例的类型，希望实例与其真正的对象类型关联，既面向对象中的多态性。接下来将通过一个例子来进行讨论，比如，定义一个<code>Dog</code>类，用来描述狗，如下：</p>
-<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dog</span> </span>&#123;</div><div class="line">    <span class="class"><span class="keyword">class</span> <span class="title">var</span> <span class="title">whatDogsSay</span> : <span class="title">String</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="string">"Woof"</span></div><div class="line">    &#125;</div><div class="line">    <span class="function"><span class="keyword">func</span> <span class="title">bark</span><span class="params">()</span></span> &#123;</div><div class="line">        <span class="built_in">print</span>(<span class="type">Dog</span>.whatDogsSay)</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><code>Dog</code>类的<code>bark</code>为狗叫所定义的方法，实现中直接硬编码<code>Dog.whatDogsSay</code>，这种方法会很不灵活，尤其是其如果作为父类被子类时。</p>
-<p>在<code>Swift</code>中，可以使用<code>type(of:)</code>方法来访问对象实际的类型，既会返回实例对象真正的类型，所以，可以对之前的<code>Dog</code>进行改进，如下：</p>
-<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dog</span> </span>&#123;</div><div class="line">    <span class="class"><span class="keyword">class</span> <span class="title">var</span> <span class="title">whatDogsSay</span> : <span class="type">String &#123;</span></span></div><div class="line">        <span class="keyword">return</span> <span class="string">"Woof"</span></div><div class="line">    &#125;</div><div class="line">    func bark() &#123;</div><div class="line">        print(type(of:self).whatDogsSay)</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">NoisyDog</span> : <span class="type">Dog &#123;</span></span></div><div class="line">    <span class="keyword">override</span> <span class="class"><span class="keyword">class</span> <span class="title">var</span> <span class="title">whatDogsSay</span> : <span class="type">String &#123;</span></span></div><div class="line">        <span class="keyword">return</span> <span class="string">"Woof woof woof"</span></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>如上定义，结果如下：</p>
-<figure class="highlight ceylon"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">let</span> nd = NoisyDog()</div><div class="line">nd.bark() <span class="comment">// Woof woof woof</span></div></pre></td></tr></table></figure>
-<p>如果向<code>NoisyDog</code>实例发送<code>bark</code>消息，结果为”Woof woof woof”。这就是<code>type(of:)</code>方法的作用，他会指向实例真正的类型。<code>self</code>表示实例，类型为<code>NoisyDog</code>，所以<code>type(of:self)</code>返回<code>NoisyDog</code>类，所以会调用<code>NoisyDog</code>类的<code>whatDogsSay</code>类属性。</p>
-<p>有时候，需要传递一个对象类型作为参数：</p>
-<ul>
-<li>声明对象的类型时，可以使用类型名加<code>.</code>再加关键字<code>Type</code>。</li>
-<li><p>如果使用一个对象作为值时，比如，将类型赋值给一个变量或者作为参数值传递给函数时，可以使用类型名加<code>self</code>关键字，或者<code>type(of:)</code>方法。</p>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/12/11/Swift之类型引用/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -972,7 +965,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">27</span>
+              <span class="site-state-item-count">28</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -989,7 +982,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">27</span>
+                <span class="site-state-item-count">28</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

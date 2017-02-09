@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="iOS,NSURLSession,网络," />
+  <meta name="keywords" content="iOS,源码分析,解耦," />
 
 
 
@@ -86,22 +86,24 @@
 
 
 
-<meta name="description" content="HTTP Keep-Alive
-HTTP的Keep-Alive，是HTTP 1.1默认的功能（HTTP 1.0可以在请求头中设置Keep-Alive来显式开启），其表示持久连接，以前我们所使用的HTTP请求，当发出请求并接收完响应后，将关闭TCP连接，所以，如果我们短时间内进行大量的HTTP请求的话，会导致过多的TCP连接建立、关闭消耗.
-HTTP Keep-Alive vs TCP KeepAl">
+<meta name="description" content="AppDelegate解耦
+说到AppDelegate，大家想必都不陌生，它作为应用(UIApplication)的委托对象，在UIApplicationMain方法中被创建，当发生应用相关事件时，提供开发者响应的机会。
+12345int main(int argc, char * argv[]) &amp;#123;    @autoreleasepool &amp;#123;        return UI">
 <meta property="og:type" content="article">
-<meta property="og:title" content="NSURLSession之使用Keep-Alive长连接">
-<meta property="og:url" content="https://zhongwuzw.github.io/2016/11/12/NSURLSession之使用keep-alive长连接/index.html">
+<meta property="og:title" content="AppDelegate解耦之JSDecoupledAppDelegate">
+<meta property="og:url" content="https://zhongwuzw.github.io/2017/02/09/AppDelegate解耦之JSDecoupledAppDelegate/index.html">
 <meta property="og:site_name" content="钟武的技术博客">
-<meta property="og:description" content="HTTP Keep-Alive
-HTTP的Keep-Alive，是HTTP 1.1默认的功能（HTTP 1.0可以在请求头中设置Keep-Alive来显式开启），其表示持久连接，以前我们所使用的HTTP请求，当发出请求并接收完响应后，将关闭TCP连接，所以，如果我们短时间内进行大量的HTTP请求的话，会导致过多的TCP连接建立、关闭消耗.
-HTTP Keep-Alive vs TCP KeepAl">
-<meta property="og:updated_time" content="2016-11-12T15:28:54.000Z">
+<meta property="og:description" content="AppDelegate解耦
+说到AppDelegate，大家想必都不陌生，它作为应用(UIApplication)的委托对象，在UIApplicationMain方法中被创建，当发生应用相关事件时，提供开发者响应的机会。
+12345int main(int argc, char * argv[]) &amp;#123;    @autoreleasepool &amp;#123;        return UI">
+<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/iOS_and_OSX_responder_chain_2x.png">
+<meta property="og:updated_time" content="2017-02-09T08:43:40.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="NSURLSession之使用Keep-Alive长连接">
-<meta name="twitter:description" content="HTTP Keep-Alive
-HTTP的Keep-Alive，是HTTP 1.1默认的功能（HTTP 1.0可以在请求头中设置Keep-Alive来显式开启），其表示持久连接，以前我们所使用的HTTP请求，当发出请求并接收完响应后，将关闭TCP连接，所以，如果我们短时间内进行大量的HTTP请求的话，会导致过多的TCP连接建立、关闭消耗.
-HTTP Keep-Alive vs TCP KeepAl">
+<meta name="twitter:title" content="AppDelegate解耦之JSDecoupledAppDelegate">
+<meta name="twitter:description" content="AppDelegate解耦
+说到AppDelegate，大家想必都不陌生，它作为应用(UIApplication)的委托对象，在UIApplicationMain方法中被创建，当发生应用相关事件时，提供开发者响应的机会。
+12345int main(int argc, char * argv[]) &amp;#123;    @autoreleasepool &amp;#123;        return UI">
+<meta name="twitter:image" content="http://oc54pu02q.bkt.clouddn.com/iOS_and_OSX_responder_chain_2x.png">
 
 
 
@@ -119,7 +121,7 @@ HTTP Keep-Alive vs TCP KeepAl">
   };
 </script>
 
-  <title> NSURLSession之使用Keep-Alive长连接 | 钟武的技术博客 </title>
+  <title> AppDelegate解耦之JSDecoupledAppDelegate | 钟武的技术博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -292,7 +294,7 @@ HTTP Keep-Alive vs TCP KeepAl">
             
             
               
-                NSURLSession之使用Keep-Alive长连接
+                AppDelegate解耦之JSDecoupledAppDelegate
               
             
           </h1>
@@ -304,8 +306,8 @@ HTTP Keep-Alive vs TCP KeepAl">
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-11-12T22:13:57+08:00" content="2016-11-12">
-              2016-11-12
+            <time itemprop="dateCreated" datetime="2017-02-09T14:52:34+08:00" content="2017-02-09">
+              2017-02-09
             </time>
           </span>
 
@@ -318,8 +320,8 @@ HTTP Keep-Alive vs TCP KeepAl">
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/iOS开发-网络/" itemprop="url" rel="index">
-                    <span itemprop="name">iOS开发-网络</span>
+                  <a href="/categories/iOS开发-项目/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发-项目</span>
                   </a>
                 </span>
 
@@ -334,8 +336,8 @@ HTTP Keep-Alive vs TCP KeepAl">
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/11/12/NSURLSession之使用keep-alive长连接/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/11/12/NSURLSession之使用keep-alive长连接/" itemprop="commentsCount"></span>
+                <a href="/2017/02/09/AppDelegate解耦之JSDecoupledAppDelegate/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/02/09/AppDelegate解耦之JSDecoupledAppDelegate/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -358,32 +360,25 @@ HTTP Keep-Alive vs TCP KeepAl">
       
 
       
-        <h2 id="HTTP-Keep-Alive"><a href="#HTTP-Keep-Alive" class="headerlink" title="HTTP Keep-Alive"></a>HTTP Keep-Alive</h2><hr>
-<p><code>HTTP</code>的<code>Keep-Alive</code>，是<code>HTTP 1.1</code>默认的功能（<code>HTTP 1.0</code>可以在请求头中设置<code>Keep-Alive</code>来显式开启），其表示持久连接，以前我们所使用的<code>HTTP</code>请求，当发出请求并接收完响应后，将关闭<code>TCP</code>连接，所以，如果我们短时间内进行大量的<code>HTTP</code>请求的话，会导致过多的<code>TCP</code>连接建立、关闭消耗.</p>
-<h2 id="HTTP-Keep-Alive-vs-TCP-KeepAlive"><a href="#HTTP-Keep-Alive-vs-TCP-KeepAlive" class="headerlink" title="HTTP Keep-Alive vs TCP KeepAlive"></a>HTTP Keep-Alive vs TCP KeepAlive</h2><hr>
-<p>注意，我们目前说的都是<code>HTTP</code>的<code>Keep-Alive</code>，其实，<code>TCP</code>也有<code>KeepAlive</code>的概念，它解决的主要问题是，当连接建立后，如果没有数据传输，或者隔一段时间才发送一次数据时，如何来确定<code>Client</code>是否在线，连接是否需要保持，<code>TCP</code>解决方法为，当超过一段时间后，<code>TCP</code>会自动发送一个数据为空的报文给<code>Client</code>，如果对方回应了，则连接继续保持，否则，在重试多次无果后将关闭连接。</p>
-<h2 id="Pipeline"><a href="#Pipeline" class="headerlink" title="Pipeline"></a>Pipeline</h2><hr>
-<p><code>HTTP 1.1</code>引入了<code>Pipeline</code>,其基于<code>Keep-Alive</code>，既利用一个连接做多次请求，当<code>Client</code>提交多个请求时，不需要等第一个请求的响应接收完就能发起第二个请求，既实现类似于流水作业的功能。目前主流服务器都支持<code>Keep-Alive</code>和<code>Pipeline</code>。</p>
-<h2 id="使用NSURLSession开启Keep-Alive、Pipeline"><a href="#使用NSURLSession开启Keep-Alive、Pipeline" class="headerlink" title="使用NSURLSession开启Keep-Alive、Pipeline"></a>使用NSURLSession开启Keep-Alive、Pipeline</h2><hr>
+        <h2 id="AppDelegate解耦"><a href="#AppDelegate解耦" class="headerlink" title="AppDelegate解耦"></a>AppDelegate解耦</h2><hr>
+<p>说到<code>AppDelegate</code>，大家想必都不陌生，它作为应用(<code>UIApplication</code>)的委托对象，在<code>UIApplicationMain</code>方法中被创建，当发生应用相关事件时，提供开发者响应的机会。</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span> main(<span class="keyword">int</span> argc, <span class="keyword">char</span> * argv[]) &#123;</div><div class="line">    <span class="keyword">@autoreleasepool</span> &#123;</div><div class="line">        <span class="keyword">return</span> <span class="built_in">UIApplicationMain</span>(argc, argv, <span class="literal">nil</span>, <span class="built_in">NSStringFromClass</span>([AppDelegate <span class="keyword">class</span>]));</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>AppDelegate</code>是<code>UIResponder</code>的子类，应用将<code>AppDelegate</code>加入响应链中。<code>UIApplication</code>作为响应链中的最上层，当<code>UIApplication</code>任然无法处理特定事件时，会将事件转发给<code>AppDelegate</code>来处理。</p>
+<p><img src="http://oc54pu02q.bkt.clouddn.com/iOS_and_OSX_responder_chain_2x.png" width="500" height="" alt="" align="center"></p>
+<p>当然，<code>AppDelegate</code>的主要职责还是响应应用事件，它满足<code>UIApplicationDelegate</code>协议，<code>UIApplicationDelegate</code>协议包含大量的委托方法，包括处理应用状态、状态恢复、后台下载数据、通知、URL Route等很多方面，这就会导致，随着程序的开发，<code>AppDelegate</code>将变得越来越臃肿，为了解决该问题，就需要进行解耦。</p>
 <a id="more"></a>
-<ul>
-<li><p>开启<code>NSURLSession</code>配置<code>NSURLSessionConfiguration</code>的<code>HTTPShouldUsePipelining</code>属性为<code>YES</code>。</p>
-</li>
-<li><p>开启<code>NSMutableURLRequest</code>的<code>HTTPShouldUsePipelining</code>为<code>YES</code>。（<code>NSMutableURLRequest</code>可以继承<code>NSURLSessionConfiguration</code>的配置，所以如果<code>NSURLSession</code>配置了，则每个请求就不再需要单独配置可。）</p>
-</li>
-<li><p>确保发出的请求在同一个<code>NSURLSession</code>中，因为每一个<code>NSURLSession</code>使用单独的连接池，所以如果<code>NSURLSession</code>不同，那么就无法利用<code>Keep-Alive</code>、<code>Pipeline</code>了。</p>
-</li>
-<li><p>如果请求开启了认证，则相同的认证才能利用<code>Keep-Alive</code>、<code>Pipeline</code>。</p>
-</li>
-</ul>
-<h2 id="附"><a href="#附" class="headerlink" title="附"></a>附</h2><hr>
-<ul>
-<li><p>使用<code>SDWebImage</code>库的类别<code>UIImageView+WebCache</code>加载图片时，默认使用的共享的<code>NSURLSession</code>，且开启了<code>HTTPShouldUsePipelining</code>。</p>
-</li>
-<li><p>使用<code>AFNetworking</code>库时，每个<code>AFHTTPSessionManager</code>都会创建一个单独的<code>NSURLSession</code>。</p>
-</li>
-</ul>
-
+<h2 id="JSDecoupledAppDelegate"><a href="#JSDecoupledAppDelegate" class="headerlink" title="JSDecoupledAppDelegate"></a>JSDecoupledAppDelegate</h2><hr>
+<p><a href="https://github.com/JaviSoto/JSDecoupledAppDelegate" target="_blank" rel="external">JSDecoupledAppDelegate</a>的目的就是进行<code>AppDelegate</code>的解耦，接下来，将讲述一下实现原理。</p>
+<p>首先为了实现解耦，需要将<code>AppDelegate</code>替换为定义好的<code>JSDecoupledAppDelegate</code>类（该类为单例模式），其相当于一个<code>Proxy</code>代理类，负责管理分发到不同的协议对象。<code>JSDecoupledAppDelegate</code>将<code>UIApplicationDelegate</code>协议进行了分类拆分，生成如下的多个协议，针对每个协议，<code>JSDecoupledAppDelegate</code>都有一个满足该协议的属性，如<code>@property (strong, nonatomic, nullable) id&lt;JSApplicationStateDelegate&gt; appStateDelegate;</code>，<code>appStateDelegate</code>用来存储满足<code>JSApplicationStateDelegate</code>协议的对象，当该协议定义的方法被调用时，将转发给委托对象进行处理。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">@<span class="keyword">protocol</span> JSApplicationStateDelegate;</div><div class="line">@<span class="keyword">protocol</span> JSApplicationDefaultOrientationDelegate;</div><div class="line">@<span class="keyword">protocol</span> JSApplicationBackgroundFetchDelegate;</div><div class="line">@<span class="keyword">protocol</span> JSApplicationRemoteNotificationsDelegate;</div><div class="line">@<span class="keyword">protocol</span> JSApplicationLocalNotificationsDelegate;</div><div class="line">@<span class="keyword">protocol</span> JSApplicationStateRestorationDelegate;</div><div class="line">@<span class="keyword">protocol</span> JSApplicationURLResourceOpeningDelegate;</div><div class="line">@<span class="keyword">protocol</span> JSApplicationShortcutItemDelegate;</div><div class="line">@<span class="keyword">protocol</span> JSApplicationHealthDelegate;</div><div class="line">@<span class="keyword">protocol</span> JSApplicationProtectedDataDelegate;</div><div class="line">@<span class="keyword">protocol</span> JSApplicationWatchInteractionDelegate;</div><div class="line">@<span class="keyword">protocol</span> JSApplicationExtensionDelegate;</div><div class="line">@<span class="keyword">protocol</span> JSApplicationActivityContinuationDelegate;</div></pre></td></tr></table></figure>
+<p>比如，我们需要处理应用状态相关事件，新建一个处理对象，满足<code>JSApplicationStateDelegate</code>协议，在对象中定义<code>+load</code>方法，将<code>JSDecoupledAppDelegate</code>的<code>appStateDelegate</code>属性赋给自己，如下所示，再在对象中实现<code>JSApplicationStateDelegate</code>方法，这样，当应用状态相关事件产生时，该对象就能收到相关事件。</p>
+<figure class="highlight inform7"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">+ (void)load</div><div class="line">&#123;</div><div class="line">    <span class="comment">[JSDecoupledAppDelegate sharedAppDelegate]</span>.appStateDelegate = <span class="comment">[<span class="comment">[self alloc]</span> init]</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这样，就实现了<code>AppDelegate</code>的解耦，针对不同的应用事件类别，由不同的对象进行处理。</p>
+<p>有的人就好奇了，<code>JSDecoupledAppDelegate</code>是怎么实现事件分发的呢？</p>
+<p><code>JSDecoupledAppDelegate</code>重载了<code>- (BOOL)respondsToSelector:(SEL)aSelector</code>方法，为什么会选择重载这个方法呢，我们再来思考一下，平时我们实现<code>Delegate</code>委托方式时，当我们需调用委托对象的某个方法时，首先需要做的就是判断一下委托对象是否实现了该方法，即使用<code>respondsToSelector:</code>（如果不进行提前判断，当委托对象没有实现该方法时，将导致<code>Crash</code>），这也就不难解释为什么选择重载该方法了。</p>
+<p>直接show code:</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line">- (<span class="built_in">BOOL</span>)respondsToSelector:(SEL)aSelector</div><div class="line">&#123;</div><div class="line">    <span class="comment">//获取委托属性名，每个协议对应一个属性，如appStateDelegate</span></div><div class="line">    <span class="built_in">NSArray</span> *delegateProperties = JSApplicationDelegateProperties();</div><div class="line"></div><div class="line">    <span class="comment">// 1. 获取定义了aSelector的协议</span></div><div class="line">    __block <span class="built_in">BOOL</span> protocolFound = <span class="literal">NO</span>;</div><div class="line">    __block <span class="built_in">BOOL</span> delegateRespondsToSelector = <span class="literal">NO</span>;</div><div class="line"></div><div class="line">    [JSApplicationDelegateSubprotocols() enumerateObjectsUsingBlock:^(<span class="built_in">NSString</span> *protocolName, <span class="built_in">NSUInteger</span> idx, <span class="built_in">BOOL</span> *stop) &#123;</div><div class="line">        <span class="comment">//获取协议定义的方法</span></div><div class="line">        <span class="built_in">NSSet</span> *protocolMethods = JSSelectorListInProtocol(<span class="built_in">NSProtocolFromString</span>(protocolName));</div><div class="line"></div><div class="line">        <span class="keyword">const</span> <span class="built_in">BOOL</span> methodCorrespondsToThisProtocol = [protocolMethods containsObject:<span class="built_in">NSStringFromSelector</span>(aSelector)];</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (methodCorrespondsToThisProtocol)</div><div class="line">        &#123;</div><div class="line">            protocolFound = <span class="literal">YES</span>;</div><div class="line"></div><div class="line">            <span class="comment">// 2. 获取协议委托对象，如appStateDelegate属性</span></div><div class="line">            <span class="keyword">id</span> delegateObjectForProtocol = [<span class="keyword">self</span> valueForKey:delegateProperties[idx]];</div><div class="line">            </div><div class="line">            <span class="comment">//判断委托对象是否实现了该方法</span></div><div class="line">            delegateRespondsToSelector = [delegateObjectForProtocol respondsToSelector:aSelector];</div><div class="line"></div><div class="line">            *stop = <span class="literal">YES</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;];</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (protocolFound)</div><div class="line">    &#123;</div><div class="line">        <span class="comment">// 3. 返回委托对象是否能响应该方法</span></div><div class="line">        <span class="keyword">return</span> delegateRespondsToSelector;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">else</span></div><div class="line">    &#123;</div><div class="line">        <span class="comment">// 4. 如不能响应，走缺省方法处理</span></div><div class="line">        <span class="keyword">return</span> [<span class="keyword">super</span> respondsToSelector:aSelector];</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="终"><a href="#终" class="headerlink" title="终"></a>终</h2>
       
     </div>
 
@@ -406,9 +401,9 @@ HTTP Keep-Alive vs TCP KeepAl">
           
             <a href="/tags/iOS/" rel="tag">#iOS</a>
           
-            <a href="/tags/NSURLSession/" rel="tag">#NSURLSession</a>
+            <a href="/tags/源码分析/" rel="tag">#源码分析</a>
           
-            <a href="/tags/网络/" rel="tag">#网络</a>
+            <a href="/tags/解耦/" rel="tag">#解耦</a>
           
         </div>
       
@@ -417,17 +412,13 @@ HTTP Keep-Alive vs TCP KeepAl">
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/11/02/Hadoop问题总结/" rel="next" title="Hadoop相关总结">
-                <i class="fa fa-chevron-left"></i> Hadoop相关总结
+              <a href="/2017/01/19/Objective-C之performSelector编译器内存泄露警告/" rel="next" title="Objective-C之performSelector编译器内存泄露警告">
+                <i class="fa fa-chevron-left"></i> Objective-C之performSelector编译器内存泄露警告
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/11/28/crontab执行Shell脚本时的工作目录/" rel="prev" title="crontab执行Shell脚本时的工作目录">
-                crontab执行Shell脚本时的工作目录 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -442,10 +433,10 @@ HTTP Keep-Alive vs TCP KeepAl">
 
     <div class="post-spread">
       
-        <div class="ds-share flat" data-thread-key="2016/11/12/NSURLSession之使用keep-alive长连接/"
-     data-title="NSURLSession之使用Keep-Alive长连接"
+        <div class="ds-share flat" data-thread-key="2017/02/09/AppDelegate解耦之JSDecoupledAppDelegate/"
+     data-title="AppDelegate解耦之JSDecoupledAppDelegate"
      data-content=""
-     data-url="https://zhongwuzw.github.io/2016/11/12/NSURLSession之使用keep-alive长连接/">
+     data-url="https://zhongwuzw.github.io/2017/02/09/AppDelegate解耦之JSDecoupledAppDelegate/">
   <div class="ds-share-inline">
     <ul  class="ds-share-icons-16">
 
@@ -475,8 +466,8 @@ HTTP Keep-Alive vs TCP KeepAl">
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/11/12/NSURLSession之使用keep-alive长连接/"
-           data-title="NSURLSession之使用Keep-Alive长连接" data-url="https://zhongwuzw.github.io/2016/11/12/NSURLSession之使用keep-alive长连接/">
+      <div class="ds-thread" data-thread-key="2017/02/09/AppDelegate解耦之JSDecoupledAppDelegate/"
+           data-title="AppDelegate解耦之JSDecoupledAppDelegate" data-url="https://zhongwuzw.github.io/2017/02/09/AppDelegate解耦之JSDecoupledAppDelegate/">
       </div>
     
   </div>
@@ -603,7 +594,7 @@ HTTP Keep-Alive vs TCP KeepAl">
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-Keep-Alive"><span class="nav-number">1.</span> <span class="nav-text">HTTP Keep-Alive</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-Keep-Alive-vs-TCP-KeepAlive"><span class="nav-number">2.</span> <span class="nav-text">HTTP Keep-Alive vs TCP KeepAlive</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pipeline"><span class="nav-number">3.</span> <span class="nav-text">Pipeline</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用NSURLSession开启Keep-Alive、Pipeline"><span class="nav-number">4.</span> <span class="nav-text">使用NSURLSession开启Keep-Alive、Pipeline</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#附"><span class="nav-number">5.</span> <span class="nav-text">附</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#AppDelegate解耦"><span class="nav-number">1.</span> <span class="nav-text">AppDelegate解耦</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JSDecoupledAppDelegate"><span class="nav-number">2.</span> <span class="nav-text">JSDecoupledAppDelegate</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#终"><span class="nav-number">3.</span> <span class="nav-text">终</span></a></li></ol></div>
             
           </div>
         </section>
