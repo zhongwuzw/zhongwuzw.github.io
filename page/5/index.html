@@ -288,6 +288,132 @@
             
               
                 
+                <a class="post-title-link" href="/2016/09/08/源码分析之SDWebImage/" itemprop="url">
+                  源码分析之SDWebImage
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-09-08T16:02:49+08:00" content="2016-09-08">
+              2016-09-08
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/iOS开发-网络/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发-网络</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/09/08/源码分析之SDWebImage/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/09/08/源码分析之SDWebImage/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><hr>
+<p>在iOS开发中，很多都使用到<a href="https://github.com/rs/SDWebImage">SDWebImage</a>库，该库使用了外观模式，提供简洁的API，<code>UIButton</code>、<code>UIImageView</code>等类可以直接调用API进行网络图片的下载，接下来，就来分析一下<code>SDWebImage</code>的整个工作流程。</p>
+<h2 id="整体结构"><a href="#整体结构" class="headerlink" title="整体结构"></a>整体结构</h2><hr>
+<p>查看<code>SDWebImage</code>的整个项目结构，除去一些辅助的类，其结构大致如下图所示，<code>UIView+WebCacheOperation</code>类作为<code>UIView</code>的类别，提供基本的方法，如设置、取消、移除<code>Operation</code>操作，该<code>Operation</code>满足<code>&lt;SDWebImageOperation&gt;</code>协议，并通过关联引用来进行存储。<br><code>UIImageView+WebCache</code>、<code>SDWebImageManager</code>等类提供对外的接口。<br><code>SDWebImageManager</code>类将作为Manager来进行下载和缓存的管理，而真正负责下载的类为<code>SDWebImageDownloader</code>类，<code>SDWebImageDownloaderOperation</code>负责封装下载对象；管理缓存的类为<code>SDImageCache</code>。<br>好了，大致结构就是这样，接下来将通过一次调用来分析其内部的具体流程。</p>
+<p><img src="http://oc54pu02q.bkt.clouddn.com/%E6%9C%AA%E5%91%BD%E5%90%8D%202.png" alt=""></p>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/09/08/源码分析之SDWebImage/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2016/09/05/iOS授权相关/" itemprop="url">
                   iOS越狱设备添加Entitlements授权
                 </a>
@@ -773,130 +899,6 @@
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/08/23/Swift中使用Objective-C的Runtime/" itemprop="url">
-                  Swift中使用Objective-C的Runtime
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-08-23T15:41:47+08:00" content="2016-08-23">
-              2016-08-23
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/iOS开发-语言/" itemprop="url" rel="index">
-                    <span itemprop="name">iOS开发-语言</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/08/23/Swift中使用Objective-C的Runtime/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/23/Swift中使用Objective-C的Runtime/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="Swift调用Objective-C的Runtime"><a href="#Swift调用Objective-C的Runtime" class="headerlink" title="Swift调用Objective-C的Runtime"></a>Swift调用Objective-C的Runtime</h1><hr>
-<p>首先，我们来测试一下使用Swift代码来调用Objective-C Runtime的方法，首先创建两个类，用来做对比，一个是纯的Swift类，另一个继承自NSObject：</p>
-<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//纯Swift类</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">SwiftClass</span> </span>&#123;</div><div class="line">    <span class="keyword">var</span> aBool = <span class="literal">true</span></div><div class="line">    <span class="keyword">var</span> aInt = <span class="number">3</span></div><div class="line">    <span class="keyword">var</span> aStrig = <span class="string">"sss"</span></div><div class="line">    <span class="keyword">var</span> aObject :<span class="type">AnyObject</span>?</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">func</span> <span class="title">swiftTest</span><span class="params">()</span></span> &#123;</div><div class="line">        </div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//继承自NSObject的类</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">SwiftWithOCClass</span> :<span class="title">NSObject</span></span>&#123;</div><div class="line">    <span class="keyword">var</span> aBool = <span class="literal">true</span></div><div class="line">    <span class="keyword">var</span> aInt = <span class="number">3</span></div><div class="line">    <span class="keyword">var</span> aStrig = <span class="string">"sss"</span></div><div class="line">    <span class="keyword">var</span> aObject :<span class="type">AnyObject</span>?</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">func</span> <span class="title">swiftTest</span><span class="params">(aCharacter:Character)</span></span> &#123;</div><div class="line">        </div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">func</span> <span class="title">justTest</span><span class="params">()</span></span> &#123;</div><div class="line">        </div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/08/23/Swift中使用Objective-C的Runtime/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -942,7 +944,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">28</span>
+              <span class="site-state-item-count">29</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -959,7 +961,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">28</span>
+                <span class="site-state-item-count">29</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
