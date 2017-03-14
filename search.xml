@@ -14,6 +14,7 @@
 <p><a href="https://en.wikipedia.org/wiki/RAID" target="_blank" rel="external">磁盘阵列</a>（Redundant Arrays of Independent Disks，RAID），是由独立磁盘构成的具有冗余能力的阵列，将数据切割成许多区段，分别放在各个硬盘上，同时有冗余，数据重构等安全服务。</p>
 <p>做RAID有很多种方案，可以根据不同的需求，使用不同的方案，如RAID0（条带）、RAID1（镜像）、RAID5、RAID10、RAID50等（不同的方法，所要求的磁盘数也不一样），通常，对于存放数据的磁盘，会使用RAID10、RAID50。做完RAID后，就形成了逻辑分区。</p>
 <p>当然，并不是说服务器一定要做RAID，不做RAID的服务器也能装系统。</p>
+ <a id="more"></a>
 <h2 id="装系统"><a href="#装系统" class="headerlink" title="装系统"></a>装系统</h2><hr>
 <p>这一步，大家应该比较熟悉了，装系统，<code>Linux</code>、<code>CentOS</code>等，如果有<code>ISO</code>镜像，通过iLO管理口，挂载镜像，启动后，就能进行系统安装，系统安装的过程中，有一步操作是挂载点设置（系统会安装在之前配置好的一个逻辑分区中），一般来说，<code>Linux</code>系统最少有两个挂载点，分别是<code>/</code>根目录、<code>swap</code>交换分区，通常，也会挂载<code>/home</code>、<code>/usr</code>、<code>/var</code>、<code>/opt</code>等目录。</p>
 <h2 id="挂载磁盘"><a href="#挂载磁盘" class="headerlink" title="挂载磁盘"></a>挂载磁盘</h2><hr>

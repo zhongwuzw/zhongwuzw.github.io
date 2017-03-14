@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://zhongwuzw.github.io/"/>
-  <updated>2017-03-14T06:47:10.000Z</updated>
+  <updated>2017-03-14T06:55:06.000Z</updated>
   <id>https://zhongwuzw.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://zhongwuzw.github.io/2017/03/14/%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B9%8B%E4%BB%8E%E8%A3%B8%E6%9C%BA%E5%88%B0%E5%8F%AF%E7%94%A8/"/>
     <id>https://zhongwuzw.github.io/2017/03/14/服务器之从裸机到可用/</id>
     <published>2017-03-14T04:16:24.000Z</published>
-    <updated>2017-03-14T06:47:10.000Z</updated>
+    <updated>2017-03-14T06:55:06.000Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><hr>
 <p>对于服务器，程序员们还是很熟悉的，任何一个互联网产品，背后几乎都离不开服务器，所有的服务，背后都是通过服务器来提供的，接下来，我将列出从裸机到可用的基本步骤，示例的服务器为<code>HP ProLiant Gen9</code>，当然，其他的服务器如<code>IBM</code>等，基本步骤也都是类似的。</p>
@@ -30,6 +30,7 @@
 <p><a href="https://en.wikipedia.org/wiki/RAID" target="_blank" rel="external">磁盘阵列</a>（Redundant Arrays of Independent Disks，RAID），是由独立磁盘构成的具有冗余能力的阵列，将数据切割成许多区段，分别放在各个硬盘上，同时有冗余，数据重构等安全服务。</p>
 <p>做RAID有很多种方案，可以根据不同的需求，使用不同的方案，如RAID0（条带）、RAID1（镜像）、RAID5、RAID10、RAID50等（不同的方法，所要求的磁盘数也不一样），通常，对于存放数据的磁盘，会使用RAID10、RAID50。做完RAID后，就形成了逻辑分区。</p>
 <p>当然，并不是说服务器一定要做RAID，不做RAID的服务器也能装系统。</p>
+ <a id="more"></a>
 <h2 id="装系统"><a href="#装系统" class="headerlink" title="装系统"></a>装系统</h2><hr>
 <p>这一步，大家应该比较熟悉了，装系统，<code>Linux</code>、<code>CentOS</code>等，如果有<code>ISO</code>镜像，通过iLO管理口，挂载镜像，启动后，就能进行系统安装，系统安装的过程中，有一步操作是挂载点设置（系统会安装在之前配置好的一个逻辑分区中），一般来说，<code>Linux</code>系统最少有两个挂载点，分别是<code>/</code>根目录、<code>swap</code>交换分区，通常，也会挂载<code>/home</code>、<code>/usr</code>、<code>/var</code>、<code>/opt</code>等目录。</p>
 <h2 id="挂载磁盘"><a href="#挂载磁盘" class="headerlink" title="挂载磁盘"></a>挂载磁盘</h2><hr>
@@ -43,7 +44,13 @@
     <summary type="html">
     
       &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;hr&gt;
-&lt;p&gt;对于服务器，程序员们还是很熟悉的，任何一个互联网产品，背后几乎都离不开服务器，所有的服务，背后都是通过服务器来提供的，接下来，我将
+&lt;p&gt;对于服务器，程序员们还是很熟悉的，任何一个互联网产品，背后几乎都离不开服务器，所有的服务，背后都是通过服务器来提供的，接下来，我将列出从裸机到可用的基本步骤，示例的服务器为&lt;code&gt;HP ProLiant Gen9&lt;/code&gt;，当然，其他的服务器如&lt;code&gt;IBM&lt;/code&gt;等，基本步骤也都是类似的。&lt;/p&gt;
+&lt;h2 id=&quot;配置管理口&quot;&gt;&lt;a href=&quot;#配置管理口&quot; class=&quot;headerlink&quot; title=&quot;配置管理口&quot;&gt;&lt;/a&gt;配置管理口&lt;/h2&gt;&lt;hr&gt;
+&lt;p&gt;通常来说，这一步是都是要走的，通过配置管理口，可以远程管理服务器，不用去机房插显示器、键盘。&lt;code&gt;HP ProLiant Gen9&lt;/code&gt;的管理口称为&lt;code&gt;iLO&lt;/code&gt;口，开机初始化后进入系统配置，进行配置，一般来说，服务器都是使用静态IP，所以需要禁掉&lt;code&gt;DHCP&lt;/code&gt;，并配置&lt;code&gt;IP&lt;/code&gt;地址、网关、子网掩码。重启后生效，这样就能够进行远程控制了。&lt;/p&gt;
+&lt;h2 id=&quot;做RAID&quot;&gt;&lt;a href=&quot;#做RAID&quot; class=&quot;headerlink&quot; title=&quot;做RAID&quot;&gt;&lt;/a&gt;做RAID&lt;/h2&gt;&lt;hr&gt;
+&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/RAID&quot;&gt;磁盘阵列&lt;/a&gt;（Redundant Arrays of Independent Disks，RAID），是由独立磁盘构成的具有冗余能力的阵列，将数据切割成许多区段，分别放在各个硬盘上，同时有冗余，数据重构等安全服务。&lt;/p&gt;
+&lt;p&gt;做RAID有很多种方案，可以根据不同的需求，使用不同的方案，如RAID0（条带）、RAID1（镜像）、RAID5、RAID10、RAID50等（不同的方法，所要求的磁盘数也不一样），通常，对于存放数据的磁盘，会使用RAID10、RAID50。做完RAID后，就形成了逻辑分区。&lt;/p&gt;
+&lt;p&gt;当然，并不是说服务器一定要做RAID，不做RAID的服务器也能装系统。&lt;/p&gt;
     
     </summary>
     
