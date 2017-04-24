@@ -18,11 +18,11 @@
 <h2 id="装系统"><a href="#装系统" class="headerlink" title="装系统"></a>装系统</h2><hr>
 <p>这一步，大家应该比较熟悉了，装系统，<code>Linux</code>、<code>CentOS</code>等，如果有<code>ISO</code>镜像，通过iLO管理口，挂载镜像，启动后，就能进行系统安装，系统安装的过程中，有一步操作是挂载点设置（系统会安装在之前配置好的一个逻辑分区中），一般来说，<code>Linux</code>系统最少有两个挂载点，分别是<code>/</code>根目录、<code>swap</code>交换分区，通常，也会挂载<code>/home</code>、<code>/usr</code>、<code>/var</code>、<code>/opt</code>等目录。</p>
 <h2 id="挂载磁盘"><a href="#挂载磁盘" class="headerlink" title="挂载磁盘"></a>挂载磁盘</h2><hr>
-<p>系统安装完后，对剩余的逻辑分区进行挂载，包括格式化、创建目录、挂载磁盘以及自动挂载配置。</p>
+<p>系统安装完后，对之前创建好的逻辑分区进行挂载，包括格式化、创建目录、挂载磁盘以及自动挂载配置。</p>
 <h2 id="配置网口IP"><a href="#配置网口IP" class="headerlink" title="配置网口IP"></a>配置网口IP</h2><hr>
-<p>整个安装过程，我们只给管理口<code>iLO</code>配置了<code>IP</code>地址，服务器会有多个的业务网口，我们可以给网口配置IP、网关、子网掩码等，这样，可以通过<code>SSH</code>来进行远程登录。</p>
+<p>整个安装过程，除了给<code>iLO</code>管理口配置<code>IP</code>地址，还要配置业务口，业务口一般使用光口（光纤传输）来做业务口，同样给其配置IP、网关、子网掩码等。</p>
 <h2 id="完"><a href="#完" class="headerlink" title="完"></a>完</h2><hr>
-<p>经过这几个步骤，系统就算完成了基本的搭建，当然，还有很多另外的操作，比如配置<code>yum</code>源、安装必备软件、系统优化等。</p>
+<p>经过这几个步骤，系统就算完成了基本的搭建，当然，还有很多另外的操作，比如配置<code>yum</code>源、配置环境、系统优化等。</p>
 ]]></content>
     </entry>
     
@@ -473,6 +473,12 @@
 <ul>
 <li><p><em>非越狱</em>下获取设备安装的所有应用：</p>
   <figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">Class c = <span class="built_in">NSClassFromString</span>(<span class="string">@"LSApplicationWorkspace"</span>);</div><div class="line"><span class="keyword">id</span> s = [(<span class="keyword">id</span>)c performSelector:<span class="built_in">NSSelectorFromString</span>(<span class="string">@"defaultWorkspace"</span>)];</div><div class="line">    </div><div class="line"><span class="built_in">NSArray</span> *arr = [s performSelector:<span class="built_in">NSSelectorFromString</span>(<span class="string">@"allInstalledApplications"</span>)];</div><div class="line">    </div><div class="line"><span class="keyword">for</span> (<span class="keyword">id</span> item <span class="keyword">in</span> arr) &#123;</div><div class="line">    <span class="built_in">NSLog</span>(<span class="string">@"%@"</span>,[item performSelector:<span class="built_in">NSSelectorFromString</span>(<span class="string">@"applicationIdentifier"</span>)]); </div><div class="line">    <span class="built_in">NSLog</span>(<span class="string">@"%@"</span>,[item performSelector:<span class="built_in">NSSelectorFromString</span>(<span class="string">@"bundleVersion"</span>)]);</div><div class="line">    <span class="built_in">NSLog</span>(<span class="string">@"%@"</span>,[item performSelector:<span class="built_in">NSSelectorFromString</span>(<span class="string">@"shortVersionString"</span>)]);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<ul>
+<li><p>当使用<code>Core Foundation</code>时，当你是对象的拥有者时，需要调用<code>CFRelease</code>，这里需要注意的是，不能调用<code>CFRelease(NULL)</code>，会导致程序崩溃，所以，调用<code>CFRelease</code>前需先判断一下对象是否存在（当然，有些特定的release函数容许<code>NULL</code>参数，如<code>CGGradientRelease</code>)。</p>
+</li>
+<li><p><code>UITableViewCell</code>默认分割线会在左侧留出一定的间距，如果想调整分割线的左、右间距，可以通过调整<code>UITableView</code>的<code>separatorInset</code>属性。</p>
 </li>
 </ul>
 ]]></content>

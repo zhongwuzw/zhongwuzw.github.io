@@ -98,7 +98,7 @@
 对于服务器，程序员们还是很熟悉的，任何一个互联网产品，背后几乎都离不开服务器，所有的服务，背后都是通过服务器来提供的，接下来，我将列出从裸机到可用的基本步骤，示例的服务器为HP ProLiant Gen9，当然，其他的服务器如IBM等，基本步骤也都是类似的。
 配置管理口
 通常来说，这一步是都是要走的，通过配置管理口，可以远程管理服务器，不用去机房插显示器、键盘。HP ProLiant Gen">
-<meta property="og:updated_time" content="2017-03-14T06:55:06.000Z">
+<meta property="og:updated_time" content="2017-04-22T15:24:17.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="服务器之从裸机到可用">
 <meta name="twitter:description" content="前言
@@ -373,11 +373,11 @@
 <h2 id="装系统"><a href="#装系统" class="headerlink" title="装系统"></a>装系统</h2><hr>
 <p>这一步，大家应该比较熟悉了，装系统，<code>Linux</code>、<code>CentOS</code>等，如果有<code>ISO</code>镜像，通过iLO管理口，挂载镜像，启动后，就能进行系统安装，系统安装的过程中，有一步操作是挂载点设置（系统会安装在之前配置好的一个逻辑分区中），一般来说，<code>Linux</code>系统最少有两个挂载点，分别是<code>/</code>根目录、<code>swap</code>交换分区，通常，也会挂载<code>/home</code>、<code>/usr</code>、<code>/var</code>、<code>/opt</code>等目录。</p>
 <h2 id="挂载磁盘"><a href="#挂载磁盘" class="headerlink" title="挂载磁盘"></a>挂载磁盘</h2><hr>
-<p>系统安装完后，对剩余的逻辑分区进行挂载，包括格式化、创建目录、挂载磁盘以及自动挂载配置。</p>
+<p>系统安装完后，对之前创建好的逻辑分区进行挂载，包括格式化、创建目录、挂载磁盘以及自动挂载配置。</p>
 <h2 id="配置网口IP"><a href="#配置网口IP" class="headerlink" title="配置网口IP"></a>配置网口IP</h2><hr>
-<p>整个安装过程，我们只给管理口<code>iLO</code>配置了<code>IP</code>地址，服务器会有多个的业务网口，我们可以给网口配置IP、网关、子网掩码等，这样，可以通过<code>SSH</code>来进行远程登录。</p>
+<p>整个安装过程，除了给<code>iLO</code>管理口配置<code>IP</code>地址，还要配置业务口，业务口一般使用光口（光纤传输）来做业务口，同样给其配置IP、网关、子网掩码等。</p>
 <h2 id="完"><a href="#完" class="headerlink" title="完"></a>完</h2><hr>
-<p>经过这几个步骤，系统就算完成了基本的搭建，当然，还有很多另外的操作，比如配置<code>yum</code>源、安装必备软件、系统优化等。</p>
+<p>经过这几个步骤，系统就算完成了基本的搭建，当然，还有很多另外的操作，比如配置<code>yum</code>源、配置环境、系统优化等。</p>
 
       
     </div>
