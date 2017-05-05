@@ -288,6 +288,134 @@
             
               
                 
+                <a class="post-title-link" href="/2016/11/12/NSURLSession之使用keep-alive长连接/" itemprop="url">
+                  NSURLSession之使用Keep-Alive长连接
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-11-12T22:13:57+08:00" content="2016-11-12">
+              2016-11-12
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/iOS开发-网络/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发-网络</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/11/12/NSURLSession之使用keep-alive长连接/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/11/12/NSURLSession之使用keep-alive长连接/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h2 id="HTTP-Keep-Alive"><a href="#HTTP-Keep-Alive" class="headerlink" title="HTTP Keep-Alive"></a>HTTP Keep-Alive</h2><hr>
+<p><code>HTTP</code>的<code>Keep-Alive</code>，是<code>HTTP 1.1</code>默认的功能（<code>HTTP 1.0</code>可以在请求头中设置<code>Keep-Alive</code>来显式开启），其表示持久连接，以前我们所使用的<code>HTTP</code>请求，当发出请求并接收完响应后，将关闭<code>TCP</code>连接，所以，如果我们短时间内进行大量的<code>HTTP</code>请求的话，会导致过多的<code>TCP</code>连接建立、关闭消耗.</p>
+<h2 id="HTTP-Keep-Alive-vs-TCP-KeepAlive"><a href="#HTTP-Keep-Alive-vs-TCP-KeepAlive" class="headerlink" title="HTTP Keep-Alive vs TCP KeepAlive"></a>HTTP Keep-Alive vs TCP KeepAlive</h2><hr>
+<p>注意，我们目前说的都是<code>HTTP</code>的<code>Keep-Alive</code>，其实，<code>TCP</code>也有<code>KeepAlive</code>的概念，它解决的主要问题是，当连接建立后，如果没有数据传输，或者隔一段时间才发送一次数据时，如何来确定<code>Client</code>是否在线，连接是否需要保持，<code>TCP</code>解决方法为，当超过一段时间后，<code>TCP</code>会自动发送一个数据为空的报文给<code>Client</code>，如果对方回应了，则连接继续保持，否则，在重试多次无果后将关闭连接。</p>
+<h2 id="Pipeline"><a href="#Pipeline" class="headerlink" title="Pipeline"></a>Pipeline</h2><hr>
+<p><code>HTTP 1.1</code>引入了<code>Pipeline</code>,其基于<code>Keep-Alive</code>，既利用一个连接做多次请求，当<code>Client</code>提交多个请求时，不需要等第一个请求的响应接收完就能发起第二个请求，既实现类似于流水作业的功能。目前主流服务器都支持<code>Keep-Alive</code>和<code>Pipeline</code>。</p>
+<h2 id="使用NSURLSession开启Keep-Alive、Pipeline"><a href="#使用NSURLSession开启Keep-Alive、Pipeline" class="headerlink" title="使用NSURLSession开启Keep-Alive、Pipeline"></a>使用NSURLSession开启Keep-Alive、Pipeline</h2><hr>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/11/12/NSURLSession之使用keep-alive长连接/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2016/11/02/Hadoop问题总结/" itemprop="url">
                   Hadoop相关总结
                 </a>
@@ -795,135 +923,6 @@
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/09/24/调整Nginx的网站根目录/" itemprop="url">
-                  修改Nginx的网站根目录
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-09-24T18:43:30+08:00" content="2016-09-24">
-              2016-09-24
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Nginx/" itemprop="url" rel="index">
-                    <span itemprop="name">Nginx</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/09/24/调整Nginx的网站根目录/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/09/24/调整Nginx的网站根目录/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="修改Nginx的网站根目录"><a href="#修改Nginx的网站根目录" class="headerlink" title="修改Nginx的网站根目录"></a>修改Nginx的网站根目录</h2><hr>
-<p>Nginx的默认网站文件保存在<code>nginx</code>的<code>html</code>目录下，由于我开发时都把项目放在自己的<code>workspace</code>里，所以准备更改网站根目录，更改方法为修改<code>nginx.conf</code>配置文件的<code>root</code>指令，<code>root</code>指令可以放在<code>http</code>、<code>server</code>、<code>location</code>块中，我选择把<code>root</code>指令放在<code>server</code>块中，如下所示：</p>
-<figure class="highlight dts"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="class">http </span>&#123;</div><div class="line">    include       mime.types;</div><div class="line">    default_type  application/octet-stream;</div><div class="line"></div><div class="line">    <span class="meta">#access_log  logs/access.log  main;</span></div><div class="line"></div><div class="line">    sendfile        on;</div><div class="line">    <span class="meta">#tcp_nopush     on;</span></div><div class="line">    </div><div class="line">    keepalive_timeout  <span class="number">65</span>;</div><div class="line"></div><div class="line">    <span class="meta">#gzip  on;</span></div><div class="line"></div><div class="line">    <span class="class">server </span>&#123;</div><div class="line">        listen       <span class="number">80</span>;</div><div class="line">        server_name  localhost;</div><div class="line">        <span class="comment">//配置root指令</span></div><div class="line">        root /Users<span class="meta-keyword">/zhongwu/</span>Documents<span class="meta-keyword">/workspace/</span>web;</div><div class="line">        &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>配置完成后，执行<code>sudo ./nginx -s reload</code>命令，Nginx支持动态更新配置信息。</p>
-<p>访问一下网页测一下，发现返回状态码403，既请求被服务器拒绝了，查看Nginx的<code>error.log</code>后，发现如下log，既Nginx没有打开该html文件的权限，所以得解决权限的问题。</p>
-<figure class="highlight accesslog"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="number">2016</span>/<span class="number">09</span>/<span class="number">24</span> <span class="number">17</span>:<span class="number">51</span>:<span class="number">39</span> <span class="string">[error]</span> <span class="number">16397</span>#<span class="number">0</span>: *<span class="number">15</span> open() <span class="string">"/Users/zhongwu/Documents/workspace/web/lounge.html"</span> failed (<span class="number">13</span>: Permission denied), client: <span class="number">127.0.0.1</span>, server: localhost, request: <span class="string">"<span class="keyword">GET</span> /lounge.html HTTP/1.1"</span>, host: <span class="string">"127.0.0.1"</span></div></pre></td></tr></table></figure>
-<p>首先我们来了解Nginx的用户权限，Nginx的<code>master</code>进程是<code>root</code>权限，而<code>worker</code>进程默认是<code>nobody</code>用户，用户组同为<code>nobody</code>，由于请求的处理是由<code>worker</code>进程处理的，所以，需要修改<code>worker</code>的用户，将其修改为我的<code>workspace</code>目录的用户，方法为直接修改Nginx配置文件，在<code>nginx.conf</code>配置文件中添加<code>user  zhongwu staff;//zhongwu是我的workspace用户，staff是用户组</code>。<br>再访问以下，成功。</p>
-<h2 id="解决127-0-0-1能访问，而localhost不能访问"><a href="#解决127-0-0-1能访问，而localhost不能访问" class="headerlink" title="解决127.0.0.1能访问，而localhost不能访问"></a>解决127.0.0.1能访问，而localhost不能访问</h2><hr>
-<p>项目出现127.0.0.1能访问，而localhost却访问不了的问题，定位，应该是<code>dns</code>域名解析的问题，查看<code>/etc/hosts</code>文件，发现有一条记录为：<code>::1 localhost</code>，<code>::1</code>是<code>ipv6</code>的表示方法，将其改为<code>ipv4</code>的，既将<code>::1</code>替换为<code>127.0.0.1</code>，因为Nginx默认并没有开启监听<code>ipv6</code>地址。</p>
-<p>再次访问，localhost就能访问了。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -969,7 +968,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-count">30</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -986,7 +985,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-count">31</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
