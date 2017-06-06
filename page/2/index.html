@@ -288,6 +288,142 @@
             
               
                 
+                <a class="post-title-link" href="/2017/01/19/Objective-C之performSelector编译器内存泄露警告/" itemprop="url">
+                  Objective-C之performSelector编译器内存泄露警告
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-01-19T14:23:10+08:00" content="2017-01-19">
+              2017-01-19
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/iOS开发-语言/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发-语言</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/01/19/Objective-C之performSelector编译器内存泄露警告/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/01/19/Objective-C之performSelector编译器内存泄露警告/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><hr>
+<blockquote>
+<p>performSelector may cause a leak because its selector is unknown</p>
+</blockquote>
+<p>在<code>ARC</code>环境下，我们使用<code>-(id)performSelector:</code>方法时，编译器会提示可能导致内存泄露的警告。大家如果一直使用<code>ARC</code>进行<code>iOS</code>开发，没有经历<code>MRC</code>时期的话，可能心里会有疑问，为什么<code>Apple</code>提供的<code>API</code>会报警告呢，又为什么会报内存泄露的警告？接下来，将详细讨论该问题。</p>
+<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><hr>
+<p>其实，产生该问题的原因是<code>ARC</code>,运行时系统需要知道调用方法的返回值类型，我们知道，方法的返回值包括：<code>void</code>,<code>int</code>,<code>NSString *</code>,<code>id</code>等，<code>ARC</code>通常可以通过定义实例方法对象的头中获取信息。</p>
+<p><code>ARC</code>对于返回值有3种处理情况：</p>
+<ol>
+<li>忽略非对象类型（<code>void</code>,<code>int</code>等）</li>
+<li>当新建对象值不再需要时<code>release</code>（如<code>init</code>,<code>copy</code>或带有<code>ns_returns_retained</code>属性的方法）</li>
+<li>不做任何处理，且假设返回的对象值会在局部作用域内有效（在最里层的<code>autorelease pool</code>结束之前都有效)</li>
+</ol>
+<p>调用<code>-(id)performSelector:</code>，编译器会假设调用方法的返回值是一个对象，且不会对返回值进行<code>retain</code>/<code>release</code>，所以，如果你调用如上讨论的第2种情况下的方法，将导致内存泄露，因为，调用的方法会返回一个新的对象。</p>
+<p>如果<code>#SEL</code>返回值类型为<code>void</code>或非对象类型，是可以安全的使用<code>-(id)performSelector:</code>的。</p>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2017/01/19/Objective-C之performSelector编译器内存泄露警告/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2016/12/27/SSO单点登录之CAS-Server/" itemprop="url">
                   SSO单点登录之CAS-Server
                 </a>
@@ -791,135 +927,6 @@
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/12/02/解决https混合http的问题/" itemprop="url">
-                  解决HTTPS混合HTTP的问题
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-12-02T12:13:44+08:00" content="2016-12-02">
-              2016-12-02
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Web开发/" itemprop="url" rel="index">
-                    <span itemprop="name">Web开发</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/12/02/解决https混合http的问题/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/12/02/解决https混合http的问题/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="HTTPS页面混合不安全的HTTP请求"><a href="#HTTPS页面混合不安全的HTTP请求" class="headerlink" title="HTTPS页面混合不安全的HTTP请求"></a>HTTPS页面混合不安全的HTTP请求</h2><hr>
-<p>在启用<code>HTTPS</code>页面时，如果出现<code>HTTP</code>请求，那么浏览器会报错，如下：</p>
-<figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Mixed <span class="string">Content:</span> The page at ‘<span class="string">https:</span><span class="comment">//www.taobao.com/‘ was loaded over HTTPS, but requested an insecure image ‘http://g.alicdn.com/s.gif’. This content should also be served over HTTPS.</span></div></pre></td></tr></table></figure>
-<p>既浏览器会<code>Block</code>掉不安全的<code>HTTP</code>请求，所以解决方法有三种：</p>
-<ol>
-<li>最简单的，将<code>HTTP</code>替换为<code>HTTPS</code>。</li>
-<li>去掉<code>URL</code>中的<code>http://</code>或<code>https://</code>，将其替换为<code>//</code>，这样，浏览器就可以根据当前页面的请求方式来动态切换了。</li>
-<li>如果涉及到第三方的资源，无法直接修改源代码，如腾讯公益404的<code>JavaScript</code>代码如下，<code>document.write</code>函数写入两个<code>JavaScript</code>文件，而这两个文件中包含了<code>HTTP</code>的请求。这个时候，我们可以在<code>&lt;head&gt;</code>中添加<code>&lt;meta http-equiv=&quot;Content-Security-Policy&quot; content=&quot;upgrade-insecure-requests&quot;&gt;</code>,浏览器会在加载<code>HTTP</code>资源时自动替换成<code>HTTPS</code>请求。</li>
-</ol>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> _base = '<span class="comment">//qzone.qq.com/gy/404/';</span></div><div class="line">document.write('&lt;scri' + <span class="symbol">'pt</span> <span class="class"><span class="keyword">type</span></span>=<span class="string">"text/javascript"</span> src=<span class="string">"' + _base + 'data.js"</span> charset=<span class="string">"utf-8"</span>&gt;&lt;/sc' + <span class="symbol">'ript</span>&gt;');</div><div class="line">document.write('&lt;scri' + <span class="symbol">'pt</span> <span class="class"><span class="keyword">type</span></span>=<span class="string">"text/javascript"</span> src=<span class="string">"' + _base + 'page.js"</span> charset=<span class="string">"utf-8"</span>&gt;&lt;/sc' + <span class="symbol">'ript</span>&gt;');</div></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -965,7 +972,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">31</span>
+              <span class="site-state-item-count">32</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -982,7 +989,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">32</span>
+                <span class="site-state-item-count">33</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

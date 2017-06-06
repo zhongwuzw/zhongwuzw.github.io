@@ -1,0 +1,884 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="iOS,Objective-C,GCD," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="钟武的技术博客" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="前言
+iOS中，我们经常使用GCD来进行并发操作，我们并不需要关心线程的管理，Dispatch Queue会自动帮我们处理线程的创建和释放，在极大的简化并发操作的同时，某些情况下，Dispatch Queue的滥用可能会导致应用挂起，如向并发队列中添加阻塞的Block，阻塞的Block会导致系统创建更多的线程来处理任务，而GCD线程池的最大线程数为64个，所以一旦达到最大值，应用将挂起。接下来，我">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GCD队列管理之YYDispatchQueuePool">
+<meta property="og:url" content="https://zhongwuzw.github.io/2017/06/05/GCD队列管理之YYDispatchQueuePool/index.html">
+<meta property="og:site_name" content="钟武的技术博客">
+<meta property="og:description" content="前言
+iOS中，我们经常使用GCD来进行并发操作，我们并不需要关心线程的管理，Dispatch Queue会自动帮我们处理线程的创建和释放，在极大的简化并发操作的同时，某些情况下，Dispatch Queue的滥用可能会导致应用挂起，如向并发队列中添加阻塞的Block，阻塞的Block会导致系统创建更多的线程来处理任务，而GCD线程池的最大线程数为64个，所以一旦达到最大值，应用将挂起。接下来，我">
+<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-06-05%20%E4%B8%8B%E5%8D%8811.28.12.png">
+<meta property="og:updated_time" content="2017-06-06T01:26:58.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="GCD队列管理之YYDispatchQueuePool">
+<meta name="twitter:description" content="前言
+iOS中，我们经常使用GCD来进行并发操作，我们并不需要关心线程的管理，Dispatch Queue会自动帮我们处理线程的创建和释放，在极大的简化并发操作的同时，某些情况下，Dispatch Queue的滥用可能会导致应用挂起，如向并发队列中添加阻塞的Block，阻塞的Block会导致系统创建更多的线程来处理任务，而GCD线程池的最大线程数为64个，所以一旦达到最大值，应用将挂起。接下来，我">
+<meta name="twitter:image" content="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-06-05%20%E4%B8%8B%E5%8D%8811.28.12.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6318342119949862000,
+      author: '主编大人'
+    }
+  };
+</script>
+
+  <title> GCD队列管理之YYDispatchQueuePool | 钟武的技术博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">钟武的技术博客</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                GCD队列管理之YYDispatchQueuePool
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-06-05T21:33:44+08:00" content="2017-06-05">
+              2017-06-05
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/iOS开发-项目/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发-项目</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/06/05/GCD队列管理之YYDispatchQueuePool/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/06/05/GCD队列管理之YYDispatchQueuePool/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><hr>
+<p><code>iOS</code>中，我们经常使用<code>GCD</code>来进行并发操作，我们并不需要关心线程的管理，<code>Dispatch Queue</code>会自动帮我们处理线程的创建和释放，在极大的简化并发操作的同时，某些情况下，<code>Dispatch Queue</code>的滥用可能会导致应用挂起，如向并发队列中添加阻塞的<code>Block</code>，阻塞的<code>Block</code>会导致系统创建更多的线程来处理任务，而<code>GCD</code>线程池的最大线程数为64个，所以一旦达到最大值，应用将挂起。<br>接下来，我将列出一些解决方案，来更好的使用<code>Dispatch Queue</code>。</p>
+<h2 id="YYDispatchQueue"><a href="#YYDispatchQueue" class="headerlink" title="YYDispatchQueue"></a>YYDispatchQueue</h2><hr>
+<p><a href="https://github.com/ibireme/YYDispatchQueuePool" target="_blank" rel="external">YYDispatchQueue</a>的主要思想是使用串行队列来替换并发队列，可以为指定的<code>NSQualityOfService</code>创建一个队列池，由<code>YYDispatchQueuePool</code>对象来进行管理，每一种<code>NSQualityOfService</code>最多可以创建32个串行队列，通过<code>- (dispatch_queue_t)queue;</code>方法来获取可用队列，其采用<code>Round Robin</code>轮询算法。</p>
+<p><img src="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-06-05%20%E4%B8%8B%E5%8D%8811.28.12.png" alt=""></p>
+<p>除了可以创建队列池来管理并发外，还可以通过<code>C</code>的全局函数（<code>dispatch_queue_t YYDispatchQueueGetForQOS(NSQualityOfService qos)</code>）来获取特定的<code>NSQualityOfService</code>串行队列，队列由全局的队列池来管理，每一种<code>NSQualityOfService</code>的串行队列数与核数相同，这样可以尽可能的减少线程之间的上下文切换。</p>
+<a id="more"></a>
+<p><code>YYDispatchQueuePool</code>对象使用<code>YYDispatchContext``struct</code>来管理队列池，代码目前还存在内存泄露的问题，因为<code>struct</code>是在堆上分配的内存，最后使用<code>YYDispatchContextRelease</code>释放<code>context</code>时只释放了结构体成员的内存空间，而没有释放结构体自己申请的空间，解决方法如下注释，加上<code>free(context)</code>即可。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> &#123;</div><div class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *name;</div><div class="line">    <span class="keyword">void</span> **queues;</div><div class="line">    <span class="keyword">uint32_t</span> queueCount;</div><div class="line">    <span class="keyword">int32_t</span> counter;</div><div class="line">&#125; YYDispatchContext;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">YYDispatchContextRelease</span><span class="params">(YYDispatchContext *context)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (!context) <span class="keyword">return</span>;</div><div class="line">    <span class="keyword">if</span> (context-&gt;queues) &#123;</div><div class="line">        <span class="keyword">for</span> (NSUInteger i = <span class="number">0</span>; i &lt; context-&gt;queueCount; i++) &#123;</div><div class="line">            <span class="keyword">void</span> *queuePointer = context-&gt;queues[i];</div><div class="line">            <span class="keyword">dispatch_queue_t</span> <span class="built_in">queue</span> = (<span class="number">__b</span>ridge_transfer <span class="keyword">dispatch_queue_t</span>)(queuePointer);</div><div class="line">            <span class="keyword">const</span> <span class="keyword">char</span> *name = dispatch_queue_get_label(<span class="built_in">queue</span>);</div><div class="line">            <span class="keyword">if</span> (name) <span class="built_in">strlen</span>(name); <span class="comment">// avoid compiler warning</span></div><div class="line">            <span class="built_in">queue</span> = nil;</div><div class="line">        &#125;</div><div class="line">        <span class="built_in">free</span>(context-&gt;queues);</div><div class="line">        context-&gt;queues = <span class="literal">NULL</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span> (context-&gt;name) <span class="built_in">free</span>((<span class="keyword">void</span> *)context-&gt;name);</div><div class="line">    <span class="comment">//内存泄露，需添加  free(context);</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="NSOperationQueue"><a href="#NSOperationQueue" class="headerlink" title="NSOperationQueue"></a>NSOperationQueue</h2><hr>
+<p>使用<code>NSOperationQueue</code>，设置<code>maxConcurrentOperationCount</code>来控制并发量。</p>
+<h2 id="Dispatch-Semaphores"><a href="#Dispatch-Semaphores" class="headerlink" title="Dispatch Semaphores"></a>Dispatch Semaphores</h2><hr>
+<p>使用<code>Dispatch Queue</code>时，可以用信号量来控制并发的数量，<code>GCD</code>提供信号量的支持，<code>dispatch_semaphore_t</code>用来表示信号量。在往队列添加任务之前，可以使用<code>dispatch_semaphore_wait</code>来获取信号量，成功获取后即可往队列中添加任务，当任务完成时，使用<code>dispatch_semaphore_signal</code>来释放信号量。</p>
+<figure class="highlight lasso"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 示例代码需要封装一下，不要直接在主线程或次级线程中直接调用dispatch_semaphore_wait，可能会引发UI挂起</span></div><div class="line"><span class="params">...</span></div><div class="line">dispatch_semaphore_t concurrencyLimitingSemaphore = dispatch_semaphore_create(limit);</div><div class="line"><span class="params">...</span></div><div class="line"></div><div class="line">dispatch_semaphore_wait(concurrencyLimitingSemaphore, DISPATCH_TIME_FOREVER);</div><div class="line">dispatch_async(someConcurrentQueue, ^&#123;</div><div class="line">    <span class="comment">/* work goes here */</span></div><div class="line">    dispatch_semaphore_signal(concurrencyLimitingSemaphore);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><hr>
+<ol>
+<li><a href="https://stackoverflow.com/questions/7213845/number-of-threads-created-by-gcd" target="_blank" rel="external">https://stackoverflow.com/questions/7213845/number-of-threads-created-by-gcd</a></li>
+<li><a href="https://github.com/ibireme/YYDispatchQueuePool" target="_blank" rel="external">https://github.com/ibireme/YYDispatchQueuePool</a></li>
+<li><a href="https://developer.apple.com/library/content/documentation/General/Conceptual/ConcurrencyProgrammingGuide/OperationQueues/OperationQueues.html#//apple_ref/doc/uid/TP40008091-CH102-SW24" target="_blank" rel="external">https://developer.apple.com/library/content/documentation/General/Conceptual/ConcurrencyProgrammingGuide/OperationQueues/OperationQueues.html#//apple_ref/doc/uid/TP40008091-CH102-SW24</a></li>
+</ol>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag">#iOS</a>
+          
+            <a href="/tags/Objective-C/" rel="tag">#Objective-C</a>
+          
+            <a href="/tags/GCD/" rel="tag">#GCD</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/26/iOS浏览器-WebBrowser/" rel="next" title="iOS浏览器-WebBrowser">
+                <i class="fa fa-chevron-left"></i> iOS浏览器-WebBrowser
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2017/06/05/GCD队列管理之YYDispatchQueuePool/"
+     data-title="GCD队列管理之YYDispatchQueuePool"
+     data-content=""
+     data-url="https://zhongwuzw.github.io/2017/06/05/GCD队列管理之YYDispatchQueuePool/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  <p>热评文章</p>
+  <div class="ds-top-threads" data-range="weekly" data-num-items="4"></div>
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/06/05/GCD队列管理之YYDispatchQueuePool/"
+           data-title="GCD队列管理之YYDispatchQueuePool" data-url="https://zhongwuzw.github.io/2017/06/05/GCD队列管理之YYDispatchQueuePool/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.JPG"
+               alt="钟武" />
+          <p class="site-author-name" itemprop="name">钟武</p>
+          <p class="site-description motion-element" itemprop="description">Keep thinking, keep coding!!!</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">32</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">13</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">33</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/zhongwuzw" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/zhongwuzw" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.douban.com/people/zhongwu/" target="_blank" title="豆瓣">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  豆瓣
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#YYDispatchQueue"><span class="nav-number">2.</span> <span class="nav-text">YYDispatchQueue</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NSOperationQueue"><span class="nav-number">3.</span> <span class="nav-text">NSOperationQueue</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Dispatch-Semaphores"><span class="nav-number">4.</span> <span class="nav-text">Dispatch Semaphores</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#附录"><span class="nav-number">5.</span> <span class="nav-text">附录</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2016 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">钟武</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"zhongwuzw"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+      
+      <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+      <script src="/js/src/hook-duoshuo.js"></script>
+    
+  
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';                
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = true;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = data.url;
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '' && data_content != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title < 0 && index_content < 0 ){
+                                isMatch = false;
+                            } else {
+                                if (index_content < 0) {
+                                    index_content = 0;
+                                }
+                                if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            }
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+                            
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').mousedown(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+  
+
+  
+
+  
+
+</body>
+</html>

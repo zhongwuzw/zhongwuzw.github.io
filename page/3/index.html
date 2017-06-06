@@ -288,6 +288,135 @@
             
               
                 
+                <a class="post-title-link" href="/2016/12/02/解决https混合http的问题/" itemprop="url">
+                  解决HTTPS混合HTTP的问题
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-12-02T12:13:44+08:00" content="2016-12-02">
+              2016-12-02
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Web开发/" itemprop="url" rel="index">
+                    <span itemprop="name">Web开发</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/12/02/解决https混合http的问题/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/12/02/解决https混合http的问题/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="HTTPS页面混合不安全的HTTP请求"><a href="#HTTPS页面混合不安全的HTTP请求" class="headerlink" title="HTTPS页面混合不安全的HTTP请求"></a>HTTPS页面混合不安全的HTTP请求</h2><hr>
+<p>在启用<code>HTTPS</code>页面时，如果出现<code>HTTP</code>请求，那么浏览器会报错，如下：</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Mixed <span class="string">Content:</span> The page at ‘<span class="string">https:</span><span class="comment">//www.taobao.com/‘ was loaded over HTTPS, but requested an insecure image ‘http://g.alicdn.com/s.gif’. This content should also be served over HTTPS.</span></div></pre></td></tr></table></figure>
+<p>既浏览器会<code>Block</code>掉不安全的<code>HTTP</code>请求，所以解决方法有三种：</p>
+<ol>
+<li>最简单的，将<code>HTTP</code>替换为<code>HTTPS</code>。</li>
+<li>去掉<code>URL</code>中的<code>http://</code>或<code>https://</code>，将其替换为<code>//</code>，这样，浏览器就可以根据当前页面的请求方式来动态切换了。</li>
+<li>如果涉及到第三方的资源，无法直接修改源代码，如腾讯公益404的<code>JavaScript</code>代码如下，<code>document.write</code>函数写入两个<code>JavaScript</code>文件，而这两个文件中包含了<code>HTTP</code>的请求。这个时候，我们可以在<code>&lt;head&gt;</code>中添加<code>&lt;meta http-equiv=&quot;Content-Security-Policy&quot; content=&quot;upgrade-insecure-requests&quot;&gt;</code>,浏览器会在加载<code>HTTP</code>资源时自动替换成<code>HTTPS</code>请求。</li>
+</ol>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> _base = '<span class="comment">//qzone.qq.com/gy/404/';</span></div><div class="line">document.write('&lt;scri' + <span class="symbol">'pt</span> <span class="class"><span class="keyword">type</span></span>=<span class="string">"text/javascript"</span> src=<span class="string">"' + _base + 'data.js"</span> charset=<span class="string">"utf-8"</span>&gt;&lt;/sc' + <span class="symbol">'ript</span>&gt;');</div><div class="line">document.write('&lt;scri' + <span class="symbol">'pt</span> <span class="class"><span class="keyword">type</span></span>=<span class="string">"text/javascript"</span> src=<span class="string">"' + _base + 'page.js"</span> charset=<span class="string">"utf-8"</span>&gt;&lt;/sc' + <span class="symbol">'ript</span>&gt;');</div></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2016/11/28/crontab执行Shell脚本时的工作目录/" itemprop="url">
                   crontab执行Shell脚本时的工作目录
                 </a>
@@ -795,133 +924,6 @@
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/10/13/使用PyMySQL处理大结果集的方法/" itemprop="url">
-                  使用PyMySQL处理大结果集的方法
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-10-13T14:53:30+08:00" content="2016-10-13">
-              2016-10-13
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Python/" itemprop="url" rel="index">
-                    <span itemprop="name">Python</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/10/13/使用PyMySQL处理大结果集的方法/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/13/使用PyMySQL处理大结果集的方法/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="使用PyMySQL处理大结果集的方法"><a href="#使用PyMySQL处理大结果集的方法" class="headerlink" title="使用PyMySQL处理大结果集的方法"></a>使用PyMySQL处理大结果集的方法</h2><hr>
-<p>最近公司项目需要向别的数据库中获取数据并同步到自己的数据库，由于是别人的库，所以没法直接使用<code>Master-Slave</code>同步，最终选择Python脚本来获取。</p>
-<p>选择了<a href="https://github.com/PyMySQL/PyMySQL">PyMySQL</a>客户端库，按照其官方教程，代码比较简单，类似如下：</p>
-<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">import pymysql.cursors</div><div class="line"></div><div class="line"><span class="comment"># Connect to the database</span></div><div class="line">connection = pymysql.connect(host=<span class="string">'localhost'</span>,</div><div class="line">                             user=<span class="string">'user'</span>,</div><div class="line">                             password=<span class="string">'passwd'</span>,</div><div class="line">                             db=<span class="string">'db'</span>,</div><div class="line">                             charset=<span class="string">'utf8mb4'</span>,</div><div class="line">                             cursorclass=pymysql.cursors.DictCursor)</div><div class="line"></div><div class="line"><span class="keyword">try</span>:</div><div class="line">    <span class="keyword">with</span> connection.cursor() <span class="keyword">as</span> cursor:</div><div class="line">        <span class="comment"># Read a single record</span></div><div class="line">        sql = <span class="string">"SELECT `id`, `password` FROM `users`"</span></div><div class="line">        cursor.execute(sql)</div><div class="line">        <span class="built_in">result</span> = cursor.fetchall()</div><div class="line">        print(<span class="built_in">result</span>)</div><div class="line"><span class="keyword">finally</span>:</div><div class="line">    connection.<span class="built_in">close</span>()</div></pre></td></tr></table></figure>
-<p><code>PyMySQL</code>在获取数据时提供了<code>fetchone()</code>和<code>fetchall()</code>函数来获取结果集，后来调试的时候，发现，不管是哪种方法，都会一次将所有结果获取到，这在数据量很大时将会消耗大量内存，所以有考虑是否还有别的方法，比如<code>one-by-one</code>的迭代获取。</p>
-<p>在查看<code>DictCursor</code>游标代码时，发现了<code>SSCursor</code>游标类，其注释如下，意在解决数据量大的问题，正合我意。</p>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/10/13/使用PyMySQL处理大结果集的方法/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -967,7 +969,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">31</span>
+              <span class="site-state-item-count">32</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -984,7 +986,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">32</span>
+                <span class="site-state-item-count">33</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

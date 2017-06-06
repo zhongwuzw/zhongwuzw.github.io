@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://zhongwuzw.github.io/"/>
-  <updated>2017-05-27T03:44:35.000Z</updated>
+  <updated>2017-06-06T01:26:58.000Z</updated>
   <id>https://zhongwuzw.github.io/</id>
   
   <author>
@@ -16,11 +16,62 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>GCD队列管理之YYDispatchQueuePool</title>
+    <link href="https://zhongwuzw.github.io/2017/06/05/GCD%E9%98%9F%E5%88%97%E7%AE%A1%E7%90%86%E4%B9%8BYYDispatchQueuePool/"/>
+    <id>https://zhongwuzw.github.io/2017/06/05/GCD队列管理之YYDispatchQueuePool/</id>
+    <published>2017-06-05T13:33:44.000Z</published>
+    <updated>2017-06-06T01:26:58.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><hr>
+<p><code>iOS</code>中，我们经常使用<code>GCD</code>来进行并发操作，我们并不需要关心线程的管理，<code>Dispatch Queue</code>会自动帮我们处理线程的创建和释放，在极大的简化并发操作的同时，某些情况下，<code>Dispatch Queue</code>的滥用可能会导致应用挂起，如向并发队列中添加阻塞的<code>Block</code>，阻塞的<code>Block</code>会导致系统创建更多的线程来处理任务，而<code>GCD</code>线程池的最大线程数为64个，所以一旦达到最大值，应用将挂起。<br>接下来，我将列出一些解决方案，来更好的使用<code>Dispatch Queue</code>。</p>
+<h2 id="YYDispatchQueue"><a href="#YYDispatchQueue" class="headerlink" title="YYDispatchQueue"></a>YYDispatchQueue</h2><hr>
+<p><a href="https://github.com/ibireme/YYDispatchQueuePool" target="_blank" rel="external">YYDispatchQueue</a>的主要思想是使用串行队列来替换并发队列，可以为指定的<code>NSQualityOfService</code>创建一个队列池，由<code>YYDispatchQueuePool</code>对象来进行管理，每一种<code>NSQualityOfService</code>最多可以创建32个串行队列，通过<code>- (dispatch_queue_t)queue;</code>方法来获取可用队列，其采用<code>Round Robin</code>轮询算法。</p>
+<p><img src="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-06-05%20%E4%B8%8B%E5%8D%8811.28.12.png" alt=""></p>
+<p>除了可以创建队列池来管理并发外，还可以通过<code>C</code>的全局函数（<code>dispatch_queue_t YYDispatchQueueGetForQOS(NSQualityOfService qos)</code>）来获取特定的<code>NSQualityOfService</code>串行队列，队列由全局的队列池来管理，每一种<code>NSQualityOfService</code>的串行队列数与核数相同，这样可以尽可能的减少线程之间的上下文切换。</p>
+<a id="more"></a>
+<p><code>YYDispatchQueuePool</code>对象使用<code>YYDispatchContext``struct</code>来管理队列池，代码目前还存在内存泄露的问题，因为<code>struct</code>是在堆上分配的内存，最后使用<code>YYDispatchContextRelease</code>释放<code>context</code>时只释放了结构体成员的内存空间，而没有释放结构体自己申请的空间，解决方法如下注释，加上<code>free(context)</code>即可。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> &#123;</div><div class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *name;</div><div class="line">    <span class="keyword">void</span> **queues;</div><div class="line">    <span class="keyword">uint32_t</span> queueCount;</div><div class="line">    <span class="keyword">int32_t</span> counter;</div><div class="line">&#125; YYDispatchContext;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">YYDispatchContextRelease</span><span class="params">(YYDispatchContext *context)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (!context) <span class="keyword">return</span>;</div><div class="line">    <span class="keyword">if</span> (context-&gt;queues) &#123;</div><div class="line">        <span class="keyword">for</span> (NSUInteger i = <span class="number">0</span>; i &lt; context-&gt;queueCount; i++) &#123;</div><div class="line">            <span class="keyword">void</span> *queuePointer = context-&gt;queues[i];</div><div class="line">            <span class="keyword">dispatch_queue_t</span> <span class="built_in">queue</span> = (<span class="number">__b</span>ridge_transfer <span class="keyword">dispatch_queue_t</span>)(queuePointer);</div><div class="line">            <span class="keyword">const</span> <span class="keyword">char</span> *name = dispatch_queue_get_label(<span class="built_in">queue</span>);</div><div class="line">            <span class="keyword">if</span> (name) <span class="built_in">strlen</span>(name); <span class="comment">// avoid compiler warning</span></div><div class="line">            <span class="built_in">queue</span> = nil;</div><div class="line">        &#125;</div><div class="line">        <span class="built_in">free</span>(context-&gt;queues);</div><div class="line">        context-&gt;queues = <span class="literal">NULL</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span> (context-&gt;name) <span class="built_in">free</span>((<span class="keyword">void</span> *)context-&gt;name);</div><div class="line">    <span class="comment">//内存泄露，需添加  free(context);</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="NSOperationQueue"><a href="#NSOperationQueue" class="headerlink" title="NSOperationQueue"></a>NSOperationQueue</h2><hr>
+<p>使用<code>NSOperationQueue</code>，设置<code>maxConcurrentOperationCount</code>来控制并发量。</p>
+<h2 id="Dispatch-Semaphores"><a href="#Dispatch-Semaphores" class="headerlink" title="Dispatch Semaphores"></a>Dispatch Semaphores</h2><hr>
+<p>使用<code>Dispatch Queue</code>时，可以用信号量来控制并发的数量，<code>GCD</code>提供信号量的支持，<code>dispatch_semaphore_t</code>用来表示信号量。在往队列添加任务之前，可以使用<code>dispatch_semaphore_wait</code>来获取信号量，成功获取后即可往队列中添加任务，当任务完成时，使用<code>dispatch_semaphore_signal</code>来释放信号量。</p>
+<figure class="highlight lasso"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 示例代码需要封装一下，不要直接在主线程或次级线程中直接调用dispatch_semaphore_wait，可能会引发UI挂起</span></div><div class="line"><span class="params">...</span></div><div class="line">dispatch_semaphore_t concurrencyLimitingSemaphore = dispatch_semaphore_create(limit);</div><div class="line"><span class="params">...</span></div><div class="line"></div><div class="line">dispatch_semaphore_wait(concurrencyLimitingSemaphore, DISPATCH_TIME_FOREVER);</div><div class="line">dispatch_async(someConcurrentQueue, ^&#123;</div><div class="line">    <span class="comment">/* work goes here */</span></div><div class="line">    dispatch_semaphore_signal(concurrencyLimitingSemaphore);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><hr>
+<ol>
+<li><a href="https://stackoverflow.com/questions/7213845/number-of-threads-created-by-gcd" target="_blank" rel="external">https://stackoverflow.com/questions/7213845/number-of-threads-created-by-gcd</a></li>
+<li><a href="https://github.com/ibireme/YYDispatchQueuePool" target="_blank" rel="external">https://github.com/ibireme/YYDispatchQueuePool</a></li>
+<li><a href="https://developer.apple.com/library/content/documentation/General/Conceptual/ConcurrencyProgrammingGuide/OperationQueues/OperationQueues.html#//apple_ref/doc/uid/TP40008091-CH102-SW24" target="_blank" rel="external">https://developer.apple.com/library/content/documentation/General/Conceptual/ConcurrencyProgrammingGuide/OperationQueues/OperationQueues.html#//apple_ref/doc/uid/TP40008091-CH102-SW24</a></li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;hr&gt;
+&lt;p&gt;&lt;code&gt;iOS&lt;/code&gt;中，我们经常使用&lt;code&gt;GCD&lt;/code&gt;来进行并发操作，我们并不需要关心线程的管理，&lt;code&gt;Dispatch Queue&lt;/code&gt;会自动帮我们处理线程的创建和释放，在极大的简化并发操作的同时，某些情况下，&lt;code&gt;Dispatch Queue&lt;/code&gt;的滥用可能会导致应用挂起，如向并发队列中添加阻塞的&lt;code&gt;Block&lt;/code&gt;，阻塞的&lt;code&gt;Block&lt;/code&gt;会导致系统创建更多的线程来处理任务，而&lt;code&gt;GCD&lt;/code&gt;线程池的最大线程数为64个，所以一旦达到最大值，应用将挂起。&lt;br&gt;接下来，我将列出一些解决方案，来更好的使用&lt;code&gt;Dispatch Queue&lt;/code&gt;。&lt;/p&gt;
+&lt;h2 id=&quot;YYDispatchQueue&quot;&gt;&lt;a href=&quot;#YYDispatchQueue&quot; class=&quot;headerlink&quot; title=&quot;YYDispatchQueue&quot;&gt;&lt;/a&gt;YYDispatchQueue&lt;/h2&gt;&lt;hr&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/ibireme/YYDispatchQueuePool&quot;&gt;YYDispatchQueue&lt;/a&gt;的主要思想是使用串行队列来替换并发队列，可以为指定的&lt;code&gt;NSQualityOfService&lt;/code&gt;创建一个队列池，由&lt;code&gt;YYDispatchQueuePool&lt;/code&gt;对象来进行管理，每一种&lt;code&gt;NSQualityOfService&lt;/code&gt;最多可以创建32个串行队列，通过&lt;code&gt;- (dispatch_queue_t)queue;&lt;/code&gt;方法来获取可用队列，其采用&lt;code&gt;Round Robin&lt;/code&gt;轮询算法。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-06-05%20%E4%B8%8B%E5%8D%8811.28.12.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;除了可以创建队列池来管理并发外，还可以通过&lt;code&gt;C&lt;/code&gt;的全局函数（&lt;code&gt;dispatch_queue_t YYDispatchQueueGetForQOS(NSQualityOfService qos)&lt;/code&gt;）来获取特定的&lt;code&gt;NSQualityOfService&lt;/code&gt;串行队列，队列由全局的队列池来管理，每一种&lt;code&gt;NSQualityOfService&lt;/code&gt;的串行队列数与核数相同，这样可以尽可能的减少线程之间的上下文切换。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="iOS开发-项目" scheme="https://zhongwuzw.github.io/categories/iOS%E5%BC%80%E5%8F%91-%E9%A1%B9%E7%9B%AE/"/>
+    
+    
+      <category term="iOS" scheme="https://zhongwuzw.github.io/tags/iOS/"/>
+    
+      <category term="Objective-C" scheme="https://zhongwuzw.github.io/tags/Objective-C/"/>
+    
+      <category term="GCD" scheme="https://zhongwuzw.github.io/tags/GCD/"/>
+    
+  </entry>
+  
+  <entry>
     <title>iOS浏览器-WebBrowser</title>
     <link href="https://zhongwuzw.github.io/2017/05/26/iOS%E6%B5%8F%E8%A7%88%E5%99%A8-WebBrowser/"/>
     <id>https://zhongwuzw.github.io/2017/05/26/iOS浏览器-WebBrowser/</id>
     <published>2017-05-26T10:22:11.000Z</published>
-    <updated>2017-05-27T03:44:35.000Z</updated>
+    <updated>2017-05-27T07:01:12.000Z</updated>
     
     <content type="html"><![CDATA[<p>一款用于网页浏览的APP（Web Browser For iOS)。<a href="https://github.com/zhongwuzw/WebBrowser" target="_blank" rel="external">Github地址</a></p>
 <h2 id="Features-功能"><a href="#Features-功能" class="headerlink" title="Features - 功能"></a>Features - 功能</h2><ol>
@@ -1133,55 +1184,6 @@
     
     
       <category term="epoll" scheme="https://zhongwuzw.github.io/tags/epoll/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Nginx的架构设计</title>
-    <link href="https://zhongwuzw.github.io/2016/09/18/Nginx%E7%9A%84%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/"/>
-    <id>https://zhongwuzw.github.io/2016/09/18/Nginx的架构设计/</id>
-    <published>2016-09-18T02:49:56.000Z</published>
-    <updated>2016-09-19T09:30:48.000Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="Nginx架构概述"><a href="#Nginx架构概述" class="headerlink" title="Nginx架构概述"></a>Nginx架构概述</h2><hr>
-<p>传统基于进程或线程的模型（<code>Apache</code>就采用这种模型）在处理并发连接时会为每一个连接建立一个单独的进程或线程，且在网络或者输入/输出操作时阻塞。这将导致内存和<code>CPU</code>的大量消耗，因为新起一个单独的进程或线程需要准备新的运行时环境，包括堆和栈内存的分配，以及新的执行上下文，当然，这些也会导致多余的<code>CPU</code>开销。最终，会由于过多的上下文切换而导致服务器性能变差。<br>反过来，我们来看Nginx的架构设计，总结起来，它是模块化的、基于事件驱动、异步、单线程且非阻塞。<br>Nginx大量使用多路复用和事件通知，Nginx会创建几个数量有限（比如<code>worker</code>的数量和<code>CPU</code>的核数相同）的<code>worker</code>进程，每个<code>worker</code>进程包含一个高效的Run-loop，来处理多个网络连接，每个<code>worker</code>进程每秒能处理成千的并发连接。</p>
-<h3 id="代码结构"><a href="#代码结构" class="headerlink" title="代码结构"></a>代码结构</h3><p><code>worker</code>进程负责维护Run-loop，并且在请求处理的每个阶段执行相应模块代码，Nginx包括很多模块，如事件模块，状态处理模块，协议模块，负载均衡等。Nginx并不支持动态加载模块，模块只能在Nginx编译时进行添加进来。<br>在接收，处理和管理网络请求时，Nginx会根据操作系统的不同，采用特定的事件模型和磁盘<code>I/O</code>，以达到更高的性能，如<code>Linux</code>，<code>Solaris</code>以及基于<code>BSD</code>的操作系统，采用<code>epoll</code>，<code>kqueue</code>，<code>event ports</code>。<br>Nginx的架构图如下：<br><img src="http://oc54pu02q.bkt.clouddn.com/QQ20160918-0@2x.png" alt=""></p>
- <a id="more"></a>
-<h3 id="Worker模型"><a href="#Worker模型" class="headerlink" title="Worker模型"></a>Worker模型</h3><p>前面提到，Nginx并不会为每一个连接新建一个进程来进行处理，相反，<code>worker</code>会从一个共享的监听套接字中获取新的请求，并在<code>worker</code>管理的Run-loop中处理请求。Nginx启动时，将创建初始的监听套接字，接下来，当<code>worker</code>处理<code>HTTP</code>请求和响应时，会持续的接收、读取、以及写入套接字。<br>Run-loop是<code>worker</code>的核心，它的主要思想是异步任务处理，实现方式包括模块化、事件通知、回调函数、定时器等。总的原则就是尽可能的非阻塞。<br>关于<code>worker</code>的数量问题，通常的建议是：</p>
-<ul>
-<li>CPU密集型：比如处理大量的TCP/IP，SSL，或压缩时，Nginx <code>worker</code>进程的数量应当和CPU核的数量一致。</li>
-<li>磁盘I/O密集型：提供文件内容，或者大量的代理，这种情况下，<code>worker</code>进程的数量可以是CPU核数的1.5或2倍。</li>
-</ul>
-<h3 id="Nginx进程职责"><a href="#Nginx进程职责" class="headerlink" title="Nginx进程职责"></a>Nginx进程职责</h3><p>Nginx运行时会有多个进程，包括一个<code>master</code>进程和多个<code>worker</code>进程，除此之外，还包括一对特定作用的进程，<code>cache loader</code>进程和<code>cache manager</code>进程。所有的进程都是单线程（即只有一个主线程）的，且进程间通信主要使用共享内存的方式。<code>master</code>进程以<code>root</code>用户权限运行，其它进程则以非<code>root</code>方式运行。<br><code>master</code>进程主要负责如下的任务：</p>
-<ul>
-<li>读取和诊断配置文件</li>
-<li>创建、绑定以及关闭套接字</li>
-<li>启动、终止和管理<code>worker</code>进程</li>
-<li>无须重启即可动态更新配置</li>
-<li>平滑升级</li>
-<li>重新打开log文件</li>
-<li>编译内嵌的<code>Perl</code>脚本</li>
-</ul>
-<p><code>worker</code>进程接收、处理连接请求，提供反向代理和过滤以及其它的功能。<br><code>cache loader</code>进程负责检测磁盘的缓存，且向内存数据库提供缓存元数据，<code>cache loader</code>在Nginx准备启动时，以一定的目录结构，遍历缓存内容的元数据，更新共享内存中的相关条目，当准备完成后退出。<br><code>cache manager</code>进程主要负责缓存的过期管理和诊断。</p>
-<h3 id="Nginx缓存简单介绍"><a href="#Nginx缓存简单介绍" class="headerlink" title="Nginx缓存简单介绍"></a>Nginx缓存简单介绍</h3><p>缓存的键和元数据存储在共享内存段中，<code>cache loader</code>、<code>cache manager</code>、<code>worker</code>进程可以对其进行访问。<br>将内容存入缓存的过程如下：<br>当Nginx从上游服务器读取响应时，响应内容首先会被写入到一个缓存文件中，当请求处理完成后，重命名缓存文件，并将它移到缓存的目录中。</p>
-<h2 id="Nginx配置"><a href="#Nginx配置" class="headerlink" title="Nginx配置"></a>Nginx配置</h2><hr>
-<p>Nginx的主配置文件名默认为<code>nginx.conf</code>，配置文件由<code>master</code>进程读取和诊断，读取完之后以一定的形式保存在内存中，当<code>worker</code>进程从<code>master</code>进程中<code>fork</code>时（<code>fork</code>之后，子进程是父进程的副本，子进程获得父进程数据空间、堆和栈的拷贝），<code>worker</code>进程就能够访问到这些配置数据。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;Nginx架构概述&quot;&gt;&lt;a href=&quot;#Nginx架构概述&quot; class=&quot;headerlink&quot; title=&quot;Nginx架构概述&quot;&gt;&lt;/a&gt;Nginx架构概述&lt;/h2&gt;&lt;hr&gt;
-&lt;p&gt;传统基于进程或线程的模型（&lt;code&gt;Apache&lt;/code&gt;就采用这种模型）在处理并发连接时会为每一个连接建立一个单独的进程或线程，且在网络或者输入/输出操作时阻塞。这将导致内存和&lt;code&gt;CPU&lt;/code&gt;的大量消耗，因为新起一个单独的进程或线程需要准备新的运行时环境，包括堆和栈内存的分配，以及新的执行上下文，当然，这些也会导致多余的&lt;code&gt;CPU&lt;/code&gt;开销。最终，会由于过多的上下文切换而导致服务器性能变差。&lt;br&gt;反过来，我们来看Nginx的架构设计，总结起来，它是模块化的、基于事件驱动、异步、单线程且非阻塞。&lt;br&gt;Nginx大量使用多路复用和事件通知，Nginx会创建几个数量有限（比如&lt;code&gt;worker&lt;/code&gt;的数量和&lt;code&gt;CPU&lt;/code&gt;的核数相同）的&lt;code&gt;worker&lt;/code&gt;进程，每个&lt;code&gt;worker&lt;/code&gt;进程包含一个高效的Run-loop，来处理多个网络连接，每个&lt;code&gt;worker&lt;/code&gt;进程每秒能处理成千的并发连接。&lt;/p&gt;
-&lt;h3 id=&quot;代码结构&quot;&gt;&lt;a href=&quot;#代码结构&quot; class=&quot;headerlink&quot; title=&quot;代码结构&quot;&gt;&lt;/a&gt;代码结构&lt;/h3&gt;&lt;p&gt;&lt;code&gt;worker&lt;/code&gt;进程负责维护Run-loop，并且在请求处理的每个阶段执行相应模块代码，Nginx包括很多模块，如事件模块，状态处理模块，协议模块，负载均衡等。Nginx并不支持动态加载模块，模块只能在Nginx编译时进行添加进来。&lt;br&gt;在接收，处理和管理网络请求时，Nginx会根据操作系统的不同，采用特定的事件模型和磁盘&lt;code&gt;I/O&lt;/code&gt;，以达到更高的性能，如&lt;code&gt;Linux&lt;/code&gt;，&lt;code&gt;Solaris&lt;/code&gt;以及基于&lt;code&gt;BSD&lt;/code&gt;的操作系统，采用&lt;code&gt;epoll&lt;/code&gt;，&lt;code&gt;kqueue&lt;/code&gt;，&lt;code&gt;event ports&lt;/code&gt;。&lt;br&gt;Nginx的架构图如下：&lt;br&gt;&lt;img src=&quot;http://oc54pu02q.bkt.clouddn.com/QQ20160918-0@2x.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="Nginx" scheme="https://zhongwuzw.github.io/categories/Nginx/"/>
-    
-    
-      <category term="Nginx" scheme="https://zhongwuzw.github.io/tags/Nginx/"/>
-    
-      <category term="服务器" scheme="https://zhongwuzw.github.io/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8/"/>
     
   </entry>
   
