@@ -4,6 +4,26 @@
   
     
     <entry>
+      <title><![CDATA[RxSwift之sentMessage、methodInvoked失效问题解决]]></title>
+      <url>https://zhongwuzw.github.io/2017/07/27/RxSwift%E4%B9%8BsentMessage%E3%80%81methodInvoked%E5%A4%B1%E6%95%88%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/</url>
+      <content type="html"><![CDATA[<h2 id="RxSwift的sentMessage、methodInvoked方法"><a href="#RxSwift的sentMessage、methodInvoked方法" class="headerlink" title="RxSwift的sentMessage、methodInvoked方法"></a>RxSwift的<code>sentMessage</code>、<code>methodInvoked</code>方法</h2><hr>
+<p><a href="https://github.com/ReactiveX/RxSwift" target="_blank" rel="external">RxSwift</a>是<a href="https://github.com/Reactive-Extensions/Rx.NET" target="_blank" rel="external">Rx</a>的<code>Swift</code>版本，用来实现函数式、响应式编程。</p>
+<p>具体<code>RxSwift</code>的很多用法不做介绍，接下来，只讨论<code>sentMessage</code>、<code>methodInvoked</code>这两个方法，其作用是返回一个<code>Observable&lt;[Any]</code>，可以作为观察者监控<code>NSObject</code>子类的某个<code>selector</code>，当执行该<code>selector</code>时，将在执行前、后分别执行注册了该<code>selector</code>的<code>sentMessage</code>、<code>methodInvoked</code>方法。</p>
+<h2 id="sentMessage、methodInvoked实现原理"><a href="#sentMessage、methodInvoked实现原理" class="headerlink" title="sentMessage、methodInvoked实现原理"></a><code>sentMessage</code>、<code>methodInvoked</code>实现原理</h2><hr>
+<p><code>sentMessage</code>、<code>methodInvoked</code>只针对某个实例起作用，其实现首先借鉴了<code>KVO</code>的实现方法，通过创建监听的对象的子类，然后重写方法的实现来实现。<code>sentMessage</code>、<code>methodInvoked</code>实现分两个版本，基础版、优化版。基础版通过<code>Swizzle``forwardInvocation:</code>、<code>respondsToSelector:</code>、<code>methodSignatureForSelector:</code>等函数，将所有需要观察的<code>selector</code>调用时进入<code>forwardInvocation:</code>流程，从而进行拦截，以实现通知；优化版则在基础班的基础上通过<code>Type Encoding</code>来做一个缓存优化，避免每次调用都进入转发的过程。</p>
+<a id="more"></a>
+<h2 id="sentMessage、methodInvoked遇到的问题"><a href="#sentMessage、methodInvoked遇到的问题" class="headerlink" title="sentMessage、methodInvoked遇到的问题"></a><code>sentMessage</code>、<code>methodInvoked</code>遇到的问题</h2><hr>
+<p>在使用<code>sentMessage</code>、<code>methodInvoked</code>方法时，发现一个问题，当观察<code>iOS``Framework</code>提供的方法时，可以正常运行，但是当观察自己创建的类（<code>NSObject</code>的子类）的实例的方法时，却始终无法运行，查看整个运行机制，<code>Class</code>、<code>IMP</code>都被正确替换，但是调用方法时，却始终截取不到，这下才意识到，难道是被编译器优化掉了？导致没有走<code>Objective-C</code>的动态派发？<br>遂翻看<code>Apple</code>的<a href="https://developer.apple.com/library/content/documentation/Swift/Conceptual/BuildingCocoaApps/" target="_blank" rel="external">Using Swift with Cocoa and Objective-C</a>，有一段话是这么说的：</p>
+<blockquote>
+<p>“When Swift APIs are imported by the Objective-C runtime, there are no guarantees of dynamic dispatch for properties, methods, subscripts, or initializers. The Swift compiler may still devirtualize or inline member access to optimize the performance of your code, bypassing the Objective-C runtime.</p>
+<p>You can use the dynamic modifier to require that access to members be dynamically dispatched through the Objective-C runtime. Requiring dynamic dispatch is rarely necessary. However, it is necessary when using APIs like key–value observing or the method_exchangeImplementations function in the Objective-C runtime, which dynamically replace the implementation of a method at runtime. If the Swift compiler inlined the implementation of the method or devirtualized access to it, the new implementation would not be used.”</p>
+</blockquote>
+<p>大概意思是当在<code>Swift</code>中使用<code>Objective-C</code>中定义的方法时，编译器不保证动态派发，会对其做优化来提高性能，导致的结果是，会使<code>KVO</code>、<code>Swizzling</code>等失效，要解决该问题，可以使用<code>dynamic</code>修饰符，使得方法强制进行<code>Objective-C</code>的动态派发。</p>
+<p>这样，问题就解决了，原来是编译器优化搞的鬼。<br><a href="https://stackoverflow.com/questions/39708434/observable-for-selector-rxswift/45340883#45340883" target="_blank" rel="external">stackoverflow</a>上也有人提这个问题，我也进行了回答。</p>
+]]></content>
+    </entry>
+    
+    <entry>
       <title><![CDATA[Swift3之Weak引用]]></title>
       <url>https://zhongwuzw.github.io/2017/06/17/Swift%E4%B9%8BWeak%E5%BC%95%E7%94%A8/</url>
       <content type="html"><![CDATA[<blockquote>
@@ -164,6 +184,7 @@
 <li>书签、历史记录管理(bookmark、history manage)</li>
 <li>页内查找(find in page)</li>
 <li>点击标题栏进行页面访问或搜索(tap the title bar to  input url for surf or key to search)</li>
+<li>自动监控剪切板<code>URL</code>，可在新窗口中打开</li>
 </ol>
 <h2 id="Usage-用法"><a href="#Usage-用法" class="headerlink" title="Usage - 用法"></a>Usage - 用法</h2><ol>
 <li><code>clone</code> or download zip file.</li>
@@ -175,10 +196,10 @@
 <li>ARC</li>
 <li><a href="https://github.com/Carthage/Carthage" target="_blank" rel="external">Carthage</a></li>
 </ul>
-<h2 id="Demo"><a href="#Demo" class="headerlink" title="Demo"></a>Demo</h2><h4 id="1-主页："><a href="#1-主页：" class="headerlink" title="1. 主页："></a>1. 主页：</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/home_scroll.gif" alt="home page"><br></p>
+<h2 id="Demo"><a href="#Demo" class="headerlink" title="Demo"></a>Demo</h2><h4 id="1-Home-Page-主页-："><a href="#1-Home-Page-主页-：" class="headerlink" title="1. Home Page (主页)："></a>1. Home Page (主页)：</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/home_scroll.gif" alt="home page"><br></p>
 
-<a id="more"></a>
-<h4 id="2-Tab切换："><a href="#2-Tab切换：" class="headerlink" title="2. Tab切换："></a>2. Tab切换：</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/home_tab_switch.gif" alt="tab"><br></p>
+
+<h4 id="2-Multi-tab-多窗口-："><a href="#2-Multi-tab-多窗口-：" class="headerlink" title="2. Multi-tab (多窗口)："></a>2. Multi-tab (多窗口)：</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/home_tab_switch.gif" alt="tab"><br></p>
 
 <p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/tab_manage.gif" alt="tab"><br></p>
 
@@ -188,40 +209,41 @@
 
 <h4 id="5-History-历史"><a href="#5-History-历史" class="headerlink" title="5. History (历史)"></a>5. History (历史)</h4><ol>
 <li>Long Press to select options. (长按记录可弹出选项按钮)</li>
-<li>Tap to open history in current window.(点击记录会在当前窗口打开历史页面)<p align="center"><br><img src="http://oc54pu02q.bkt.clouddn.com/history.gif" alt="history"><br></p>
+<li>Tap to open history in current window.(点击记录会在当前窗口打开历史页面)<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/history.gif" alt="history"><br></p>
 
 </li>
 </ol>
 <h4 id="6-Favorite-收藏"><a href="#6-Favorite-收藏" class="headerlink" title="6. Favorite (收藏)"></a>6. Favorite (收藏)</h4><h5 id="In-non-editing-mode-在非编辑模式下操作"><a href="#In-non-editing-mode-在非编辑模式下操作" class="headerlink" title="In non-editing mode (在非编辑模式下操作)"></a>In non-editing mode (在非编辑模式下操作)</h5><ol>
 <li><p>Long press on directory to edit directory name in non-editing mode.(长按目录来编辑目录名字)</p>
-<p align="center"><br><img src="http://oc54pu02q.bkt.clouddn.com/bookmark_edit_long_section.gif" alt="favorite"><br></p>
+<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_edit_long_section.gif" alt="favorite"><br></p>
 </li>
 <li><p>Long press on bookmark item to edit bookmark’s url, name, directory in non-editing mode.(长按书签项来编辑书签的地址、名字、以及所在目录)</p>
-<p align="center"><br><img src="http://oc54pu02q.bkt.clouddn.com/bookmark_long_edit_item.gif" alt="favorite"><br></p>
+<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_long_edit_item.gif" alt="favorite"><br></p>
 
 </li>
 </ol>
 <h5 id="In-editing-mode-在编辑模式下"><a href="#In-editing-mode-在编辑模式下" class="headerlink" title="In editing mode (在编辑模式下)"></a>In editing mode (在编辑模式下)</h5><ol>
 <li><p>reorder, delete directory in editing mode.(删除、排序目录)</p>
-<p align="center"><br><img src="http://oc54pu02q.bkt.clouddn.com/bookmark_edit_section.gif" alt="favorite"><br></p>
+<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_edit_section.gif" alt="favorite"><br></p>
 </li>
 <li><p>click “新文件夹” button to add new directory in editing mode.(点击”新文件夹”按钮来创建新的目录)</p>
-<p align="center"><br><img src="http://oc54pu02q.bkt.clouddn.com/bookmark_add_section.gif" alt="favorite"><br></p>
+<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_add_section.gif" alt="favorite"><br></p>
 </li>
 <li><p>reorder, delete bookmark in editing mode.(删除、排序书签)</p>
-<p align="center"><br><img src="http://oc54pu02q.bkt.clouddn.com/bookmark_edit_item.gif" alt="favorite"><br></p>
+<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_edit_item.gif" alt="favorite"><br></p>
 </li>
 <li><p>add new bookmark.(添加新书签)</p>
-<p align="center"><br><img src="http://oc54pu02q.bkt.clouddn.com/bookmark_add.gif" alt="favorite"><br></p>
+<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_add.gif" alt="favorite"><br></p>
 
 </li>
 </ol>
-<h4 id="7-find-in-page-页内查找"><a href="#7-find-in-page-页内查找" class="headerlink" title="7. find in page (页内查找)"></a>7. find in page (页内查找)</h4><p align="center"><br>  <img src="http://oc54pu02q.bkt.clouddn.com/findinpage.gif" alt="find in page"><br></p>
+<h4 id="7-find-in-page-页内查找"><a href="#7-find-in-page-页内查找" class="headerlink" title="7. find in page (页内查找)"></a>7. find in page (页内查找)</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/findinpage.gif" alt="find in page"><br></p>
 
-
-
-
-
+<h2 id="License"><a href="#License" class="headerlink" title="License"></a>License</h2><p>The MIT License (MIT)</p>
+<p>Copyright (c) 2017 Zhong Wu</p>
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy<br>of this software and associated documentation files (the “Software”), to deal<br>in the Software without restriction, including without limitation the rights<br>to use, copy, modify, merge, publish, distribute, sublicense, and/or sell<br>copies of the Software, and to permit persons to whom the Software is<br>furnished to do so, subject to the following conditions:</p>
+<p>The above copyright notice and this permission notice shall be included in all<br>copies or substantial portions of the Software.</p>
+<p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR<br>IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,<br>FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE<br>AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER<br>LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,<br>OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE<br>SOFTWARE.</p>
 ]]></content>
     </entry>
     

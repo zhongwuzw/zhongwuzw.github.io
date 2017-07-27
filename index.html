@@ -288,6 +288,132 @@
             
               
                 
+                <a class="post-title-link" href="/2017/07/27/RxSwift之sentMessage、methodInvoked失效问题解决/" itemprop="url">
+                  RxSwift之sentMessage、methodInvoked失效问题解决
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-07-27T17:32:08+08:00" content="2017-07-27">
+              2017-07-27
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/iOS开发-项目/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发-项目</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/07/27/RxSwift之sentMessage、methodInvoked失效问题解决/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/07/27/RxSwift之sentMessage、methodInvoked失效问题解决/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h2 id="RxSwift的sentMessage、methodInvoked方法"><a href="#RxSwift的sentMessage、methodInvoked方法" class="headerlink" title="RxSwift的sentMessage、methodInvoked方法"></a>RxSwift的<code>sentMessage</code>、<code>methodInvoked</code>方法</h2><hr>
+<p><a href="https://github.com/ReactiveX/RxSwift">RxSwift</a>是<a href="https://github.com/Reactive-Extensions/Rx.NET">Rx</a>的<code>Swift</code>版本，用来实现函数式、响应式编程。</p>
+<p>具体<code>RxSwift</code>的很多用法不做介绍，接下来，只讨论<code>sentMessage</code>、<code>methodInvoked</code>这两个方法，其作用是返回一个<code>Observable&lt;[Any]</code>，可以作为观察者监控<code>NSObject</code>子类的某个<code>selector</code>，当执行该<code>selector</code>时，将在执行前、后分别执行注册了该<code>selector</code>的<code>sentMessage</code>、<code>methodInvoked</code>方法。</p>
+<h2 id="sentMessage、methodInvoked实现原理"><a href="#sentMessage、methodInvoked实现原理" class="headerlink" title="sentMessage、methodInvoked实现原理"></a><code>sentMessage</code>、<code>methodInvoked</code>实现原理</h2><hr>
+<p><code>sentMessage</code>、<code>methodInvoked</code>只针对某个实例起作用，其实现首先借鉴了<code>KVO</code>的实现方法，通过创建监听的对象的子类，然后重写方法的实现来实现。<code>sentMessage</code>、<code>methodInvoked</code>实现分两个版本，基础版、优化版。基础版通过<code>Swizzle``forwardInvocation:</code>、<code>respondsToSelector:</code>、<code>methodSignatureForSelector:</code>等函数，将所有需要观察的<code>selector</code>调用时进入<code>forwardInvocation:</code>流程，从而进行拦截，以实现通知；优化版则在基础班的基础上通过<code>Type Encoding</code>来做一个缓存优化，避免每次调用都进入转发的过程。</p>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2017/07/27/RxSwift之sentMessage、methodInvoked失效问题解决/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2017/06/17/Swift之Weak引用/" itemprop="url">
                   Swift3之Weak引用
                 </a>
@@ -616,13 +742,15 @@
 
       
         
-          <p>一款用于网页浏览的APP（Web Browser For iOS)。<a href="https://github.com/zhongwuzw/WebBrowser">Github地址</a></p>
+          
+            <p>一款用于网页浏览的APP（Web Browser For iOS)。<a href="https://github.com/zhongwuzw/WebBrowser" target="_blank" rel="external">Github地址</a></p>
 <h2 id="Features-功能"><a href="#Features-功能" class="headerlink" title="Features - 功能"></a>Features - 功能</h2><ol>
 <li>多Tab页浏览(multi-tab browsing)</li>
 <li>冷启动恢复浏览记录，包括当前页及前进后退页面(session restore, includes current page and backforward list)</li>
 <li>书签、历史记录管理(bookmark、history manage)</li>
 <li>页内查找(find in page)</li>
 <li>点击标题栏进行页面访问或搜索(tap the title bar to  input url for surf or key to search)</li>
+<li>自动监控剪切板<code>URL</code>，可在新窗口中打开</li>
 </ol>
 <h2 id="Usage-用法"><a href="#Usage-用法" class="headerlink" title="Usage - 用法"></a>Usage - 用法</h2><ol>
 <li><code>clone</code> or download zip file.</li>
@@ -632,14 +760,58 @@
 <h2 id="Requirements-依赖"><a href="#Requirements-依赖" class="headerlink" title="Requirements - 依赖"></a>Requirements - 依赖</h2><ul>
 <li>iOS 8.0 or higher</li>
 <li>ARC</li>
-<li><a href="https://github.com/Carthage/Carthage">Carthage</a></li>
+<li><a href="https://github.com/Carthage/Carthage" target="_blank" rel="external">Carthage</a></li>
 </ul>
-<h2 id="Demo"><a href="#Demo" class="headerlink" title="Demo"></a>Demo</h2><h4 id="1-主页："><a href="#1-主页：" class="headerlink" title="1. 主页："></a>1. 主页：</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/home_scroll.gif" alt="home page"/><br></p>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2017/05/26/iOS浏览器-WebBrowser/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
+<h2 id="Demo"><a href="#Demo" class="headerlink" title="Demo"></a>Demo</h2><h4 id="1-Home-Page-主页-："><a href="#1-Home-Page-主页-：" class="headerlink" title="1. Home Page (主页)："></a>1. Home Page (主页)：</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/home_scroll.gif" alt="home page"><br></p>
+
+
+<h4 id="2-Multi-tab-多窗口-："><a href="#2-Multi-tab-多窗口-：" class="headerlink" title="2. Multi-tab (多窗口)："></a>2. Multi-tab (多窗口)：</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/home_tab_switch.gif" alt="tab"><br></p>
+
+<p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/tab_manage.gif" alt="tab"><br></p>
+
+<h4 id="3-Search-搜索-："><a href="#3-Search-搜索-：" class="headerlink" title="3. Search (搜索)："></a>3. Search (搜索)：</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/home_search.gif" alt="search"><br></p>
+
+<h4 id="4-No-Image-Mode-无图模式"><a href="#4-No-Image-Mode-无图模式" class="headerlink" title="4. No Image Mode (无图模式)"></a>4. No Image Mode (无图模式)</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/no-image-mode.gif" alt="no image mode"><br></p>
+
+<h4 id="5-History-历史"><a href="#5-History-历史" class="headerlink" title="5. History (历史)"></a>5. History (历史)</h4><ol>
+<li>Long Press to select options. (长按记录可弹出选项按钮)</li>
+<li>Tap to open history in current window.(点击记录会在当前窗口打开历史页面)<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/history.gif" alt="history"><br></p>
+
+</li>
+</ol>
+<h4 id="6-Favorite-收藏"><a href="#6-Favorite-收藏" class="headerlink" title="6. Favorite (收藏)"></a>6. Favorite (收藏)</h4><h5 id="In-non-editing-mode-在非编辑模式下操作"><a href="#In-non-editing-mode-在非编辑模式下操作" class="headerlink" title="In non-editing mode (在非编辑模式下操作)"></a>In non-editing mode (在非编辑模式下操作)</h5><ol>
+<li><p>Long press on directory to edit directory name in non-editing mode.(长按目录来编辑目录名字)</p>
+<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_edit_long_section.gif" alt="favorite"><br></p>
+</li>
+<li><p>Long press on bookmark item to edit bookmark’s url, name, directory in non-editing mode.(长按书签项来编辑书签的地址、名字、以及所在目录)</p>
+<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_long_edit_item.gif" alt="favorite"><br></p>
+
+</li>
+</ol>
+<h5 id="In-editing-mode-在编辑模式下"><a href="#In-editing-mode-在编辑模式下" class="headerlink" title="In editing mode (在编辑模式下)"></a>In editing mode (在编辑模式下)</h5><ol>
+<li><p>reorder, delete directory in editing mode.(删除、排序目录)</p>
+<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_edit_section.gif" alt="favorite"><br></p>
+</li>
+<li><p>click “新文件夹” button to add new directory in editing mode.(点击”新文件夹”按钮来创建新的目录)</p>
+<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_add_section.gif" alt="favorite"><br></p>
+</li>
+<li><p>reorder, delete bookmark in editing mode.(删除、排序书签)</p>
+<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_edit_item.gif" alt="favorite"><br></p>
+</li>
+<li><p>add new bookmark.(添加新书签)</p>
+<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_add.gif" alt="favorite"><br></p>
+
+</li>
+</ol>
+<h4 id="7-find-in-page-页内查找"><a href="#7-find-in-page-页内查找" class="headerlink" title="7. find in page (页内查找)"></a>7. find in page (页内查找)</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/findinpage.gif" alt="find in page"><br></p>
+
+<h2 id="License"><a href="#License" class="headerlink" title="License"></a>License</h2><p>The MIT License (MIT)</p>
+<p>Copyright (c) 2017 Zhong Wu</p>
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy<br>of this software and associated documentation files (the “Software”), to deal<br>in the Software without restriction, including without limitation the rights<br>to use, copy, modify, merge, publish, distribute, sublicense, and/or sell<br>copies of the Software, and to permit persons to whom the Software is<br>furnished to do so, subject to the following conditions:</p>
+<p>The above copyright notice and this permission notice shall be included in all<br>copies or substantial portions of the Software.</p>
+<p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR<br>IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,<br>FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE<br>AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER<br>LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,<br>OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE<br>SOFTWARE.</p>
+
+          
         
       
     </div>
@@ -798,135 +970,6 @@
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/03/14/服务器之从裸机到可用/" itemprop="url">
-                  服务器之从裸机到可用
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-03-14T12:16:24+08:00" content="2017-03-14">
-              2017-03-14
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/系统/" itemprop="url" rel="index">
-                    <span itemprop="name">系统</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2017/03/14/服务器之从裸机到可用/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/03/14/服务器之从裸机到可用/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><hr>
-<p>对于服务器，程序员们还是很熟悉的，任何一个互联网产品，背后几乎都离不开服务器，所有的服务，背后都是通过服务器来提供的，接下来，我将列出从裸机到可用的基本步骤，示例的服务器为<code>HP ProLiant Gen9</code>，当然，其他的服务器如<code>IBM</code>等，基本步骤也都是类似的。</p>
-<h2 id="配置管理口"><a href="#配置管理口" class="headerlink" title="配置管理口"></a>配置管理口</h2><hr>
-<p>通常来说，这一步是都是要走的，通过配置管理口，可以远程管理服务器，不用去机房插显示器、键盘。<code>HP ProLiant Gen9</code>的管理口称为<code>iLO</code>口，开机初始化后进入系统配置，进行配置，一般来说，服务器都是使用静态IP，所以需要禁掉<code>DHCP</code>，并配置<code>IP</code>地址、网关、子网掩码。重启后生效，这样就能够进行远程控制了。</p>
-<h2 id="做RAID"><a href="#做RAID" class="headerlink" title="做RAID"></a>做RAID</h2><hr>
-<p><a href="https://en.wikipedia.org/wiki/RAID">磁盘阵列</a>（Redundant Arrays of Independent Disks，RAID），是由独立磁盘构成的具有冗余能力的阵列，将数据切割成许多区段，分别放在各个硬盘上，同时有冗余，数据重构等安全服务。</p>
-<p>做RAID有很多种方案，可以根据不同的需求，使用不同的方案，如RAID0（条带）、RAID1（镜像）、RAID5、RAID10、RAID50等（不同的方法，所要求的磁盘数也不一样），通常，对于存放数据的磁盘，会使用RAID10、RAID50。做完RAID后，就形成了逻辑分区。</p>
-<p>当然，并不是说服务器一定要做RAID，不做RAID的服务器也能装系统。</p>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2017/03/14/服务器之从裸机到可用/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -972,7 +1015,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">33</span>
+              <span class="site-state-item-count">34</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -989,7 +1032,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">33</span>
+                <span class="site-state-item-count">35</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://zhongwuzw.github.io/"/>
-  <updated>2017-06-19T16:06:19.000Z</updated>
+  <updated>2017-07-27T15:27:13.000Z</updated>
   <id>https://zhongwuzw.github.io/</id>
   
   <author>
@@ -14,6 +14,52 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>RxSwift之sentMessage、methodInvoked失效问题解决</title>
+    <link href="https://zhongwuzw.github.io/2017/07/27/RxSwift%E4%B9%8BsentMessage%E3%80%81methodInvoked%E5%A4%B1%E6%95%88%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/"/>
+    <id>https://zhongwuzw.github.io/2017/07/27/RxSwift之sentMessage、methodInvoked失效问题解决/</id>
+    <published>2017-07-27T09:32:08.000Z</published>
+    <updated>2017-07-27T15:27:13.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="RxSwift的sentMessage、methodInvoked方法"><a href="#RxSwift的sentMessage、methodInvoked方法" class="headerlink" title="RxSwift的sentMessage、methodInvoked方法"></a>RxSwift的<code>sentMessage</code>、<code>methodInvoked</code>方法</h2><hr>
+<p><a href="https://github.com/ReactiveX/RxSwift" target="_blank" rel="external">RxSwift</a>是<a href="https://github.com/Reactive-Extensions/Rx.NET" target="_blank" rel="external">Rx</a>的<code>Swift</code>版本，用来实现函数式、响应式编程。</p>
+<p>具体<code>RxSwift</code>的很多用法不做介绍，接下来，只讨论<code>sentMessage</code>、<code>methodInvoked</code>这两个方法，其作用是返回一个<code>Observable&lt;[Any]</code>，可以作为观察者监控<code>NSObject</code>子类的某个<code>selector</code>，当执行该<code>selector</code>时，将在执行前、后分别执行注册了该<code>selector</code>的<code>sentMessage</code>、<code>methodInvoked</code>方法。</p>
+<h2 id="sentMessage、methodInvoked实现原理"><a href="#sentMessage、methodInvoked实现原理" class="headerlink" title="sentMessage、methodInvoked实现原理"></a><code>sentMessage</code>、<code>methodInvoked</code>实现原理</h2><hr>
+<p><code>sentMessage</code>、<code>methodInvoked</code>只针对某个实例起作用，其实现首先借鉴了<code>KVO</code>的实现方法，通过创建监听的对象的子类，然后重写方法的实现来实现。<code>sentMessage</code>、<code>methodInvoked</code>实现分两个版本，基础版、优化版。基础版通过<code>Swizzle``forwardInvocation:</code>、<code>respondsToSelector:</code>、<code>methodSignatureForSelector:</code>等函数，将所有需要观察的<code>selector</code>调用时进入<code>forwardInvocation:</code>流程，从而进行拦截，以实现通知；优化版则在基础班的基础上通过<code>Type Encoding</code>来做一个缓存优化，避免每次调用都进入转发的过程。</p>
+<a id="more"></a>
+<h2 id="sentMessage、methodInvoked遇到的问题"><a href="#sentMessage、methodInvoked遇到的问题" class="headerlink" title="sentMessage、methodInvoked遇到的问题"></a><code>sentMessage</code>、<code>methodInvoked</code>遇到的问题</h2><hr>
+<p>在使用<code>sentMessage</code>、<code>methodInvoked</code>方法时，发现一个问题，当观察<code>iOS``Framework</code>提供的方法时，可以正常运行，但是当观察自己创建的类（<code>NSObject</code>的子类）的实例的方法时，却始终无法运行，查看整个运行机制，<code>Class</code>、<code>IMP</code>都被正确替换，但是调用方法时，却始终截取不到，这下才意识到，难道是被编译器优化掉了？导致没有走<code>Objective-C</code>的动态派发？<br>遂翻看<code>Apple</code>的<a href="https://developer.apple.com/library/content/documentation/Swift/Conceptual/BuildingCocoaApps/" target="_blank" rel="external">Using Swift with Cocoa and Objective-C</a>，有一段话是这么说的：</p>
+<blockquote>
+<p>“When Swift APIs are imported by the Objective-C runtime, there are no guarantees of dynamic dispatch for properties, methods, subscripts, or initializers. The Swift compiler may still devirtualize or inline member access to optimize the performance of your code, bypassing the Objective-C runtime.</p>
+<p>You can use the dynamic modifier to require that access to members be dynamically dispatched through the Objective-C runtime. Requiring dynamic dispatch is rarely necessary. However, it is necessary when using APIs like key–value observing or the method_exchangeImplementations function in the Objective-C runtime, which dynamically replace the implementation of a method at runtime. If the Swift compiler inlined the implementation of the method or devirtualized access to it, the new implementation would not be used.”</p>
+</blockquote>
+<p>大概意思是当在<code>Swift</code>中使用<code>Objective-C</code>中定义的方法时，编译器不保证动态派发，会对其做优化来提高性能，导致的结果是，会使<code>KVO</code>、<code>Swizzling</code>等失效，要解决该问题，可以使用<code>dynamic</code>修饰符，使得方法强制进行<code>Objective-C</code>的动态派发。</p>
+<p>这样，问题就解决了，原来是编译器优化搞的鬼。<br><a href="https://stackoverflow.com/questions/39708434/observable-for-selector-rxswift/45340883#45340883" target="_blank" rel="external">stackoverflow</a>上也有人提这个问题，我也进行了回答。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;RxSwift的sentMessage、methodInvoked方法&quot;&gt;&lt;a href=&quot;#RxSwift的sentMessage、methodInvoked方法&quot; class=&quot;headerlink&quot; title=&quot;RxSwift的sentMessage、methodInvoked方法&quot;&gt;&lt;/a&gt;RxSwift的&lt;code&gt;sentMessage&lt;/code&gt;、&lt;code&gt;methodInvoked&lt;/code&gt;方法&lt;/h2&gt;&lt;hr&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/ReactiveX/RxSwift&quot;&gt;RxSwift&lt;/a&gt;是&lt;a href=&quot;https://github.com/Reactive-Extensions/Rx.NET&quot;&gt;Rx&lt;/a&gt;的&lt;code&gt;Swift&lt;/code&gt;版本，用来实现函数式、响应式编程。&lt;/p&gt;
+&lt;p&gt;具体&lt;code&gt;RxSwift&lt;/code&gt;的很多用法不做介绍，接下来，只讨论&lt;code&gt;sentMessage&lt;/code&gt;、&lt;code&gt;methodInvoked&lt;/code&gt;这两个方法，其作用是返回一个&lt;code&gt;Observable&amp;lt;[Any]&lt;/code&gt;，可以作为观察者监控&lt;code&gt;NSObject&lt;/code&gt;子类的某个&lt;code&gt;selector&lt;/code&gt;，当执行该&lt;code&gt;selector&lt;/code&gt;时，将在执行前、后分别执行注册了该&lt;code&gt;selector&lt;/code&gt;的&lt;code&gt;sentMessage&lt;/code&gt;、&lt;code&gt;methodInvoked&lt;/code&gt;方法。&lt;/p&gt;
+&lt;h2 id=&quot;sentMessage、methodInvoked实现原理&quot;&gt;&lt;a href=&quot;#sentMessage、methodInvoked实现原理&quot; class=&quot;headerlink&quot; title=&quot;sentMessage、methodInvoked实现原理&quot;&gt;&lt;/a&gt;&lt;code&gt;sentMessage&lt;/code&gt;、&lt;code&gt;methodInvoked&lt;/code&gt;实现原理&lt;/h2&gt;&lt;hr&gt;
+&lt;p&gt;&lt;code&gt;sentMessage&lt;/code&gt;、&lt;code&gt;methodInvoked&lt;/code&gt;只针对某个实例起作用，其实现首先借鉴了&lt;code&gt;KVO&lt;/code&gt;的实现方法，通过创建监听的对象的子类，然后重写方法的实现来实现。&lt;code&gt;sentMessage&lt;/code&gt;、&lt;code&gt;methodInvoked&lt;/code&gt;实现分两个版本，基础版、优化版。基础版通过&lt;code&gt;Swizzle``forwardInvocation:&lt;/code&gt;、&lt;code&gt;respondsToSelector:&lt;/code&gt;、&lt;code&gt;methodSignatureForSelector:&lt;/code&gt;等函数，将所有需要观察的&lt;code&gt;selector&lt;/code&gt;调用时进入&lt;code&gt;forwardInvocation:&lt;/code&gt;流程，从而进行拦截，以实现通知；优化版则在基础班的基础上通过&lt;code&gt;Type Encoding&lt;/code&gt;来做一个缓存优化，避免每次调用都进入转发的过程。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="iOS开发-项目" scheme="https://zhongwuzw.github.io/categories/iOS%E5%BC%80%E5%8F%91-%E9%A1%B9%E7%9B%AE/"/>
+    
+    
+      <category term="iOS" scheme="https://zhongwuzw.github.io/tags/iOS/"/>
+    
+      <category term="Swift" scheme="https://zhongwuzw.github.io/tags/Swift/"/>
+    
+      <category term="RxSwift" scheme="https://zhongwuzw.github.io/tags/RxSwift/"/>
+    
+      <category term="Runtime" scheme="https://zhongwuzw.github.io/tags/Runtime/"/>
+    
+  </entry>
   
   <entry>
     <title>Swift3之Weak引用</title>
@@ -224,7 +270,7 @@
     <link href="https://zhongwuzw.github.io/2017/05/26/iOS%E6%B5%8F%E8%A7%88%E5%99%A8-WebBrowser/"/>
     <id>https://zhongwuzw.github.io/2017/05/26/iOS浏览器-WebBrowser/</id>
     <published>2017-05-26T10:22:11.000Z</published>
-    <updated>2017-05-27T07:01:12.000Z</updated>
+    <updated>2017-07-22T15:50:46.000Z</updated>
     
     <content type="html"><![CDATA[<p>一款用于网页浏览的APP（Web Browser For iOS)。<a href="https://github.com/zhongwuzw/WebBrowser" target="_blank" rel="external">Github地址</a></p>
 <h2 id="Features-功能"><a href="#Features-功能" class="headerlink" title="Features - 功能"></a>Features - 功能</h2><ol>
@@ -233,6 +279,7 @@
 <li>书签、历史记录管理(bookmark、history manage)</li>
 <li>页内查找(find in page)</li>
 <li>点击标题栏进行页面访问或搜索(tap the title bar to  input url for surf or key to search)</li>
+<li>自动监控剪切板<code>URL</code>，可在新窗口中打开</li>
 </ol>
 <h2 id="Usage-用法"><a href="#Usage-用法" class="headerlink" title="Usage - 用法"></a>Usage - 用法</h2><ol>
 <li><code>clone</code> or download zip file.</li>
@@ -244,10 +291,10 @@
 <li>ARC</li>
 <li><a href="https://github.com/Carthage/Carthage" target="_blank" rel="external">Carthage</a></li>
 </ul>
-<h2 id="Demo"><a href="#Demo" class="headerlink" title="Demo"></a>Demo</h2><h4 id="1-主页："><a href="#1-主页：" class="headerlink" title="1. 主页："></a>1. 主页：</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/home_scroll.gif" alt="home page"><br></p>
+<h2 id="Demo"><a href="#Demo" class="headerlink" title="Demo"></a>Demo</h2><h4 id="1-Home-Page-主页-："><a href="#1-Home-Page-主页-：" class="headerlink" title="1. Home Page (主页)："></a>1. Home Page (主页)：</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/home_scroll.gif" alt="home page"><br></p>
 
-<a id="more"></a>
-<h4 id="2-Tab切换："><a href="#2-Tab切换：" class="headerlink" title="2. Tab切换："></a>2. Tab切换：</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/home_tab_switch.gif" alt="tab"><br></p>
+
+<h4 id="2-Multi-tab-多窗口-："><a href="#2-Multi-tab-多窗口-：" class="headerlink" title="2. Multi-tab (多窗口)："></a>2. Multi-tab (多窗口)：</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/home_tab_switch.gif" alt="tab"><br></p>
 
 <p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/tab_manage.gif" alt="tab"><br></p>
 
@@ -257,63 +304,47 @@
 
 <h4 id="5-History-历史"><a href="#5-History-历史" class="headerlink" title="5. History (历史)"></a>5. History (历史)</h4><ol>
 <li>Long Press to select options. (长按记录可弹出选项按钮)</li>
-<li>Tap to open history in current window.(点击记录会在当前窗口打开历史页面)<p align="center"><br><img src="http://oc54pu02q.bkt.clouddn.com/history.gif" alt="history"><br></p>
+<li>Tap to open history in current window.(点击记录会在当前窗口打开历史页面)<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/history.gif" alt="history"><br></p>
 
 </li>
 </ol>
 <h4 id="6-Favorite-收藏"><a href="#6-Favorite-收藏" class="headerlink" title="6. Favorite (收藏)"></a>6. Favorite (收藏)</h4><h5 id="In-non-editing-mode-在非编辑模式下操作"><a href="#In-non-editing-mode-在非编辑模式下操作" class="headerlink" title="In non-editing mode (在非编辑模式下操作)"></a>In non-editing mode (在非编辑模式下操作)</h5><ol>
 <li><p>Long press on directory to edit directory name in non-editing mode.(长按目录来编辑目录名字)</p>
-<p align="center"><br><img src="http://oc54pu02q.bkt.clouddn.com/bookmark_edit_long_section.gif" alt="favorite"><br></p>
+<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_edit_long_section.gif" alt="favorite"><br></p>
 </li>
 <li><p>Long press on bookmark item to edit bookmark’s url, name, directory in non-editing mode.(长按书签项来编辑书签的地址、名字、以及所在目录)</p>
-<p align="center"><br><img src="http://oc54pu02q.bkt.clouddn.com/bookmark_long_edit_item.gif" alt="favorite"><br></p>
+<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_long_edit_item.gif" alt="favorite"><br></p>
 
 </li>
 </ol>
 <h5 id="In-editing-mode-在编辑模式下"><a href="#In-editing-mode-在编辑模式下" class="headerlink" title="In editing mode (在编辑模式下)"></a>In editing mode (在编辑模式下)</h5><ol>
 <li><p>reorder, delete directory in editing mode.(删除、排序目录)</p>
-<p align="center"><br><img src="http://oc54pu02q.bkt.clouddn.com/bookmark_edit_section.gif" alt="favorite"><br></p>
+<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_edit_section.gif" alt="favorite"><br></p>
 </li>
 <li><p>click “新文件夹” button to add new directory in editing mode.(点击”新文件夹”按钮来创建新的目录)</p>
-<p align="center"><br><img src="http://oc54pu02q.bkt.clouddn.com/bookmark_add_section.gif" alt="favorite"><br></p>
+<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_add_section.gif" alt="favorite"><br></p>
 </li>
 <li><p>reorder, delete bookmark in editing mode.(删除、排序书签)</p>
-<p align="center"><br><img src="http://oc54pu02q.bkt.clouddn.com/bookmark_edit_item.gif" alt="favorite"><br></p>
+<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_edit_item.gif" alt="favorite"><br></p>
 </li>
 <li><p>add new bookmark.(添加新书签)</p>
-<p align="center"><br><img src="http://oc54pu02q.bkt.clouddn.com/bookmark_add.gif" alt="favorite"><br></p>
+<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_add.gif" alt="favorite"><br></p>
 
 </li>
 </ol>
-<h4 id="7-find-in-page-页内查找"><a href="#7-find-in-page-页内查找" class="headerlink" title="7. find in page (页内查找)"></a>7. find in page (页内查找)</h4><p align="center"><br>  <img src="http://oc54pu02q.bkt.clouddn.com/findinpage.gif" alt="find in page"><br></p>
+<h4 id="7-find-in-page-页内查找"><a href="#7-find-in-page-页内查找" class="headerlink" title="7. find in page (页内查找)"></a>7. find in page (页内查找)</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/findinpage.gif" alt="find in page"><br></p>
 
-
-
-
-
+<h2 id="License"><a href="#License" class="headerlink" title="License"></a>License</h2><p>The MIT License (MIT)</p>
+<p>Copyright (c) 2017 Zhong Wu</p>
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy<br>of this software and associated documentation files (the “Software”), to deal<br>in the Software without restriction, including without limitation the rights<br>to use, copy, modify, merge, publish, distribute, sublicense, and/or sell<br>copies of the Software, and to permit persons to whom the Software is<br>furnished to do so, subject to the following conditions:</p>
+<p>The above copyright notice and this permission notice shall be included in all<br>copies or substantial portions of the Software.</p>
+<p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR<br>IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,<br>FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE<br>AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER<br>LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,<br>OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE<br>SOFTWARE.</p>
 ]]></content>
     
     <summary type="html">
     
-      &lt;p&gt;一款用于网页浏览的APP（Web Browser For iOS)。&lt;a href=&quot;https://github.com/zhongwuzw/WebBrowser&quot;&gt;Github地址&lt;/a&gt;&lt;/p&gt;
-&lt;h2 id=&quot;Features-功能&quot;&gt;&lt;a href=&quot;#Features-功能&quot; class=&quot;headerlink&quot; title=&quot;Features - 功能&quot;&gt;&lt;/a&gt;Features - 功能&lt;/h2&gt;&lt;ol&gt;
-&lt;li&gt;多Tab页浏览(multi-tab browsing)&lt;/li&gt;
-&lt;li&gt;冷启动恢复浏览记录，包括当前页及前进后退页面(session restore, includes current page and backforward list)&lt;/li&gt;
-&lt;li&gt;书签、历史记录管理(bookmark、history manage)&lt;/li&gt;
-&lt;li&gt;页内查找(find in page)&lt;/li&gt;
-&lt;li&gt;点击标题栏进行页面访问或搜索(tap the title bar to  input url for surf or key to search)&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h2 id=&quot;Usage-用法&quot;&gt;&lt;a href=&quot;#Usage-用法&quot; class=&quot;headerlink&quot; title=&quot;Usage - 用法&quot;&gt;&lt;/a&gt;Usage - 用法&lt;/h2&gt;&lt;ol&gt;
-&lt;li&gt;&lt;code&gt;clone&lt;/code&gt; or download zip file.&lt;/li&gt;
-&lt;li&gt;Run command &lt;code&gt;carthage update --platform iOS&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;Just run WebBrowser.xcodeproj&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h2 id=&quot;Requirements-依赖&quot;&gt;&lt;a href=&quot;#Requirements-依赖&quot; class=&quot;headerlink&quot; title=&quot;Requirements - 依赖&quot;&gt;&lt;/a&gt;Requirements - 依赖&lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;iOS 8.0 or higher&lt;/li&gt;
-&lt;li&gt;ARC&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;https://github.com/Carthage/Carthage&quot;&gt;Carthage&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&quot;Demo&quot;&gt;&lt;a href=&quot;#Demo&quot; class=&quot;headerlink&quot; title=&quot;Demo&quot;&gt;&lt;/a&gt;Demo&lt;/h2&gt;&lt;h4 id=&quot;1-主页：&quot;&gt;&lt;a href=&quot;#1-主页：&quot; class=&quot;headerlink&quot; title=&quot;1. 主页：&quot;&gt;&lt;/a&gt;1. 主页：&lt;/h4&gt;&lt;p align=&quot;center&quot;&gt;&lt;br&gt;  &lt;img src=&quot;https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/home_scroll.gif&quot; alt=&quot;home page&quot;/&gt;&lt;br&gt;&lt;/p&gt;
+      &lt;p&gt;一款用于网页浏览的APP（Web Browser For iOS)。&lt;a href=&quot;https://github.com/zhongwuzw/WebBrowser&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Github地址&lt;/a&gt;&lt;/p&gt;
+&lt;h2 i
     
     </summary>
     
@@ -1273,43 +1304,6 @@
       <category term="Nginx" scheme="https://zhongwuzw.github.io/tags/Nginx/"/>
     
       <category term="服务器" scheme="https://zhongwuzw.github.io/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>iOS获取通话记录</title>
-    <link href="https://zhongwuzw.github.io/2016/09/22/iOS%E8%8E%B7%E5%8F%96%E9%80%9A%E8%AF%9D%E8%AE%B0%E5%BD%95/"/>
-    <id>https://zhongwuzw.github.io/2016/09/22/iOS获取通话记录/</id>
-    <published>2016-09-22T09:34:14.000Z</published>
-    <updated>2016-09-22T10:11:49.000Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><hr>
-<p><code>iOS8.3</code>之后，存放通话日志的数据库的位置换成了<code>/private/var/mobile/Library/CallHistoryDB/</code>目录，数据库名为<code>CallHistory.storedata</code>，由于其采用了<code>Sqlite</code>的<code>wal</code>机制，所以还有两个文件，分别为<code>CallHistory.storedata-shm</code>、<code>CallHistory.storedata-wal</code>,一开始想得很简单，直接使用<code>Sqlite</code>打开该数据库，读取即可，后来发现使用<code>NSFileManager</code>并不能获取到该文件。接下来将详细列出解决思路。</p>
-<h2 id="读取通话日志文件"><a href="#读取通话日志文件" class="headerlink" title="读取通话日志文件"></a>读取通话日志文件</h2><hr>
-<p>直接使用<code>NSFileManager</code>不能获取到通话日志文件的原因很简单，因为App本身是在一个沙盒里面的，App只能访问自己的存储空间，系统有一套安全机制来对其进行限制。所以，首先得解决这个限制，解决方案是添加Entitlements授权，在Entitlements文件中添加如下代码：</p>
-<figure class="highlight dts"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="params">&lt;key&gt;</span>com.apple.security.exception.files.absolute-path.read-write<span class="params">&lt;/key&gt;</span></div><div class="line"><span class="params">&lt;array&gt;</span></div><div class="line">	<span class="params">&lt;string&gt;</span><span class="meta-keyword">/private/</span>var<span class="meta-keyword">/mobile/</span>Library/CallHistoryDB/CallHistory.storedata-wal<span class="params">&lt;/string&gt;</span></div><div class="line">	<span class="params">&lt;string&gt;</span><span class="meta-keyword">/private/</span>var<span class="meta-keyword">/mobile/</span>Library/CallHistoryDB/CallHistory.storedata-shm<span class="params">&lt;/string&gt;</span></div><div class="line">	<span class="params">&lt;string&gt;</span><span class="meta-keyword">/private/</span>var<span class="meta-keyword">/mobile/</span>Library/CallHistoryDB/CallHistory.storedata<span class="params">&lt;/string&gt;</span></div><div class="line"><span class="params">&lt;/array&gt;</span></div></pre></td></tr></table></figure>
-<p>这样，就能访问到通话日志文件。</p>
-<h2 id="使用Sqlite读取数据库"><a href="#使用Sqlite读取数据库" class="headerlink" title="使用Sqlite读取数据库"></a>使用<code>Sqlite</code>读取数据库</h2><hr>
-<p>使用<code>Sqlite</code>直接读取数据库内容时，发现，在调用<code>int errorCode = sqlite3_prepare_v2(database,[sqlStatement UTF8String],-1,&amp;compiledStatement, NULL);</code>时，出现错误，错误代码为<code>SQLITE_AUTH</code>，既没有权限，最后解决方案是，将3个文件内容读出，并保存到App自己的存储空间中，比如<code>Cache</code>目录中，再对保存到App存储目录中的数据库文件进行操作即可。</p>
-<h2 id="解决wal模式问题"><a href="#解决wal模式问题" class="headerlink" title="解决wal模式问题"></a>解决<code>wal</code>模式问题</h2><hr>
-<p>由于通话日志的数据库采用了新的事务设计<code>wal</code>（write-ahead logging），数据库修改后，首先会把修改内容写入日志（-wal），为了提高性能创建了一个内存索引（-shm），映射每一个page是否dirty，读取时先看需要的page是否在<code>wal</code>日志中，然后再读取，当达到一定条件后Sqlite会自动将数据flush到数据库文件，当然也可以手动flush，在打开数据库之后，调用<code>sqlite3_wal_checkpoint(database, NULL);</code>即可手动flush</p>
-<h2 id="结束"><a href="#结束" class="headerlink" title="结束"></a>结束</h2><hr>
-<p>解决这几个问题后，就能成功读取通话日志了，其他的日志，如短信等等同理都可以读取到。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;hr&gt;
-&lt;p&gt;&lt;code&gt;iOS8.3&lt;/code&gt;之后，存放通话日志的数据库的位置换成了&lt;code&gt;/private/var/mobile/L
-    
-    </summary>
-    
-      <category term="iOS开发-越狱" scheme="https://zhongwuzw.github.io/categories/iOS%E5%BC%80%E5%8F%91-%E8%B6%8A%E7%8B%B1/"/>
-    
-    
-      <category term="iOS" scheme="https://zhongwuzw.github.io/tags/iOS/"/>
-    
-      <category term="越狱" scheme="https://zhongwuzw.github.io/tags/%E8%B6%8A%E7%8B%B1/"/>
     
   </entry>
   

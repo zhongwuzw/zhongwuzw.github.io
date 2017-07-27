@@ -288,6 +288,135 @@
             
               
                 
+                <a class="post-title-link" href="/2017/03/14/服务器之从裸机到可用/" itemprop="url">
+                  服务器之从裸机到可用
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-03-14T12:16:24+08:00" content="2017-03-14">
+              2017-03-14
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/系统/" itemprop="url" rel="index">
+                    <span itemprop="name">系统</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/03/14/服务器之从裸机到可用/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/03/14/服务器之从裸机到可用/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><hr>
+<p>对于服务器，程序员们还是很熟悉的，任何一个互联网产品，背后几乎都离不开服务器，所有的服务，背后都是通过服务器来提供的，接下来，我将列出从裸机到可用的基本步骤，示例的服务器为<code>HP ProLiant Gen9</code>，当然，其他的服务器如<code>IBM</code>等，基本步骤也都是类似的。</p>
+<h2 id="配置管理口"><a href="#配置管理口" class="headerlink" title="配置管理口"></a>配置管理口</h2><hr>
+<p>通常来说，这一步是都是要走的，通过配置管理口，可以远程管理服务器，不用去机房插显示器、键盘。<code>HP ProLiant Gen9</code>的管理口称为<code>iLO</code>口，开机初始化后进入系统配置，进行配置，一般来说，服务器都是使用静态IP，所以需要禁掉<code>DHCP</code>，并配置<code>IP</code>地址、网关、子网掩码。重启后生效，这样就能够进行远程控制了。</p>
+<h2 id="做RAID"><a href="#做RAID" class="headerlink" title="做RAID"></a>做RAID</h2><hr>
+<p><a href="https://en.wikipedia.org/wiki/RAID">磁盘阵列</a>（Redundant Arrays of Independent Disks，RAID），是由独立磁盘构成的具有冗余能力的阵列，将数据切割成许多区段，分别放在各个硬盘上，同时有冗余，数据重构等安全服务。</p>
+<p>做RAID有很多种方案，可以根据不同的需求，使用不同的方案，如RAID0（条带）、RAID1（镜像）、RAID5、RAID10、RAID50等（不同的方法，所要求的磁盘数也不一样），通常，对于存放数据的磁盘，会使用RAID10、RAID50。做完RAID后，就形成了逻辑分区。</p>
+<p>当然，并不是说服务器一定要做RAID，不做RAID的服务器也能装系统。</p>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2017/03/14/服务器之从裸机到可用/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2017/02/09/AppDelegate解耦之JSDecoupledAppDelegate/" itemprop="url">
                   AppDelegate解耦之JSDecoupledAppDelegate
                 </a>
@@ -794,132 +923,6 @@
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/12/14/源码分析之Alamofire/" itemprop="url">
-                  源码分析之Alamofire
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-12-14T17:26:46+08:00" content="2016-12-14">
-              2016-12-14
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/iOS开发-网络/" itemprop="url" rel="index">
-                    <span itemprop="name">iOS开发-网络</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/12/14/源码分析之Alamofire/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/12/14/源码分析之Alamofire/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h2><hr>
-<p><code>Alamofire</code>是对<code>URLSession</code>的封装，针对普通请求，上传、下载等操作，提供对应的<code>Request</code>，其对象关系如下：</p>
-<p> <img src="http://oc54pu02q.bkt.clouddn.com/25E6C99A-FDF4-4314-A41A-03E746BBA401.png" width = "500" height = "254" alt="" align=center /></p>
-<p>每一个<code>Request</code>关联一个<code>TaskDelegate</code>，<code>TaskDelegate</code>用来处理<code>URLSessionTask</code>使用过程中的网络回调，<code>TaskDelegate</code>有一个<code>queue</code>成员，用来执行<code>task</code>完成后的回调处理，<code>completionHandler</code>默认会在主线程回调。<code>Alamofire</code>有一个<code>SessionDelegate</code>，对<code>Session</code>的所有网络回调做处理，并调用每一个<code>task</code>的<code>TaskDelegate</code>，正因为<code>SessionDelegate</code>只有一个实例，所以会涉及到线程安全的问题，对某些关键属性需要做竟态处理，如管理<code>Request</code>的字典。委托处理流程如下图所示：</p>
-<p> <img src="http://oc54pu02q.bkt.clouddn.com/05A842ED-9D20-47AA-8609-282B95A36E7B.png" width = "500" height = "254" alt="" align=center /></p>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/12/14/源码分析之Alamofire/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -965,7 +968,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">33</span>
+              <span class="site-state-item-count">34</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -982,7 +985,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">33</span>
+                <span class="site-state-item-count">35</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

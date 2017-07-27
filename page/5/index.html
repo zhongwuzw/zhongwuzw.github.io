@@ -288,6 +288,137 @@
             
               
                 
+                <a class="post-title-link" href="/2016/09/22/iOS获取通话记录/" itemprop="url">
+                  iOS获取通话记录
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-09-22T17:34:14+08:00" content="2016-09-22">
+              2016-09-22
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/iOS开发-越狱/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发-越狱</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/09/22/iOS获取通话记录/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/09/22/iOS获取通话记录/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><hr>
+<p><code>iOS8.3</code>之后，存放通话日志的数据库的位置换成了<code>/private/var/mobile/Library/CallHistoryDB/</code>目录，数据库名为<code>CallHistory.storedata</code>，由于其采用了<code>Sqlite</code>的<code>wal</code>机制，所以还有两个文件，分别为<code>CallHistory.storedata-shm</code>、<code>CallHistory.storedata-wal</code>,一开始想得很简单，直接使用<code>Sqlite</code>打开该数据库，读取即可，后来发现使用<code>NSFileManager</code>并不能获取到该文件。接下来将详细列出解决思路。</p>
+<h2 id="读取通话日志文件"><a href="#读取通话日志文件" class="headerlink" title="读取通话日志文件"></a>读取通话日志文件</h2><hr>
+<p>直接使用<code>NSFileManager</code>不能获取到通话日志文件的原因很简单，因为App本身是在一个沙盒里面的，App只能访问自己的存储空间，系统有一套安全机制来对其进行限制。所以，首先得解决这个限制，解决方案是添加Entitlements授权，在Entitlements文件中添加如下代码：</p>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="params">&lt;key&gt;</span>com.apple.security.exception.files.absolute-path.read-write<span class="params">&lt;/key&gt;</span></div><div class="line"><span class="params">&lt;array&gt;</span></div><div class="line">	<span class="params">&lt;string&gt;</span><span class="meta-keyword">/private/</span>var<span class="meta-keyword">/mobile/</span>Library/CallHistoryDB/CallHistory.storedata-wal<span class="params">&lt;/string&gt;</span></div><div class="line">	<span class="params">&lt;string&gt;</span><span class="meta-keyword">/private/</span>var<span class="meta-keyword">/mobile/</span>Library/CallHistoryDB/CallHistory.storedata-shm<span class="params">&lt;/string&gt;</span></div><div class="line">	<span class="params">&lt;string&gt;</span><span class="meta-keyword">/private/</span>var<span class="meta-keyword">/mobile/</span>Library/CallHistoryDB/CallHistory.storedata<span class="params">&lt;/string&gt;</span></div><div class="line"><span class="params">&lt;/array&gt;</span></div></pre></td></tr></table></figure>
+<p>这样，就能访问到通话日志文件。</p>
+<h2 id="使用Sqlite读取数据库"><a href="#使用Sqlite读取数据库" class="headerlink" title="使用Sqlite读取数据库"></a>使用<code>Sqlite</code>读取数据库</h2><hr>
+<p>使用<code>Sqlite</code>直接读取数据库内容时，发现，在调用<code>int errorCode = sqlite3_prepare_v2(database,[sqlStatement UTF8String],-1,&amp;compiledStatement, NULL);</code>时，出现错误，错误代码为<code>SQLITE_AUTH</code>，既没有权限，最后解决方案是，将3个文件内容读出，并保存到App自己的存储空间中，比如<code>Cache</code>目录中，再对保存到App存储目录中的数据库文件进行操作即可。</p>
+<h2 id="解决wal模式问题"><a href="#解决wal模式问题" class="headerlink" title="解决wal模式问题"></a>解决<code>wal</code>模式问题</h2><hr>
+<p>由于通话日志的数据库采用了新的事务设计<code>wal</code>（write-ahead logging），数据库修改后，首先会把修改内容写入日志（-wal），为了提高性能创建了一个内存索引（-shm），映射每一个page是否dirty，读取时先看需要的page是否在<code>wal</code>日志中，然后再读取，当达到一定条件后Sqlite会自动将数据flush到数据库文件，当然也可以手动flush，在打开数据库之后，调用<code>sqlite3_wal_checkpoint(database, NULL);</code>即可手动flush</p>
+<h2 id="结束"><a href="#结束" class="headerlink" title="结束"></a>结束</h2><hr>
+<p>解决这几个问题后，就能成功读取通话日志了，其他的日志，如短信等等同理都可以读取到。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2016/09/21/epoll的两种工作模式/" itemprop="url">
                   epoll的两种工作模式
                 </a>
@@ -772,132 +903,6 @@
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/09/08/源码分析之SDWebImage/" itemprop="url">
-                  源码分析之SDWebImage
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-09-08T16:02:49+08:00" content="2016-09-08">
-              2016-09-08
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/iOS开发-网络/" itemprop="url" rel="index">
-                    <span itemprop="name">iOS开发-网络</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/09/08/源码分析之SDWebImage/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/09/08/源码分析之SDWebImage/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><hr>
-<p>在iOS开发中，很多都使用到<a href="https://github.com/rs/SDWebImage">SDWebImage</a>库，该库使用了外观模式，提供简洁的API，<code>UIButton</code>、<code>UIImageView</code>等类可以直接调用API进行网络图片的下载，接下来，就来分析一下<code>SDWebImage</code>的整个工作流程。</p>
-<h2 id="整体结构"><a href="#整体结构" class="headerlink" title="整体结构"></a>整体结构</h2><hr>
-<p>查看<code>SDWebImage</code>的整个项目结构，除去一些辅助的类，其结构大致如下图所示，<code>UIView+WebCacheOperation</code>类作为<code>UIView</code>的类别，提供基本的方法，如设置、取消、移除<code>Operation</code>操作，该<code>Operation</code>满足<code>&lt;SDWebImageOperation&gt;</code>协议，并通过关联引用来进行存储。<br><code>UIImageView+WebCache</code>、<code>SDWebImageManager</code>等类提供对外的接口。<br><code>SDWebImageManager</code>类将作为Manager来进行下载和缓存的管理，而真正负责下载的类为<code>SDWebImageDownloader</code>类，<code>SDWebImageDownloaderOperation</code>负责封装下载对象；管理缓存的类为<code>SDImageCache</code>。<br>好了，大致结构就是这样，接下来将通过一次调用来分析其内部的具体流程。</p>
-<p><img src="http://oc54pu02q.bkt.clouddn.com/%E6%9C%AA%E5%91%BD%E5%90%8D%202.png" alt=""></p>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/09/08/源码分析之SDWebImage/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -943,7 +948,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">33</span>
+              <span class="site-state-item-count">34</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -960,7 +965,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">33</span>
+                <span class="site-state-item-count">35</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

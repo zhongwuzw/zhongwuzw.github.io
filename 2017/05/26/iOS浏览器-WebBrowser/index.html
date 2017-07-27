@@ -105,15 +105,15 @@ Features - 功能
 <meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/tab_manage.gif">
 <meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/home_search.gif">
 <meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/no-image-mode.gif">
-<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/history.gif">
-<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/bookmark_edit_long_section.gif">
-<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/bookmark_long_edit_item.gif">
-<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/bookmark_edit_section.gif">
-<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/bookmark_add_section.gif">
-<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/bookmark_edit_item.gif">
-<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/bookmark_add.gif">
-<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/findinpage.gif">
-<meta property="og:updated_time" content="2017-05-27T07:01:12.000Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/history.gif">
+<meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_edit_long_section.gif">
+<meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_long_edit_item.gif">
+<meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_edit_section.gif">
+<meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_add_section.gif">
+<meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_edit_item.gif">
+<meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_add.gif">
+<meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/findinpage.gif">
+<meta property="og:updated_time" content="2017-07-22T15:50:46.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS浏览器-WebBrowser">
 <meta name="twitter:description" content="一款用于网页浏览的APP（Web Browser For iOS)。Github地址
@@ -385,6 +385,7 @@ Features - 功能
 <li>书签、历史记录管理(bookmark、history manage)</li>
 <li>页内查找(find in page)</li>
 <li>点击标题栏进行页面访问或搜索(tap the title bar to  input url for surf or key to search)</li>
+<li>自动监控剪切板<code>URL</code>，可在新窗口中打开</li>
 </ol>
 <h2 id="Usage-用法"><a href="#Usage-用法" class="headerlink" title="Usage - 用法"></a>Usage - 用法</h2><ol>
 <li><code>clone</code> or download zip file.</li>
@@ -396,10 +397,10 @@ Features - 功能
 <li>ARC</li>
 <li><a href="https://github.com/Carthage/Carthage" target="_blank" rel="external">Carthage</a></li>
 </ul>
-<h2 id="Demo"><a href="#Demo" class="headerlink" title="Demo"></a>Demo</h2><h4 id="1-主页："><a href="#1-主页：" class="headerlink" title="1. 主页："></a>1. 主页：</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/home_scroll.gif" alt="home page"><br></p>
+<h2 id="Demo"><a href="#Demo" class="headerlink" title="Demo"></a>Demo</h2><h4 id="1-Home-Page-主页-："><a href="#1-Home-Page-主页-：" class="headerlink" title="1. Home Page (主页)："></a>1. Home Page (主页)：</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/home_scroll.gif" alt="home page"><br></p>
 
-<a id="more"></a>
-<h4 id="2-Tab切换："><a href="#2-Tab切换：" class="headerlink" title="2. Tab切换："></a>2. Tab切换：</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/home_tab_switch.gif" alt="tab"><br></p>
+
+<h4 id="2-Multi-tab-多窗口-："><a href="#2-Multi-tab-多窗口-：" class="headerlink" title="2. Multi-tab (多窗口)："></a>2. Multi-tab (多窗口)：</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/home_tab_switch.gif" alt="tab"><br></p>
 
 <p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/tab_manage.gif" alt="tab"><br></p>
 
@@ -409,40 +410,41 @@ Features - 功能
 
 <h4 id="5-History-历史"><a href="#5-History-历史" class="headerlink" title="5. History (历史)"></a>5. History (历史)</h4><ol>
 <li>Long Press to select options. (长按记录可弹出选项按钮)</li>
-<li>Tap to open history in current window.(点击记录会在当前窗口打开历史页面)<p align="center"><br><img src="http://oc54pu02q.bkt.clouddn.com/history.gif" alt="history"><br></p>
+<li>Tap to open history in current window.(点击记录会在当前窗口打开历史页面)<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/history.gif" alt="history"><br></p>
 
 </li>
 </ol>
 <h4 id="6-Favorite-收藏"><a href="#6-Favorite-收藏" class="headerlink" title="6. Favorite (收藏)"></a>6. Favorite (收藏)</h4><h5 id="In-non-editing-mode-在非编辑模式下操作"><a href="#In-non-editing-mode-在非编辑模式下操作" class="headerlink" title="In non-editing mode (在非编辑模式下操作)"></a>In non-editing mode (在非编辑模式下操作)</h5><ol>
 <li><p>Long press on directory to edit directory name in non-editing mode.(长按目录来编辑目录名字)</p>
-<p align="center"><br><img src="http://oc54pu02q.bkt.clouddn.com/bookmark_edit_long_section.gif" alt="favorite"><br></p>
+<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_edit_long_section.gif" alt="favorite"><br></p>
 </li>
 <li><p>Long press on bookmark item to edit bookmark’s url, name, directory in non-editing mode.(长按书签项来编辑书签的地址、名字、以及所在目录)</p>
-<p align="center"><br><img src="http://oc54pu02q.bkt.clouddn.com/bookmark_long_edit_item.gif" alt="favorite"><br></p>
+<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_long_edit_item.gif" alt="favorite"><br></p>
 
 </li>
 </ol>
 <h5 id="In-editing-mode-在编辑模式下"><a href="#In-editing-mode-在编辑模式下" class="headerlink" title="In editing mode (在编辑模式下)"></a>In editing mode (在编辑模式下)</h5><ol>
 <li><p>reorder, delete directory in editing mode.(删除、排序目录)</p>
-<p align="center"><br><img src="http://oc54pu02q.bkt.clouddn.com/bookmark_edit_section.gif" alt="favorite"><br></p>
+<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_edit_section.gif" alt="favorite"><br></p>
 </li>
 <li><p>click “新文件夹” button to add new directory in editing mode.(点击”新文件夹”按钮来创建新的目录)</p>
-<p align="center"><br><img src="http://oc54pu02q.bkt.clouddn.com/bookmark_add_section.gif" alt="favorite"><br></p>
+<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_add_section.gif" alt="favorite"><br></p>
 </li>
 <li><p>reorder, delete bookmark in editing mode.(删除、排序书签)</p>
-<p align="center"><br><img src="http://oc54pu02q.bkt.clouddn.com/bookmark_edit_item.gif" alt="favorite"><br></p>
+<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_edit_item.gif" alt="favorite"><br></p>
 </li>
 <li><p>add new bookmark.(添加新书签)</p>
-<p align="center"><br><img src="http://oc54pu02q.bkt.clouddn.com/bookmark_add.gif" alt="favorite"><br></p>
+<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_add.gif" alt="favorite"><br></p>
 
 </li>
 </ol>
-<h4 id="7-find-in-page-页内查找"><a href="#7-find-in-page-页内查找" class="headerlink" title="7. find in page (页内查找)"></a>7. find in page (页内查找)</h4><p align="center"><br>  <img src="http://oc54pu02q.bkt.clouddn.com/findinpage.gif" alt="find in page"><br></p>
+<h4 id="7-find-in-page-页内查找"><a href="#7-find-in-page-页内查找" class="headerlink" title="7. find in page (页内查找)"></a>7. find in page (页内查找)</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/findinpage.gif" alt="find in page"><br></p>
 
-
-
-
-
+<h2 id="License"><a href="#License" class="headerlink" title="License"></a>License</h2><p>The MIT License (MIT)</p>
+<p>Copyright (c) 2017 Zhong Wu</p>
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy<br>of this software and associated documentation files (the “Software”), to deal<br>in the Software without restriction, including without limitation the rights<br>to use, copy, modify, merge, publish, distribute, sublicense, and/or sell<br>copies of the Software, and to permit persons to whom the Software is<br>furnished to do so, subject to the following conditions:</p>
+<p>The above copyright notice and this permission notice shall be included in all<br>copies or substantial portions of the Software.</p>
+<p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR<br>IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,<br>FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE<br>AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER<br>LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,<br>OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE<br>SOFTWARE.</p>
 
       
     </div>
@@ -583,7 +585,7 @@ Features - 功能
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">33</span>
+              <span class="site-state-item-count">34</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -600,7 +602,7 @@ Features - 功能
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">33</span>
+                <span class="site-state-item-count">35</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -665,7 +667,7 @@ Features - 功能
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Features-功能"><span class="nav-number">1.</span> <span class="nav-text">Features - 功能</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Usage-用法"><span class="nav-number">2.</span> <span class="nav-text">Usage - 用法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Requirements-依赖"><span class="nav-number">3.</span> <span class="nav-text">Requirements - 依赖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Demo"><span class="nav-number">4.</span> <span class="nav-text">Demo</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-主页："><span class="nav-number">4.0.1.</span> <span class="nav-text">1. 主页：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-Tab切换："><span class="nav-number">4.0.2.</span> <span class="nav-text">2. Tab切换：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-Search-搜索-："><span class="nav-number">4.0.3.</span> <span class="nav-text">3. Search (搜索)：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-No-Image-Mode-无图模式"><span class="nav-number">4.0.4.</span> <span class="nav-text">4. No Image Mode (无图模式)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-History-历史"><span class="nav-number">4.0.5.</span> <span class="nav-text">5. History (历史)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-Favorite-收藏"><span class="nav-number">4.0.6.</span> <span class="nav-text">6. Favorite (收藏)</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#In-non-editing-mode-在非编辑模式下操作"><span class="nav-number">4.0.6.1.</span> <span class="nav-text">In non-editing mode (在非编辑模式下操作)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#In-editing-mode-在编辑模式下"><span class="nav-number">4.0.6.2.</span> <span class="nav-text">In editing mode (在编辑模式下)</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-find-in-page-页内查找"><span class="nav-number">4.0.7.</span> <span class="nav-text">7. find in page (页内查找)</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Features-功能"><span class="nav-number">1.</span> <span class="nav-text">Features - 功能</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Usage-用法"><span class="nav-number">2.</span> <span class="nav-text">Usage - 用法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Requirements-依赖"><span class="nav-number">3.</span> <span class="nav-text">Requirements - 依赖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Demo"><span class="nav-number">4.</span> <span class="nav-text">Demo</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Home-Page-主页-："><span class="nav-number">4.0.1.</span> <span class="nav-text">1. Home Page (主页)：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-Multi-tab-多窗口-："><span class="nav-number">4.0.2.</span> <span class="nav-text">2. Multi-tab (多窗口)：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-Search-搜索-："><span class="nav-number">4.0.3.</span> <span class="nav-text">3. Search (搜索)：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-No-Image-Mode-无图模式"><span class="nav-number">4.0.4.</span> <span class="nav-text">4. No Image Mode (无图模式)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-History-历史"><span class="nav-number">4.0.5.</span> <span class="nav-text">5. History (历史)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-Favorite-收藏"><span class="nav-number">4.0.6.</span> <span class="nav-text">6. Favorite (收藏)</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#In-non-editing-mode-在非编辑模式下操作"><span class="nav-number">4.0.6.1.</span> <span class="nav-text">In non-editing mode (在非编辑模式下操作)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#In-editing-mode-在编辑模式下"><span class="nav-number">4.0.6.2.</span> <span class="nav-text">In editing mode (在编辑模式下)</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-find-in-page-页内查找"><span class="nav-number">4.0.7.</span> <span class="nav-text">7. find in page (页内查找)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#License"><span class="nav-number">5.</span> <span class="nav-text">License</span></a></li></ol></div>
             
           </div>
         </section>
