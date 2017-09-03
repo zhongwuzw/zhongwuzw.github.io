@@ -86,23 +86,19 @@
 
 
 
-<meta name="description" content="Swift是OO（面向对象）的语言，所以少不了方法和属性的重载等特性，程序只能在运行时来确定具体的方法或属性来间接调用或间接访问，这就叫做动态派发。从性能上考虑，对于动态派发的方法，会有常量时间的运行时开销。接下来将介绍三种方法来移除这样的动态性，final，private，全模块优化（Whole Module Optimization），以此提升性能。
-考虑下面的例子：
-123456789101">
+<meta name="description" content="Swift是OO（面向对象）的语言，所以少不了方法和属性的重载等特性，程序只能在运行时来确定具体的方法或属性来间接调用或间接访问，这就叫做动态派发。从性能上考虑，对于动态派发的方法，会有常量时间的运行时开销。接下来将介绍三种方法来移除这样的动态性，final，private，全模块优化（Whole Module Optimization），以此提升性能。 考虑下面的例子： 123456789101">
+<meta name="keywords" content="iOS,Swift">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Swift之通过减少动态派发来提升性能">
 <meta property="og:url" content="https://zhongwuzw.github.io/2016/08/24/Swift之通过减少动态派发来提升性能/index.html">
 <meta property="og:site_name" content="钟武的技术博客">
-<meta property="og:description" content="Swift是OO（面向对象）的语言，所以少不了方法和属性的重载等特性，程序只能在运行时来确定具体的方法或属性来间接调用或间接访问，这就叫做动态派发。从性能上考虑，对于动态派发的方法，会有常量时间的运行时开销。接下来将介绍三种方法来移除这样的动态性，final，private，全模块优化（Whole Module Optimization），以此提升性能。
-考虑下面的例子：
-123456789101">
+<meta property="og:description" content="Swift是OO（面向对象）的语言，所以少不了方法和属性的重载等特性，程序只能在运行时来确定具体的方法或属性来间接调用或间接访问，这就叫做动态派发。从性能上考虑，对于动态派发的方法，会有常量时间的运行时开销。接下来将介绍三种方法来移除这样的动态性，final，private，全模块优化（Whole Module Optimization），以此提升性能。 考虑下面的例子： 123456789101">
+<meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/QQ20160825-0@2x.png">
 <meta property="og:updated_time" content="2016-09-19T09:26:46.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Swift之通过减少动态派发来提升性能">
-<meta name="twitter:description" content="Swift是OO（面向对象）的语言，所以少不了方法和属性的重载等特性，程序只能在运行时来确定具体的方法或属性来间接调用或间接访问，这就叫做动态派发。从性能上考虑，对于动态派发的方法，会有常量时间的运行时开销。接下来将介绍三种方法来移除这样的动态性，final，private，全模块优化（Whole Module Optimization），以此提升性能。
-考虑下面的例子：
-123456789101">
+<meta name="twitter:description" content="Swift是OO（面向对象）的语言，所以少不了方法和属性的重载等特性，程序只能在运行时来确定具体的方法或属性来间接调用或间接访问，这就叫做动态派发。从性能上考虑，对于动态派发的方法，会有常量时间的运行时开销。接下来将介绍三种方法来移除这样的动态性，final，private，全模块优化（Whole Module Optimization），以此提升性能。 考虑下面的例子： 123456789101">
 <meta name="twitter:image" content="http://oc54pu02q.bkt.clouddn.com/QQ20160825-0@2x.png">
 
 
@@ -530,7 +526,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">34</span>
+              <span class="site-state-item-count">35</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>

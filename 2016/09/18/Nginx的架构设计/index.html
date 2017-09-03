@@ -86,20 +86,19 @@
 
 
 
-<meta name="description" content="Nginx架构概述
-传统基于进程或线程的模型（Apache就采用这种模型）在处理并发连接时会为每一个连接建立一个单独的进程或线程，且在网络或者输入/输出操作时阻塞。这将导致内存和CPU的大量消耗，因为新起一个单独的进程或线程需要准备新的运行时环境，包括堆和栈内存的分配，以及新的执行上下文，当然，这些也会导致多余的CPU开销。最终，会由于过多的上下文切换而导致服务器性能变差。反过来，我们来看Ngin">
+<meta name="description" content="Nginx架构概述 传统基于进程或线程的模型（Apache就采用这种模型）在处理并发连接时会为每一个连接建立一个单独的进程或线程，且在网络或者输入/输出操作时阻塞。这将导致内存和CPU的大量消耗，因为新起一个单独的进程或线程需要准备新的运行时环境，包括堆和栈内存的分配，以及新的执行上下文，当然，这些也会导致多余的CPU开销。最终，会由于过多的上下文切换而导致服务器性能变差。反过来，我们来看Ngin">
+<meta name="keywords" content="Nginx,服务器">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Nginx的架构设计">
 <meta property="og:url" content="https://zhongwuzw.github.io/2016/09/18/Nginx的架构设计/index.html">
 <meta property="og:site_name" content="钟武的技术博客">
-<meta property="og:description" content="Nginx架构概述
-传统基于进程或线程的模型（Apache就采用这种模型）在处理并发连接时会为每一个连接建立一个单独的进程或线程，且在网络或者输入/输出操作时阻塞。这将导致内存和CPU的大量消耗，因为新起一个单独的进程或线程需要准备新的运行时环境，包括堆和栈内存的分配，以及新的执行上下文，当然，这些也会导致多余的CPU开销。最终，会由于过多的上下文切换而导致服务器性能变差。反过来，我们来看Ngin">
+<meta property="og:description" content="Nginx架构概述 传统基于进程或线程的模型（Apache就采用这种模型）在处理并发连接时会为每一个连接建立一个单独的进程或线程，且在网络或者输入/输出操作时阻塞。这将导致内存和CPU的大量消耗，因为新起一个单独的进程或线程需要准备新的运行时环境，包括堆和栈内存的分配，以及新的执行上下文，当然，这些也会导致多余的CPU开销。最终，会由于过多的上下文切换而导致服务器性能变差。反过来，我们来看Ngin">
+<meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/QQ20160918-0@2x.png">
 <meta property="og:updated_time" content="2016-09-19T09:30:48.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Nginx的架构设计">
-<meta name="twitter:description" content="Nginx架构概述
-传统基于进程或线程的模型（Apache就采用这种模型）在处理并发连接时会为每一个连接建立一个单独的进程或线程，且在网络或者输入/输出操作时阻塞。这将导致内存和CPU的大量消耗，因为新起一个单独的进程或线程需要准备新的运行时环境，包括堆和栈内存的分配，以及新的执行上下文，当然，这些也会导致多余的CPU开销。最终，会由于过多的上下文切换而导致服务器性能变差。反过来，我们来看Ngin">
+<meta name="twitter:description" content="Nginx架构概述 传统基于进程或线程的模型（Apache就采用这种模型）在处理并发连接时会为每一个连接建立一个单独的进程或线程，且在网络或者输入/输出操作时阻塞。这将导致内存和CPU的大量消耗，因为新起一个单独的进程或线程需要准备新的运行时环境，包括堆和栈内存的分配，以及新的执行上下文，当然，这些也会导致多余的CPU开销。最终，会由于过多的上下文切换而导致服务器性能变差。反过来，我们来看Ngin">
 <meta name="twitter:image" content="http://oc54pu02q.bkt.clouddn.com/QQ20160918-0@2x.png">
 
 
@@ -516,7 +515,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">34</span>
+              <span class="site-state-item-count">35</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>

@@ -86,20 +86,19 @@
 
 
 
-<meta name="description" content="前言
-iOS中，我们经常使用GCD来进行并发操作，我们并不需要关心线程的管理，Dispatch Queue会自动帮我们处理线程的创建和释放，在极大的简化并发操作的同时，某些情况下，Dispatch Queue的滥用可能会导致应用挂起，如向并发队列中添加阻塞的Block，阻塞的Block会导致系统创建更多的线程来处理任务，而GCD线程池的最大线程数为64个，所以一旦达到最大值，应用将挂起。接下来，我">
+<meta name="description" content="前言 iOS中，我们经常使用GCD来进行并发操作，我们并不需要关心线程的管理，Dispatch Queue会自动帮我们处理线程的创建和释放，在极大的简化并发操作的同时，某些情况下，Dispatch Queue的滥用可能会导致应用挂起，如向并发队列中添加阻塞的Block，阻塞的Block会导致系统创建更多的线程来处理任务，而GCD线程池的最大线程数为64个，所以一旦达到最大值，应用将挂起。接下来，我">
+<meta name="keywords" content="iOS,Objective-C,GCD">
 <meta property="og:type" content="article">
 <meta property="og:title" content="GCD队列管理之YYDispatchQueuePool">
 <meta property="og:url" content="https://zhongwuzw.github.io/2017/06/05/GCD队列管理之YYDispatchQueuePool/index.html">
 <meta property="og:site_name" content="钟武的技术博客">
-<meta property="og:description" content="前言
-iOS中，我们经常使用GCD来进行并发操作，我们并不需要关心线程的管理，Dispatch Queue会自动帮我们处理线程的创建和释放，在极大的简化并发操作的同时，某些情况下，Dispatch Queue的滥用可能会导致应用挂起，如向并发队列中添加阻塞的Block，阻塞的Block会导致系统创建更多的线程来处理任务，而GCD线程池的最大线程数为64个，所以一旦达到最大值，应用将挂起。接下来，我">
+<meta property="og:description" content="前言 iOS中，我们经常使用GCD来进行并发操作，我们并不需要关心线程的管理，Dispatch Queue会自动帮我们处理线程的创建和释放，在极大的简化并发操作的同时，某些情况下，Dispatch Queue的滥用可能会导致应用挂起，如向并发队列中添加阻塞的Block，阻塞的Block会导致系统创建更多的线程来处理任务，而GCD线程池的最大线程数为64个，所以一旦达到最大值，应用将挂起。接下来，我">
+<meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-06-05%20%E4%B8%8B%E5%8D%8811.28.12.png">
 <meta property="og:updated_time" content="2017-06-06T01:26:58.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="GCD队列管理之YYDispatchQueuePool">
-<meta name="twitter:description" content="前言
-iOS中，我们经常使用GCD来进行并发操作，我们并不需要关心线程的管理，Dispatch Queue会自动帮我们处理线程的创建和释放，在极大的简化并发操作的同时，某些情况下，Dispatch Queue的滥用可能会导致应用挂起，如向并发队列中添加阻塞的Block，阻塞的Block会导致系统创建更多的线程来处理任务，而GCD线程池的最大线程数为64个，所以一旦达到最大值，应用将挂起。接下来，我">
+<meta name="twitter:description" content="前言 iOS中，我们经常使用GCD来进行并发操作，我们并不需要关心线程的管理，Dispatch Queue会自动帮我们处理线程的创建和释放，在极大的简化并发操作的同时，某些情况下，Dispatch Queue的滥用可能会导致应用挂起，如向并发队列中添加阻塞的Block，阻塞的Block会导致系统创建更多的线程来处理任务，而GCD线程池的最大线程数为64个，所以一旦达到最大值，应用将挂起。接下来，我">
 <meta name="twitter:image" content="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-06-05%20%E4%B8%8B%E5%8D%8811.28.12.png">
 
 
@@ -515,7 +514,7 @@ iOS中，我们经常使用GCD来进行并发操作，我们并不需要关心�
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">34</span>
+              <span class="site-state-item-count">35</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>

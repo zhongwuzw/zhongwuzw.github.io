@@ -86,31 +86,18 @@
 
 
 
-<meta name="description" content="由于不同的Swift版本引用计数实现会有不同，该文讨论的引用计数原理都基于Swift3
-
-弱引用
-做iOS开发时经常会遇到循环引用，如果处理不当会导致内存泄露，我们通常会使用weak reference弱引用来解决该问题，因为弱引用不会retain对象，当对象引用计数变为0时，弱引用指针将会被赋nil。
-实现过程
-通常如果实现弱引用，可以让每一个对象维护所有指向该对象的一个弱引用列表，当一个弱引">
+<meta name="description" content="由于不同的Swift版本引用计数实现会有不同，该文讨论的引用计数原理都基于Swift3  弱引用 做iOS开发时经常会遇到循环引用，如果处理不当会导致内存泄露，我们通常会使用weak reference弱引用来解决该问题，因为弱引用不会retain对象，当对象引用计数变为0时，弱引用指针将会被赋nil。 实现过程 通常如果实现弱引用，可以让每一个对象维护所有指向该对象的一个弱引用列表，当一个弱引">
+<meta name="keywords" content="iOS,Swift">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Swift3之Weak引用">
 <meta property="og:url" content="https://zhongwuzw.github.io/2017/06/17/Swift之Weak引用/index.html">
 <meta property="og:site_name" content="钟武的技术博客">
-<meta property="og:description" content="由于不同的Swift版本引用计数实现会有不同，该文讨论的引用计数原理都基于Swift3
-
-弱引用
-做iOS开发时经常会遇到循环引用，如果处理不当会导致内存泄露，我们通常会使用weak reference弱引用来解决该问题，因为弱引用不会retain对象，当对象引用计数变为0时，弱引用指针将会被赋nil。
-实现过程
-通常如果实现弱引用，可以让每一个对象维护所有指向该对象的一个弱引用列表，当一个弱引">
+<meta property="og:description" content="由于不同的Swift版本引用计数实现会有不同，该文讨论的引用计数原理都基于Swift3  弱引用 做iOS开发时经常会遇到循环引用，如果处理不当会导致内存泄露，我们通常会使用weak reference弱引用来解决该问题，因为弱引用不会retain对象，当对象引用计数变为0时，弱引用指针将会被赋nil。 实现过程 通常如果实现弱引用，可以让每一个对象维护所有指向该对象的一个弱引用列表，当一个弱引">
+<meta property="og:locale" content="zh-Hans">
 <meta property="og:updated_time" content="2017-06-19T16:06:19.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Swift3之Weak引用">
-<meta name="twitter:description" content="由于不同的Swift版本引用计数实现会有不同，该文讨论的引用计数原理都基于Swift3
-
-弱引用
-做iOS开发时经常会遇到循环引用，如果处理不当会导致内存泄露，我们通常会使用weak reference弱引用来解决该问题，因为弱引用不会retain对象，当对象引用计数变为0时，弱引用指针将会被赋nil。
-实现过程
-通常如果实现弱引用，可以让每一个对象维护所有指向该对象的一个弱引用列表，当一个弱引">
+<meta name="twitter:description" content="由于不同的Swift版本引用计数实现会有不同，该文讨论的引用计数原理都基于Swift3  弱引用 做iOS开发时经常会遇到循环引用，如果处理不当会导致内存泄露，我们通常会使用weak reference弱引用来解决该问题，因为弱引用不会retain对象，当对象引用计数变为0时，弱引用指针将会被赋nil。 实现过程 通常如果实现弱引用，可以让每一个对象维护所有指向该对象的一个弱引用列表，当一个弱引">
 
 
 
@@ -622,7 +609,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">34</span>
+              <span class="site-state-item-count">35</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>

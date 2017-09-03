@@ -86,27 +86,20 @@
 
 
 
-<meta name="description" content="源码分析
-Alamofire是对URLSession的封装，针对普通请求，上传、下载等操作，提供对应的Request，其对象关系如下：
- 
-每一个Request关联一个TaskDelegate，TaskDelegate用来处理URLSessionTask使用过程中的网络回调，TaskDelegate有一个queue成员，用来执行task完成后的回调处理，completionHandler默认会在主">
+<meta name="description" content="源码分析 Alamofire是对URLSession的封装，针对普通请求，上传、下载等操作，提供对应的Request，其对象关系如下：   每一个Request关联一个TaskDelegate，TaskDelegate用来处理URLSessionTask使用过程中的网络回调，TaskDelegate有一个queue成员，用来执行task完成后的回调处理，completionHandler默认会在主">
+<meta name="keywords" content="iOS,源码分析,Alamofire">
 <meta property="og:type" content="article">
 <meta property="og:title" content="源码分析之Alamofire">
 <meta property="og:url" content="https://zhongwuzw.github.io/2016/12/14/源码分析之Alamofire/index.html">
 <meta property="og:site_name" content="钟武的技术博客">
-<meta property="og:description" content="源码分析
-Alamofire是对URLSession的封装，针对普通请求，上传、下载等操作，提供对应的Request，其对象关系如下：
- 
-每一个Request关联一个TaskDelegate，TaskDelegate用来处理URLSessionTask使用过程中的网络回调，TaskDelegate有一个queue成员，用来执行task完成后的回调处理，completionHandler默认会在主">
+<meta property="og:description" content="源码分析 Alamofire是对URLSession的封装，针对普通请求，上传、下载等操作，提供对应的Request，其对象关系如下：   每一个Request关联一个TaskDelegate，TaskDelegate用来处理URLSessionTask使用过程中的网络回调，TaskDelegate有一个queue成员，用来执行task完成后的回调处理，completionHandler默认会在主">
+<meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/25E6C99A-FDF4-4314-A41A-03E746BBA401.png">
 <meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/05A842ED-9D20-47AA-8609-282B95A36E7B.png">
 <meta property="og:updated_time" content="2016-12-19T09:38:31.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="源码分析之Alamofire">
-<meta name="twitter:description" content="源码分析
-Alamofire是对URLSession的封装，针对普通请求，上传、下载等操作，提供对应的Request，其对象关系如下：
- 
-每一个Request关联一个TaskDelegate，TaskDelegate用来处理URLSessionTask使用过程中的网络回调，TaskDelegate有一个queue成员，用来执行task完成后的回调处理，completionHandler默认会在主">
+<meta name="twitter:description" content="源码分析 Alamofire是对URLSession的封装，针对普通请求，上传、下载等操作，提供对应的Request，其对象关系如下：   每一个Request关联一个TaskDelegate，TaskDelegate用来处理URLSessionTask使用过程中的网络回调，TaskDelegate有一个queue成员，用来执行task完成后的回调处理，completionHandler默认会在主">
 <meta name="twitter:image" content="http://oc54pu02q.bkt.clouddn.com/25E6C99A-FDF4-4314-A41A-03E746BBA401.png">
 
 
@@ -510,7 +503,7 @@ Alamofire是对URLSession的封装，针对普通请求，上传、下载等操�
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">34</span>
+              <span class="site-state-item-count">35</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>

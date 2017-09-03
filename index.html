@@ -92,6 +92,7 @@
 <meta property="og:url" content="https://zhongwuzw.github.io/index.html">
 <meta property="og:site_name" content="钟武的技术博客">
 <meta property="og:description" content="Keep thinking, keep coding!!!">
+<meta property="og:locale" content="zh-Hans">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="钟武的技术博客">
 <meta name="twitter:description" content="Keep thinking, keep coding!!!">
@@ -288,6 +289,144 @@
             
               
                 
+                <a class="post-title-link" href="/2017/09/01/实现Swift的Array/" itemprop="url">
+                  实现Swift的Array
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-09-01T10:16:46+08:00" content="2017-09-01">
+              2017-09-01
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/iOS开发-语言/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发-语言</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/09/01/实现Swift的Array/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/09/01/实现Swift的Array/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>当我们从<code>Obj-C</code>转到<code>Swift</code>时，会发现<code>Swift</code>提供的数据结构大量使用值语义，如<code>Array</code>、<code>Dictionary</code>等，今天，我们将实现<code>Array</code>的基本功能，来理解值语义以及写时复制。</p>
+<h2 id="值和引用语义"><a href="#值和引用语义" class="headerlink" title="值和引用语义"></a>值和引用语义</h2><hr>
+<p>在实现之前，我们来简单讨论一下值语义和引用语义的区别。当我们使用<code>Obj-C</code>及大多数其他面向对象语言开发时，经常会使用对象指针或引用，而这就是常说的引用语义，我们可以赋值一个对象实例的引用给一个变量：</p>
+<p><code>MyClass *a = ...;</code></p>
+<p>接着，可以将该变量赋值给另一个变量：</p>
+<p><code>MyClass *b = a;</code></p>
+<p>此时，<code>a</code>和<code>b</code>将指向同一个对象，如果指向的对象是可变的，当我们修改对象的内容时，两者对其都可见。</p>
+<p>值语义相对比较简单，我们使用的如<code>int</code>、<code>struct</code>等都是值语义，声明为值语义的变量，其直接指向真正的值，而不是值的指针。所以当我们进行赋值时，将得到值的拷贝，如：</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">int a = <span class="number">42</span><span class="comment">;</span></div><div class="line">int <span class="keyword">b </span>= a<span class="comment">;</span></div><div class="line"><span class="keyword">b++;</span></div></pre></td></tr></table></figure>
+<p>此时，<code>b</code>的值为<code>43</code>，而<code>a</code>依然为<code>42</code>。</p>
+<p>在<code>Swift</code>中，<code>class</code>类型仍然是引用语义，<code>struct</code>则为值语义，所以，如果对<code>class</code>类型进行赋值时，将得到一个指向同一个实例的引用，对实例对象内容的修改将对所有的引用可见；使用<code>struct</code>时，则不会，每个变量之间都是独立的。</p>
+<p>对于使用过<code>Obj-C</code>开发过的人来说，转到<code>Swift</code>使用其提供的数组和字典时，可能会不习惯，因为<code>Swift</code>中两者已经变成了值语义，如：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="selector-tag">var</span> <span class="selector-tag">a</span> = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</div><div class="line"><span class="selector-tag">var</span> <span class="selector-tag">b</span> = <span class="selector-tag">a</span></div><div class="line"><span class="selector-tag">b</span>.append(<span class="number">4</span>)</div></pre></td></tr></table></figure>
+<p>对于大多数语言，如上代码的结果一般都是<code>a</code>和<code>b</code>都指向同一个数组<code>[1, 2, 3, 4]</code>。而在<code>Swift</code>中，<code>a</code>指向<code>[1, 2, 3]</code>，<code>b</code>则指向<code>[1, 2, 3, 4]</code>。</p>
+<h2 id="实现值语义"><a href="#实现值语义" class="headerlink" title="实现值语义"></a>实现值语义</h2><hr>
+<p>如果对象包含固定数量的数据，那么实现就比较简单：我们直接将数据放到<code>struct</code>中即可。比如想要一个2D <code>Point</code>类型且满足值语义，可以创建一个<code>struct</code>包含<code>x``y</code>的值：</p>
+<figure class="highlight excel"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">struct Point &#123;</div><div class="line">    <span class="built_in">var</span> <span class="symbol">x:</span> <span class="built_in">Int</span></div><div class="line">    <span class="built_in">var</span> <span class="symbol">y:</span> <span class="built_in">Int</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2017/09/01/实现Swift的Array/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2017/07/27/RxSwift之sentMessage、methodInvoked失效问题解决/" itemprop="url">
                   RxSwift之sentMessage、methodInvoked失效问题解决
                 </a>
@@ -358,10 +497,10 @@
       
         
           <h2 id="RxSwift的sentMessage、methodInvoked方法"><a href="#RxSwift的sentMessage、methodInvoked方法" class="headerlink" title="RxSwift的sentMessage、methodInvoked方法"></a>RxSwift的<code>sentMessage</code>、<code>methodInvoked</code>方法</h2><hr>
-<p><a href="https://github.com/ReactiveX/RxSwift">RxSwift</a>是<a href="https://github.com/Reactive-Extensions/Rx.NET">Rx</a>的<code>Swift</code>版本，用来实现函数式、响应式编程。</p>
+<p><a href="https://github.com/ReactiveX/RxSwift" target="_blank" rel="external">RxSwift</a>是<a href="https://github.com/Reactive-Extensions/Rx.NET" target="_blank" rel="external">Rx</a>的<code>Swift</code>版本，用来实现函数式、响应式编程。</p>
 <p>具体<code>RxSwift</code>的很多用法不做介绍，接下来，只讨论<code>sentMessage</code>、<code>methodInvoked</code>这两个方法，其作用是返回一个<code>Observable&lt;[Any]</code>，可以作为观察者监控<code>NSObject</code>子类的某个<code>selector</code>，当执行该<code>selector</code>时，将在执行前、后分别执行注册了该<code>selector</code>的<code>sentMessage</code>、<code>methodInvoked</code>方法。</p>
 <h2 id="sentMessage、methodInvoked实现原理"><a href="#sentMessage、methodInvoked实现原理" class="headerlink" title="sentMessage、methodInvoked实现原理"></a><code>sentMessage</code>、<code>methodInvoked</code>实现原理</h2><hr>
-<p><code>sentMessage</code>、<code>methodInvoked</code>只针对某个实例起作用，其实现首先借鉴了<code>KVO</code>的实现方法，通过创建监听的对象的子类，然后重写方法的实现来实现。<code>sentMessage</code>、<code>methodInvoked</code>实现分两个版本，基础版、优化版。基础版通过<code>Swizzle``forwardInvocation:</code>、<code>respondsToSelector:</code>、<code>methodSignatureForSelector:</code>等函数，将所有需要观察的<code>selector</code>调用时进入<code>forwardInvocation:</code>流程，从而进行拦截，以实现通知；优化版则在基础班的基础上通过<code>Type Encoding</code>来做一个缓存优化，避免每次调用都进入转发的过程。</p>
+<p><code>sentMessage</code>、<code>methodInvoked</code>只针对某个实例起作用，其实现首先借鉴了<code>KVO</code>的实现方法，通过创建监听的对象的子类，然后重写方法的实现来实现。<code>sentMessage</code>、<code>methodInvoked</code>实现分两个版本，基础版、优化版。基础版通过<code>Swizzle</code> <code>forwardInvocation:</code>、<code>respondsToSelector:</code>、<code>methodSignatureForSelector:</code>等函数，将所有需要观察的<code>selector</code>调用时进入<code>forwardInvocation:</code>流程，从而进行拦截，以实现通知；优化版则在基础班的基础上通过<code>Type Encoding</code>来做一个缓存优化，避免每次调用都进入转发的过程。</p>
           <div class="post-more-link text-center">
             <a class="btn" href="/2017/07/27/RxSwift之sentMessage、methodInvoked失效问题解决/#more" rel="contents">
               阅读全文 &raquo;
@@ -618,7 +757,7 @@
           <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><hr>
 <p><code>iOS</code>中，我们经常使用<code>GCD</code>来进行并发操作，我们并不需要关心线程的管理，<code>Dispatch Queue</code>会自动帮我们处理线程的创建和释放，在极大的简化并发操作的同时，某些情况下，<code>Dispatch Queue</code>的滥用可能会导致应用挂起，如向并发队列中添加阻塞的<code>Block</code>，阻塞的<code>Block</code>会导致系统创建更多的线程来处理任务，而<code>GCD</code>线程池的最大线程数为64个，所以一旦达到最大值，应用将挂起。<br>接下来，我将列出一些解决方案，来更好的使用<code>Dispatch Queue</code>。</p>
 <h2 id="YYDispatchQueue"><a href="#YYDispatchQueue" class="headerlink" title="YYDispatchQueue"></a>YYDispatchQueue</h2><hr>
-<p><a href="https://github.com/ibireme/YYDispatchQueuePool">YYDispatchQueue</a>的主要思想是使用串行队列来替换并发队列，可以为指定的<code>NSQualityOfService</code>创建一个队列池，由<code>YYDispatchQueuePool</code>对象来进行管理，每一种<code>NSQualityOfService</code>最多可以创建32个串行队列，通过<code>- (dispatch_queue_t)queue;</code>方法来获取可用队列，其采用<code>Round Robin</code>轮询算法。</p>
+<p><a href="https://github.com/ibireme/YYDispatchQueuePool" target="_blank" rel="external">YYDispatchQueue</a>的主要思想是使用串行队列来替换并发队列，可以为指定的<code>NSQualityOfService</code>创建一个队列池，由<code>YYDispatchQueuePool</code>对象来进行管理，每一种<code>NSQualityOfService</code>最多可以创建32个串行队列，通过<code>- (dispatch_queue_t)queue;</code>方法来获取可用队列，其采用<code>Round Robin</code>轮询算法。</p>
 <p><img src="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-06-05%20%E4%B8%8B%E5%8D%8811.28.12.png" alt=""></p>
 <p>除了可以创建队列池来管理并发外，还可以通过<code>C</code>的全局函数（<code>dispatch_queue_t YYDispatchQueueGetForQOS(NSQualityOfService qos)</code>）来获取特定的<code>NSQualityOfService</code>串行队列，队列由全局的队列池来管理，每一种<code>NSQualityOfService</code>的串行队列数与核数相同，这样可以尽可能的减少线程之间的上下文切换。</p>
           <div class="post-more-link text-center">
@@ -742,8 +881,7 @@
 
       
         
-          
-            <p>一款用于网页浏览的APP（Web Browser For iOS)。<a href="https://github.com/zhongwuzw/WebBrowser" target="_blank" rel="external">Github地址</a></p>
+          <p>一款用于网页浏览的APP（Web Browser For iOS)。<a href="https://github.com/zhongwuzw/WebBrowser" target="_blank" rel="external">Github地址</a></p>
 <h2 id="Features-功能"><a href="#Features-功能" class="headerlink" title="Features - 功能"></a>Features - 功能</h2><ol>
 <li>多Tab页浏览(multi-tab browsing)</li>
 <li>冷启动恢复浏览记录，包括当前页及前进后退页面(session restore, includes current page and backforward list)</li>
@@ -765,182 +903,9 @@
 <h2 id="Demo"><a href="#Demo" class="headerlink" title="Demo"></a>Demo</h2><h4 id="1-Home-Page-主页-："><a href="#1-Home-Page-主页-：" class="headerlink" title="1. Home Page (主页)："></a>1. Home Page (主页)：</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/home_scroll.gif" alt="home page"><br></p>
 
 
-<h4 id="2-Multi-tab-多窗口-："><a href="#2-Multi-tab-多窗口-：" class="headerlink" title="2. Multi-tab (多窗口)："></a>2. Multi-tab (多窗口)：</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/home_tab_switch.gif" alt="tab"><br></p>
-
-<p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/tab_manage.gif" alt="tab"><br></p>
-
-<h4 id="3-Search-搜索-："><a href="#3-Search-搜索-：" class="headerlink" title="3. Search (搜索)："></a>3. Search (搜索)：</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/home_search.gif" alt="search"><br></p>
-
-<h4 id="4-No-Image-Mode-无图模式"><a href="#4-No-Image-Mode-无图模式" class="headerlink" title="4. No Image Mode (无图模式)"></a>4. No Image Mode (无图模式)</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/no-image-mode.gif" alt="no image mode"><br></p>
-
-<h4 id="5-History-历史"><a href="#5-History-历史" class="headerlink" title="5. History (历史)"></a>5. History (历史)</h4><ol>
-<li>Long Press to select options. (长按记录可弹出选项按钮)</li>
-<li>Tap to open history in current window.(点击记录会在当前窗口打开历史页面)<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/history.gif" alt="history"><br></p>
-
-</li>
-</ol>
-<h4 id="6-Favorite-收藏"><a href="#6-Favorite-收藏" class="headerlink" title="6. Favorite (收藏)"></a>6. Favorite (收藏)</h4><h5 id="In-non-editing-mode-在非编辑模式下操作"><a href="#In-non-editing-mode-在非编辑模式下操作" class="headerlink" title="In non-editing mode (在非编辑模式下操作)"></a>In non-editing mode (在非编辑模式下操作)</h5><ol>
-<li><p>Long press on directory to edit directory name in non-editing mode.(长按目录来编辑目录名字)</p>
-<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_edit_long_section.gif" alt="favorite"><br></p>
-</li>
-<li><p>Long press on bookmark item to edit bookmark’s url, name, directory in non-editing mode.(长按书签项来编辑书签的地址、名字、以及所在目录)</p>
-<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_long_edit_item.gif" alt="favorite"><br></p>
-
-</li>
-</ol>
-<h5 id="In-editing-mode-在编辑模式下"><a href="#In-editing-mode-在编辑模式下" class="headerlink" title="In editing mode (在编辑模式下)"></a>In editing mode (在编辑模式下)</h5><ol>
-<li><p>reorder, delete directory in editing mode.(删除、排序目录)</p>
-<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_edit_section.gif" alt="favorite"><br></p>
-</li>
-<li><p>click “新文件夹” button to add new directory in editing mode.(点击”新文件夹”按钮来创建新的目录)</p>
-<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_add_section.gif" alt="favorite"><br></p>
-</li>
-<li><p>reorder, delete bookmark in editing mode.(删除、排序书签)</p>
-<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_edit_item.gif" alt="favorite"><br></p>
-</li>
-<li><p>add new bookmark.(添加新书签)</p>
-<p align="center"><br><img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/bookmark_add.gif" alt="favorite"><br></p>
-
-</li>
-</ol>
-<h4 id="7-find-in-page-页内查找"><a href="#7-find-in-page-页内查找" class="headerlink" title="7. find in page (页内查找)"></a>7. find in page (页内查找)</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/findinpage.gif" alt="find in page"><br></p>
-
-<h2 id="License"><a href="#License" class="headerlink" title="License"></a>License</h2><p>The MIT License (MIT)</p>
-<p>Copyright (c) 2017 Zhong Wu</p>
-<p>Permission is hereby granted, free of charge, to any person obtaining a copy<br>of this software and associated documentation files (the “Software”), to deal<br>in the Software without restriction, including without limitation the rights<br>to use, copy, modify, merge, publish, distribute, sublicense, and/or sell<br>copies of the Software, and to permit persons to whom the Software is<br>furnished to do so, subject to the following conditions:</p>
-<p>The above copyright notice and this permission notice shall be included in all<br>copies or substantial portions of the Software.</p>
-<p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR<br>IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,<br>FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE<br>AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER<br>LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,<br>OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE<br>SOFTWARE.</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/05/01/WWDC-Session406-优化App启动时间/" itemprop="url">
-                  WWDC-Session406-优化App启动时间
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-05-01T23:46:05+08:00" content="2017-05-01">
-              2017-05-01
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/iOS开发-项目/" itemprop="url" rel="index">
-                    <span itemprop="name">iOS开发-项目</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2017/05/01/WWDC-Session406-优化App启动时间/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/05/01/WWDC-Session406-优化App启动时间/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="理论"><a href="#理论" class="headerlink" title="理论"></a>理论</h2><hr>
-<h3 id="Mach-O"><a href="#Mach-O" class="headerlink" title="Mach-O"></a>Mach-O</h3><h4 id="Mach-O相关术语"><a href="#Mach-O相关术语" class="headerlink" title="Mach-O相关术语"></a>Mach-O相关术语</h4><p><code>Mach-O</code>为<code>Mach Object</code>文件格式的缩写，它是一种用于可执行文件，目标代码，动态库，内核转储的文件格式。它包括多种文件类型：</p>
-<ul>
-<li><code>Executable</code>(可执行文件)：App的主二进制文件</li>
-<li><code>Dylib</code>：动态库（如<code>DSO</code>、<code>DLL</code>)</li>
-<li><code>Bundle</code>：不能被链接的动态库，只能通过<code>dlopen()</code>，用于<code>Mac OS</code>。</li>
-</ul>
-<p><code>Image</code>：可以是可执行文件、动态库或者<code>bundle</code>。<br><code>Framework</code>：动态库，包含资源和头文件。</p>
-<h4 id="Mach-O-Image文件"><a href="#Mach-O-Image文件" class="headerlink" title="Mach-O Image文件"></a>Mach-O Image文件</h4><p>文件由多个<code>segment</code>(<code>段</code>)组成，每一个<code>段</code>由多个<code>page</code>(<code>页</code>)组成，<code>段</code>的大小为<code>页</code>大小的整数倍。如下图，<code>TEXT段</code>占3<code>页</code>，<code>DATA</code>、<code>LINKEDIT</code>分别占1<code>页</code>。<code>页</code>的大小取决于硬件，在<code>arm64</code>下，<code>页</code>大小为16K，其它则为4K。<br><img src="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-02%20%E4%B8%8B%E5%8D%8810.24.03.png" alt=""></p>
-<p>我们还可以从<code>section</code>(节)的角度来理解<code>段</code>,编译器对<code>section</code>是透明的，<code>section</code>仅仅是一个<code>段</code>的子区间，它没有任何的大小约束，但是<code>section</code>之间不会重叠。<br><img src="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-02%20%E4%B8%8B%E5%8D%8810.41.36.png" alt=""></p>
-<p>事实上，每一个二进制文件都包含<code>TEXT</code>、<code>DATA</code>、<code>LINKEDIT</code>这3个通用的<code>段</code>，<code>TEXT</code>位于文件的开始，它包括<code>Mach header</code>，机器指令，代码以及只读常量如C字符串，<code>DATA段</code>是可读写的，其包括所有的全局变量，静态变量等。<code>LINKEDIT</code>包含加载程序的<code>meta data</code>(元数据)。</p>
+<h4 id="2-Multi-tab-多窗口-："><a href="#2-Multi-tab-多窗口-：" class="headerlink" title="2. Multi-tab (多窗口)："></a>2. Multi-tab (多窗口)：</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/home_tab_switch.gif" alt="tab"><br></p><br>
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/05/01/WWDC-Session406-优化App启动时间/#more" rel="contents">
+            <a class="btn" href="/2017/05/26/iOS浏览器-WebBrowser/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1015,7 +980,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">34</span>
+              <span class="site-state-item-count">35</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>

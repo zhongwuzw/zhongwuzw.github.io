@@ -86,16 +86,14 @@
 
 
 
-<meta name="description" content="iOS中，Hit-Testing主要用于决定哪个视图来首先处理Touch事件，确定完后，就会依据响应者链来进行事件的处理。接下来，我们将分析Hit-Testing的工作流程。
-
-由于不确定的原因，Hit-Testing测试会被执行多次，导致单个视图的-(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event方法会被调用多次，由于是幂等">
+<meta name="description" content="iOS中，Hit-Testing主要用于决定哪个视图来首先处理Touch事件，确定完后，就会依据响应者链来进行事件的处理。接下来，我们将分析Hit-Testing的工作流程。  由于不确定的原因，Hit-Testing测试会被执行多次，导致单个视图的-(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event方法会被调用多次，由于是幂等">
+<meta name="keywords" content="iOS开发-UI">
 <meta property="og:type" content="article">
 <meta property="og:title" content="iOS事件处理之Hit-Testing">
 <meta property="og:url" content="https://zhongwuzw.github.io/2016/09/12/iOS事件处理之Hit-Testing/index.html">
 <meta property="og:site_name" content="钟武的技术博客">
-<meta property="og:description" content="iOS中，Hit-Testing主要用于决定哪个视图来首先处理Touch事件，确定完后，就会依据响应者链来进行事件的处理。接下来，我们将分析Hit-Testing的工作流程。
-
-由于不确定的原因，Hit-Testing测试会被执行多次，导致单个视图的-(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event方法会被调用多次，由于是幂等">
+<meta property="og:description" content="iOS中，Hit-Testing主要用于决定哪个视图来首先处理Touch事件，确定完后，就会依据响应者链来进行事件的处理。接下来，我们将分析Hit-Testing的工作流程。  由于不确定的原因，Hit-Testing测试会被执行多次，导致单个视图的-(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event方法会被调用多次，由于是幂等">
+<meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/hit-test-view-hierarchy.png">
 <meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/hit-test-depth-first-traversal.png">
 <meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/hit-test-flowchart.png">
@@ -104,9 +102,7 @@
 <meta property="og:updated_time" content="2016-09-19T09:28:16.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS事件处理之Hit-Testing">
-<meta name="twitter:description" content="iOS中，Hit-Testing主要用于决定哪个视图来首先处理Touch事件，确定完后，就会依据响应者链来进行事件的处理。接下来，我们将分析Hit-Testing的工作流程。
-
-由于不确定的原因，Hit-Testing测试会被执行多次，导致单个视图的-(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event方法会被调用多次，由于是幂等">
+<meta name="twitter:description" content="iOS中，Hit-Testing主要用于决定哪个视图来首先处理Touch事件，确定完后，就会依据响应者链来进行事件的处理。接下来，我们将分析Hit-Testing的工作流程。  由于不确定的原因，Hit-Testing测试会被执行多次，导致单个视图的-(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event方法会被调用多次，由于是幂等">
 <meta name="twitter:image" content="http://oc54pu02q.bkt.clouddn.com/hit-test-view-hierarchy.png">
 
 
@@ -528,7 +524,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">34</span>
+              <span class="site-state-item-count">35</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>

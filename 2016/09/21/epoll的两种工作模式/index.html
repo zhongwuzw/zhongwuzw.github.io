@@ -86,25 +86,18 @@
 
 
 
-<meta name="description" content="前言
-epoll是Linux下的一个多路复用API，当处理大并发的事件时，其性能远强于古老的poll和select。epoll可以工作在两种模式下，LT（水平触发）、ET（边缘触发），接下来将讨论这两种模式的区别。
-ET（边缘触发）和LT（水平触发）
-默认情况下，epoll采用LT模式工作，该模式支持阻塞和非阻塞套接字，如果想采用ET模式，可以使用EPOLLET参数。ET模式只支持非阻塞套接字，其">
+<meta name="description" content="前言 epoll是Linux下的一个多路复用API，当处理大并发的事件时，其性能远强于古老的poll和select。epoll可以工作在两种模式下，LT（水平触发）、ET（边缘触发），接下来将讨论这两种模式的区别。 ET（边缘触发）和LT（水平触发） 默认情况下，epoll采用LT模式工作，该模式支持阻塞和非阻塞套接字，如果想采用ET模式，可以使用EPOLLET参数。ET模式只支持非阻塞套接字，其">
+<meta name="keywords" content="epoll">
 <meta property="og:type" content="article">
 <meta property="og:title" content="epoll的两种工作模式">
 <meta property="og:url" content="https://zhongwuzw.github.io/2016/09/21/epoll的两种工作模式/index.html">
 <meta property="og:site_name" content="钟武的技术博客">
-<meta property="og:description" content="前言
-epoll是Linux下的一个多路复用API，当处理大并发的事件时，其性能远强于古老的poll和select。epoll可以工作在两种模式下，LT（水平触发）、ET（边缘触发），接下来将讨论这两种模式的区别。
-ET（边缘触发）和LT（水平触发）
-默认情况下，epoll采用LT模式工作，该模式支持阻塞和非阻塞套接字，如果想采用ET模式，可以使用EPOLLET参数。ET模式只支持非阻塞套接字，其">
+<meta property="og:description" content="前言 epoll是Linux下的一个多路复用API，当处理大并发的事件时，其性能远强于古老的poll和select。epoll可以工作在两种模式下，LT（水平触发）、ET（边缘触发），接下来将讨论这两种模式的区别。 ET（边缘触发）和LT（水平触发） 默认情况下，epoll采用LT模式工作，该模式支持阻塞和非阻塞套接字，如果想采用ET模式，可以使用EPOLLET参数。ET模式只支持非阻塞套接字，其">
+<meta property="og:locale" content="zh-Hans">
 <meta property="og:updated_time" content="2016-09-21T10:38:50.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="epoll的两种工作模式">
-<meta name="twitter:description" content="前言
-epoll是Linux下的一个多路复用API，当处理大并发的事件时，其性能远强于古老的poll和select。epoll可以工作在两种模式下，LT（水平触发）、ET（边缘触发），接下来将讨论这两种模式的区别。
-ET（边缘触发）和LT（水平触发）
-默认情况下，epoll采用LT模式工作，该模式支持阻塞和非阻塞套接字，如果想采用ET模式，可以使用EPOLLET参数。ET模式只支持非阻塞套接字，其">
+<meta name="twitter:description" content="前言 epoll是Linux下的一个多路复用API，当处理大并发的事件时，其性能远强于古老的poll和select。epoll可以工作在两种模式下，LT（水平触发）、ET（边缘触发），接下来将讨论这两种模式的区别。 ET（边缘触发）和LT（水平触发） 默认情况下，epoll采用LT模式工作，该模式支持阻塞和非阻塞套接字，如果想采用ET模式，可以使用EPOLLET参数。ET模式只支持非阻塞套接字，其">
 
 
 
@@ -499,7 +492,7 @@ ET（边缘触发）和LT（水平触发）
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">34</span>
+              <span class="site-state-item-count">35</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
