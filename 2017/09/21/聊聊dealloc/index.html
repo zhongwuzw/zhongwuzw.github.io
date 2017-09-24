@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="iOS,Objective-C,项目开发,知乎日报," />
+  <meta name="keywords" content="iOS," />
 
 
 
@@ -86,26 +86,18 @@
 
 
 
-<meta name="description" content="Disclaimer - 声明Zhihu is a trademark of Zhihu. Inc. This app is not created nor endorsed by Zhihu Inc. All the information and content accessible through Zhihu Daily Purify are subject to Zhihu’s copyr">
-<meta name="keywords" content="iOS,Objective-C,项目开发,知乎日报">
+<meta name="description" content="前言 在iOS开发中，我们经常会通过dealloc来判断对象实例是否被释放，依据是当对象实例的引用计数变为0时，运行时会调用对象实例的dealloc方法，我们可以利用该方法做一些扫尾的工作。 dealloc调用时机 直接上代码，如下sidetable_release函数会在给对象发送release消息的时候调用，sidetable_release方法首先获取对象的引用计数，对引用计数相关标志位做操">
+<meta name="keywords" content="iOS">
 <meta property="og:type" content="article">
-<meta property="og:title" content="知乎日报iOS">
-<meta property="og:url" content="https://zhongwuzw.github.io/2016/08/18/知乎日报iOS/index.html">
+<meta property="og:title" content="聊聊dealloc">
+<meta property="og:url" content="https://zhongwuzw.github.io/2017/09/21/聊聊dealloc/index.html">
 <meta property="og:site_name" content="钟武的技术博客">
-<meta property="og:description" content="Disclaimer - 声明Zhihu is a trademark of Zhihu. Inc. This app is not created nor endorsed by Zhihu Inc. All the information and content accessible through Zhihu Daily Purify are subject to Zhihu’s copyr">
+<meta property="og:description" content="前言 在iOS开发中，我们经常会通过dealloc来判断对象实例是否被释放，依据是当对象实例的引用计数变为0时，运行时会调用对象实例的dealloc方法，我们可以利用该方法做一些扫尾的工作。 dealloc调用时机 直接上代码，如下sidetable_release函数会在给对象发送release消息的时候调用，sidetable_release方法首先获取对象的引用计数，对引用计数相关标志位做操">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/ZhihuDaily/master/images/demo1.gif">
-<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/responder_chain.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/ZhihuDaily/master/images/demo2.gif">
-<meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/ZhihuDaily/master/images/demo3.gif">
-<meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/ZhihuDaily/master/images/demo4.gif">
-<meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/ZhihuDaily/master/images/demo5.gif">
-<meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/ZhihuDaily/master/images/demo6.gif">
-<meta property="og:updated_time" content="2016-09-19T09:27:36.000Z">
+<meta property="og:updated_time" content="2017-09-24T04:48:29.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="知乎日报iOS">
-<meta name="twitter:description" content="Disclaimer - 声明Zhihu is a trademark of Zhihu. Inc. This app is not created nor endorsed by Zhihu Inc. All the information and content accessible through Zhihu Daily Purify are subject to Zhihu’s copyr">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/zhongwuzw/ZhihuDaily/master/images/demo1.gif">
+<meta name="twitter:title" content="聊聊dealloc">
+<meta name="twitter:description" content="前言 在iOS开发中，我们经常会通过dealloc来判断对象实例是否被释放，依据是当对象实例的引用计数变为0时，运行时会调用对象实例的dealloc方法，我们可以利用该方法做一些扫尾的工作。 dealloc调用时机 直接上代码，如下sidetable_release函数会在给对象发送release消息的时候调用，sidetable_release方法首先获取对象的引用计数，对引用计数相关标志位做操">
 
 
 
@@ -123,7 +115,7 @@
   };
 </script>
 
-  <title> 知乎日报iOS | 钟武的技术博客 </title>
+  <title> 聊聊dealloc | 钟武的技术博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -305,7 +297,7 @@
             
             
               
-                知乎日报iOS
+                聊聊dealloc
               
             
           </h1>
@@ -317,8 +309,8 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-08-18T17:31:02+08:00" content="2016-08-18">
-              2016-08-18
+            <time itemprop="dateCreated" datetime="2017-09-21T17:52:34+08:00" content="2017-09-21">
+              2017-09-21
             </time>
           </span>
 
@@ -331,8 +323,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/iOS开发-项目/" itemprop="url" rel="index">
-                    <span itemprop="name">iOS开发-项目</span>
+                  <a href="/categories/iOS开发-语言/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发-语言</span>
                   </a>
                 </span>
 
@@ -347,8 +339,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/08/18/知乎日报iOS/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/18/知乎日报iOS/" itemprop="commentsCount"></span>
+                <a href="/2017/09/21/聊聊dealloc/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/09/21/聊聊dealloc/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -371,53 +363,31 @@
       
 
       
-        <p><strong>Disclaimer - 声明</strong><br><em>Zhihu</em> is a trademark of <em>Zhihu. Inc</em>. This app is not created nor endorsed by Zhihu Inc. All the information and content accessible through Zhihu Daily Purify are subject to Zhihu’s copyright and terms of use. This is a free app and does not charge for anything. All content are available for free from <a href="http://www.zhihu.com" target="_blank" rel="external">Zhihu</a>.</p>
-<p>『知乎』是 <em>知乎. Inc</em> 的注册商标。本软件与其代码非由知乎创作或维护。软件中所包含的信息与内容皆违反版权与知乎用户协议。它是一个免费软件，使用它不收取您任何费用。其中的所有内容均可在<a href="http://www.zhihu.com" target="_blank" rel="external">知乎</a>获取。</p>
-<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>最近工作工作不是很忙，所以准备开发项目练练手，之前发现了这个<em><a href="https://github.com/izzyleung/ZhihuDailyPurify/" target="_blank" rel="external">知乎日报API</a></em>,其提供了知乎日报的API地址，所以决定开发知乎日报。先上<em><a href="https://github.com/zhongwuzw/ZhihuDaily" target="_blank" rel="external">Github地址</a></em>，欢迎<em>Star、Issues、Pull Request</em>。</p>
-<h1 id="展示"><a href="#展示" class="headerlink" title="展示"></a>展示</h1><h2 id="1-应用主页部分："><a href="#1-应用主页部分：" class="headerlink" title="1.应用主页部分："></a>1.应用主页部分：</h2><p><img src="https://raw.githubusercontent.com/zhongwuzw/ZhihuDaily/master/images/demo1.gif" alt=""><br><a id="more"></a></p>
-<ul>
-<li>主页中最上方的滚动条实现思路：该无限滚动条有很多实现方式，包括使用UIScrollView，添加3个子视图用于管理，每次滑动后都进行3个子视图内容的重新赋值。之前，我采用过这种思路，所以又想了另外一种方法，直接使用UICollectionView来实现，在第一个和最后一个数据源中添加最后一个、第一个数据，在scrollViewDidScroll中处理到达左右两边后的跳转即可，代码如下：</li>
-</ul>
-<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">-(<span class="keyword">void</span>)scrollViewDidScroll:(<span class="built_in">UIScrollView</span> *)scrollView&#123;</div><div class="line">	[<span class="keyword">self</span> scrollCollectionViewToCorrectIndexPath];</div><div class="line">&#125;</div><div class="line"></div><div class="line">-(<span class="keyword">void</span>)scrollCollectionViewToCorrectIndexPath&#123;</div><div class="line">	<span class="keyword">float</span> contentOffsetWhenFullyScrolledRight = <span class="keyword">self</span>.frame.size.width * ([<span class="keyword">self</span>.dataArray count] <span class="number">-1</span>);</div><div class="line">	<span class="keyword">if</span> (<span class="keyword">self</span>.collectionView.contentOffset.x == contentOffsetWhenFullyScrolledRight) 	&#123;</div><div class="line">        <span class="built_in">NSIndexPath</span> *newIndexPath = [<span class="built_in">NSIndexPath</span> indexPathForItem:<span class="number">1</span> inSection:<span class="number">0</span>];</div><div class="line">        </div><div class="line">        [<span class="keyword">self</span>.collectionView scrollToItemAtIndexPath:newIndexPath atScrollPosition:<span class="built_in">UICollectionViewScrollPositionLeft</span> animated:<span class="literal">NO</span>];</div><div class="line">        </div><div class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">self</span>.collectionView.contentOffset.x == <span class="number">0</span>)  &#123;</div><div class="line">        <span class="built_in">NSIndexPath</span> *newIndexPath = [<span class="built_in">NSIndexPath</span> indexPathForItem:([<span class="keyword">self</span>.dataArray count] <span class="number">-2</span>) inSection:<span class="number">0</span>];</div><div class="line">        </div><div class="line">        [<span class="keyword">self</span>.collectionView scrollToItemAtIndexPath:newIndexPath atScrollPosition:<span class="built_in">UICollectionViewScrollPositionLeft</span> animated:<span class="literal">NO</span>];</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li>由于主页上方的无限滚动条是有UICollectionView来实现的，所以为了实现主页新闻页滑动时的动态放缩，直接在setFrame中invalidate collectionView的layout即可(一开始使用AutoLayout来调整，后来发现当快速滑动时会出现短时间错位的问题，所以只得使用setFrame)：</li>
-</ul>
-<figure class="highlight less"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="selector-tag">-</span>(void)<span class="selector-tag">setFrame</span><span class="selector-pseudo">:(CGRect)frame</span>&#123;</div><div class="line">    <span class="selector-tag">if</span> (self.height != frame.size.height) &#123;</div><div class="line">        <span class="selector-attr">[self.collectionView.collectionViewLayout invalidateLayout]</span>;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="selector-attr">[super setFrame:frame]</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li>项目中多个页面实现了点击状态栏页面滑动到顶部的功能，实现方法无非就是先获取到点击状态栏时的事件，由于AppDelegate继承自UIResponder，所以能够响应事件，作为响应者链最顶层（响应者链如下图所示）的响应者，当前面的Responder无法处理事件而向上传递时，最后会到达AppDelegate，所以统一在AppDelegate中处理状态栏的点击，直接重写<code>- (void)touchesBegan:(NSSet&lt;UITouch *&gt; *)touches withEvent:(UIEvent *)event</code>方法，代码示例如下：</li>
-</ul>
-<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">-(<span class="keyword">void</span>)touchesBegan:(<span class="built_in">NSSet</span>&lt;<span class="built_in">UITouch</span> *&gt; *)touches withEvent:(<span class="built_in">UIEvent</span> *)event&#123;</div><div class="line">    [<span class="keyword">super</span> touchesBegan:touches withEvent:event];</div><div class="line">    </div><div class="line">    <span class="built_in">NSSet</span>&lt;<span class="built_in">UITouch</span> *&gt; *events = [event allTouches];</div><div class="line">    <span class="built_in">UITouch</span> *touch = [events anyObject];</div><div class="line">    <span class="built_in">CGPoint</span> location = [touch locationInView:<span class="keyword">self</span>.window];</div><div class="line">    <span class="built_in">CGRect</span> statusBarFrame = [<span class="built_in">UIApplication</span> sharedApplication].statusBarFrame;</div><div class="line">    </div><div class="line">    <span class="keyword">if</span> (<span class="built_in">CGRectContainsPoint</span>(statusBarFrame, location)) &#123;</div><div class="line">        [[<span class="built_in">NSNotificationCenter</span> defaultCenter] postNotificationName:STATUS_BAR_TAP_NOTIFICATION object:<span class="literal">nil</span>];</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><img src="http://oc54pu02q.bkt.clouddn.com/responder_chain.png" alt="image"></p>
-<ul>
-<li>在使用Notification时需要注意的就是Observer对象一定要在自己被销毁之前remove掉Observer。还有一个注意的点就是Observer在接收到Notification执行时的线程与发出Notification的线程是一致的，所以如果存在子线程发Notification的情况，在Observer处理时不要直接操作UI。</li>
-</ul>
-<h2 id="2-新闻详细页部分："><a href="#2-新闻详细页部分：" class="headerlink" title="2.新闻详细页部分："></a>2.新闻详细页部分：</h2><p><img src="https://raw.githubusercontent.com/zhongwuzw/ZhihuDaily/master/images/demo2.gif" alt=""><br><img src="https://raw.githubusercontent.com/zhongwuzw/ZhihuDaily/master/images/demo3.gif" alt=""></p>
-<ul>
-<li>新闻主页和详细页部分使用了一个单例Manager来进行数据的管理，使用外观模式，Manager提供简洁的接口，如下代码：</li>
-</ul>
-<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">HomePageDataManager</span> : <span class="title">NSObject</span></span></div><div class="line"></div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="built_in">NSMutableArray</span>&lt;NewsListResponseModel *&gt; *homePageArray;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSArray</span>&lt;TopNewsResponseModel *&gt; *topNewsArray;</div><div class="line"></div><div class="line">SYNTHESIZE_SINGLETON_FOR_CLASS_HEADER(HomePageDataManager)</div><div class="line">- (<span class="built_in">NSURLSessionDataTask</span> *)getLatestNewsWithSuccess:(HttpClientSuccessBlock)success</div><div class="line">                                              fail:(HttpClientFailureBlock)fail;</div><div class="line">- (<span class="built_in">NSURLSessionDataTask</span> *)getPreviousNewsWithSuccess:(HttpClientSuccessBlock)success</div><div class="line">                                              fail:(HttpClientFailureBlock)fail;</div><div class="line">- (<span class="built_in">NSInteger</span>)numberofSections;</div><div class="line">- (<span class="built_in">NSInteger</span>)numberofRowsInSection:(<span class="built_in">NSInteger</span>)section;</div><div class="line">- (NewsResponseModel *)modelForRowAtIndexPath:(<span class="built_in">NSIndexPath</span> *)indexPath;</div><div class="line">- (<span class="built_in">NSString</span> *)headerTitleForSection:(<span class="built_in">NSInteger</span>)section;</div><div class="line">- (<span class="built_in">NSInteger</span>)getPreviousNewsWithSection:(<span class="built_in">NSInteger</span> *)section currentID:(<span class="built_in">NSInteger</span>)currentID;</div><div class="line">- (<span class="built_in">NSInteger</span>)getNextNewsWithSection:(<span class="built_in">NSInteger</span> *)section currentID:(<span class="built_in">NSInteger</span>)currentID;</div><div class="line"></div><div class="line"><span class="keyword">@end</span></div></pre></td></tr></table></figure>
-<ul>
-<li>因为在详细页可以进行新闻的上下切换，所以有可能更新数据源，这样，当返回到主页时，数据源可能已经更新，这个时候主页需要重新reload 数据，否则会导致崩溃。</li>
-<li><p>详细页的上下切换动画实现，直接使用UIView提供的animateWithDuration方法，上下切换时只是View的切换，由同一个控制器管理。</p>
-<h2 id="3-主题日报部分："><a href="#3-主题日报部分：" class="headerlink" title="3.主题日报部分："></a>3.主题日报部分：</h2><p><img src="https://raw.githubusercontent.com/zhongwuzw/ZhihuDaily/master/images/demo4.gif" alt=""></p>
-</li>
-<li><p>主题日报部分基本和主页类似，在主题日报列表中进行切换时，不再重新创建Controller以及UI，而是直接reload数据。</p>
-<h2 id="4-夜间部分："><a href="#4-夜间部分：" class="headerlink" title="4.夜间部分："></a>4.夜间部分：</h2><p><img src="https://raw.githubusercontent.com/zhongwuzw/ZhihuDaily/master/images/demo5.gif" alt=""></p>
-</li>
-<li><p>夜间模式实现：使用UIView的Category，类别中使用Objective-C的关联对象来存储模式的配置项，并且作为Observer来监听夜间模式的切换。</p>
-</li>
-</ul>
-<h2 id="5-设置-移动网络不下载图片"><a href="#5-设置-移动网络不下载图片" class="headerlink" title="5.设置-移动网络不下载图片"></a>5.设置-移动网络不下载图片</h2><p><img src="https://raw.githubusercontent.com/zhongwuzw/ZhihuDaily/master/images/demo6.gif" alt=""></p>
-<ul>
-<li>实现：使用NSURLProtocol来进行图片的管理，这里需要注意的就是要解决AF、SDWebCache使用NSURLSession的问题。</li>
-</ul>
-<h2 id="Features-特性"><a href="#Features-特性" class="headerlink" title="Features - 特性"></a>Features - 特性</h2><ul>
-<li>实现知乎日报大多数功能</li>
-<li>没有广告</li>
-</ul>
-<h2 id="TODO-后续实现"><a href="#TODO-后续实现" class="headerlink" title="TODO - 后续实现"></a>TODO - 后续实现</h2><ul>
-<li><del>网络状况切换管理</del> （已完成）</li>
-</ul>
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><hr>
+<p>在<code>iOS</code>开发中，我们经常会通过<code>dealloc</code>来判断对象实例是否被释放，依据是当对象实例的引用计数变为0时，运行时会调用对象实例的<code>dealloc</code>方法，我们可以利用该方法做一些扫尾的工作。</p>
+<h2 id="dealloc调用时机"><a href="#dealloc调用时机" class="headerlink" title="dealloc调用时机"></a>dealloc调用时机</h2><hr>
+<p>直接上代码，如下<code>sidetable_release</code>函数会在给对象发送<code>release</code>消息的时候调用，<code>sidetable_release</code>方法首先获取对象的引用计数，对引用计数相关标志位做操作，若对象实例可以被释放，将通过<code>objc_msgSend</code>发送<code>SEL_dealloc</code>消息，既调用对象的<code>dealloc</code>方法。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">uintptr_t</span></div><div class="line">objc_object::sidetable_release(<span class="keyword">bool</span> performDealloc)</div><div class="line">&#123;</div><div class="line"><span class="meta">#<span class="meta-keyword">if</span> SUPPORT_NONPOINTER_ISA</span></div><div class="line">    assert(!isa.nonpointer);</div><div class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></div><div class="line">    SideTable&amp; table = SideTables()[<span class="keyword">this</span>];</div><div class="line"></div><div class="line">    <span class="keyword">bool</span> do_dealloc = <span class="literal">false</span>;</div><div class="line"></div><div class="line">    table.lock();</div><div class="line">    RefcountMap::iterator it = table.refcnts.find(<span class="keyword">this</span>);</div><div class="line">    <span class="keyword">if</span> (it == table.refcnts.end()) &#123;</div><div class="line">        do_dealloc = <span class="literal">true</span>;</div><div class="line">        table.refcnts[<span class="keyword">this</span>] = SIDE_TABLE_DEALLOCATING;</div><div class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (it-&gt;second &lt; SIDE_TABLE_DEALLOCATING) &#123;</div><div class="line">        <span class="comment">// SIDE_TABLE_WEAKLY_REFERENCED may be set. Don't change it.</span></div><div class="line">        do_dealloc = <span class="literal">true</span>;</div><div class="line">        it-&gt;second |= SIDE_TABLE_DEALLOCATING;</div><div class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (! (it-&gt;second &amp; SIDE_TABLE_RC_PINNED)) &#123;</div><div class="line">        it-&gt;second -= SIDE_TABLE_RC_ONE;</div><div class="line">    &#125;</div><div class="line">    table.unlock();</div><div class="line">    <span class="comment">// 进行释放操作，调用dealloc</span></div><div class="line">    <span class="keyword">if</span> (do_dealloc  &amp;&amp;  performDealloc) &#123;</div><div class="line">        ((<span class="keyword">void</span>(*)(objc_object *, SEL))objc_msgSend)(<span class="keyword">this</span>, SEL_dealloc);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> do_dealloc;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<a id="more"></a>
+<p><code>dealloc</code>方法的实现如下：</p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">- <span class="params">(void)</span>dealloc &#123;</div><div class="line">    _objc_rootDealloc<span class="params">(self)</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>直接调用<code>_objc_rootDealloc</code>方法来做处理，我们省略一些细节处理，通常情况下，<code>dealloc</code>方法最终会调用<code>objc_dispose</code>方法，内部又调用<code>objc_destructInstance</code>方法来进行析构操作，析构完成后将内存释放掉。</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">id</span> </div><div class="line">object_dispose(<span class="keyword">id</span> obj)</div><div class="line">&#123;</div><div class="line">    <span class="keyword">if</span> (!obj) <span class="keyword">return</span> <span class="literal">nil</span>;</div><div class="line"></div><div class="line">    objc_destructInstance(obj);</div><div class="line">    <span class="comment">// 做完各种析构操作后释放obj的内存</span></div><div class="line">    free(obj);</div><div class="line"></div><div class="line">    <span class="keyword">return</span> <span class="literal">nil</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">void *objc_destructInstance(id obj) </div><div class="line">&#123;</div><div class="line">    <span class="keyword">if</span> (obj) &#123;</div><div class="line">        <span class="comment">// Read all of the flags at once for performance.</span></div><div class="line">        <span class="keyword">bool</span> cxx = obj-&gt;hasCxxDtor();</div><div class="line">        <span class="keyword">bool</span> assoc = obj-&gt;hasAssociatedObjects();</div><div class="line"></div><div class="line">        <span class="comment">// This order is important.</span></div><div class="line">        <span class="keyword">if</span> (cxx) object_cxxDestruct(obj);   <span class="comment">// 调用C++析构器</span></div><div class="line">        <span class="keyword">if</span> (assoc) _object_remove_assocations(obj); <span class="comment">// 移除对象相关的关联引用</span></div><div class="line">        obj-&gt;clearDeallocating();   <span class="comment">// 进行ARC相关操作，如weak置nil，清理计数位</span></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> obj;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="并发赋值"><a href="#并发赋值" class="headerlink" title="并发赋值"></a>并发赋值</h2><hr>
+<p>考虑如下代码，我们来模拟并发的对变量<code>obj</code>进行赋值。<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">__block <span class="built_in">NSObject</span> *obj = [<span class="built_in">NSObject</span> new];</div><div class="line"><span class="built_in">dispatch_async</span>(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, <span class="number">0</span>), ^&#123;</div><div class="line">    <span class="keyword">while</span> (<span class="literal">YES</span>) &#123;</div><div class="line">        obj = [<span class="built_in">NSObject</span> new];</div><div class="line">    &#125;</div><div class="line">&#125;);</div><div class="line"></div><div class="line"><span class="keyword">while</span> (<span class="literal">YES</span>) &#123;</div><div class="line">    obj = [<span class="built_in">NSObject</span> new];</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>执行如上代码，我们发现，很快程序就会崩溃，异常为<code>EXC_BAD_ACCESS</code>，既访问已释放的内存地址，异常栈如下，在调用<code>objc_msgSend</code>发送<code>SEL_dealloc</code>方法时异常，而该方法正是在如上的<code>objc_object::sidetable_release</code>中被调用的，也就是<code>release</code>方法调用过程中。最终的原因就是对已释放的对象实例再次进行<code>release</code>操作。</p>
+<figure class="highlight x86asm"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="number">0x106463a00</span> &lt;+<span class="number">156</span>&gt;: callq  <span class="number">0x1064653e8</span>               <span class="comment">; objc::DenseMapBase&lt;objc::DenseMap&lt;DisguisedPtr&lt;objc_object&gt;, unsigned long, true, objc::DenseMapInfo&lt;DisguisedPtr&lt;objc_object&gt; &gt; &gt;, DisguisedPtr&lt;objc_object&gt;, unsigned long, objc::DenseMapInfo&lt;DisguisedPtr&lt;objc_object&gt; &gt;, true&gt;::FindAndConstruct(DisguisedPtr&lt;objc_object&gt; const&amp;)</span></div><div class="line"><span class="number">0x106463a05</span> &lt;+<span class="number">161</span>&gt;: <span class="keyword">movq</span>   <span class="number">$0</span>x2, <span class="number">0x8</span>(%rax)</div><div class="line"><span class="number">0x106463a0d</span> &lt;+<span class="number">169</span>&gt;: movl   -<span class="number">0x2c</span>(%rbp), %ebx</div><div class="line"><span class="number">0x106463a10</span> &lt;+<span class="number">172</span>&gt;: <span class="keyword">movq</span>   %r15, %rdi</div><div class="line"><span class="number">0x106463a13</span> &lt;+<span class="number">175</span>&gt;: callq  <span class="number">0x1064669fa</span>               <span class="comment">; symbol stub for: os_unfair_lock_unlock</span></div><div class="line"><span class="number">0x106463a18</span> &lt;+<span class="number">180</span>&gt;: testb  %bl, %bl</div><div class="line"><span class="number">0x106463a1a</span> &lt;+<span class="number">182</span>&gt;: <span class="keyword">je</span>     <span class="number">0x106463a2e</span>               <span class="comment">; &lt;+202&gt;</span></div><div class="line"><span class="number">0x106463a1c</span> &lt;+<span class="number">184</span>&gt;: leaq   <span class="number">0x55a8ad</span>(%rip), %rax      <span class="comment">; SEL_dealloc</span></div><div class="line"><span class="number">0x106463a23</span> &lt;+<span class="number">191</span>&gt;: <span class="keyword">movq</span>   (%rax), %rsi // 在这访问了已释放的内存地址</div><div class="line"><span class="number">0x106463a26</span> &lt;+<span class="number">194</span>&gt;: <span class="keyword">movq</span>   %r14, %rdi</div><div class="line"><span class="number">0x106463a29</span> &lt;+<span class="number">197</span>&gt;: callq  <span class="number">0x106465940</span>               <span class="comment">; objc_msgSend</span></div><div class="line"><span class="number">0x106463a2e</span> &lt;+<span class="number">202</span>&gt;: movl   <span class="number">$0</span>x1, %eax</div><div class="line"><span class="number">0x106463a33</span> &lt;+<span class="number">207</span>&gt;: <span class="keyword">jmp</span>    <span class="number">0x106463a4c</span>               <span class="comment">; &lt;+232&gt;</span></div></pre></td></tr></table></figure>
+<p>为什么会导致这样的结果呢？原因其实是，对属性的赋值操作并不是原子操作，对属性的赋值其实是调用属性的<code>setter</code>方法，默认<code>setter</code>代码实现如下：</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">- (<span class="keyword">void</span>)setObj:(<span class="built_in">NSObject</span> *)obj &#123;</div><div class="line">    <span class="keyword">if</span> (obj != _obj) &#123;          <span class="comment">// 1</span></div><div class="line">        <span class="keyword">id</span> oldValue = _obj;     <span class="comment">// 2</span></div><div class="line">        _obj = [obj <span class="keyword">retain</span>];    <span class="comment">// 3</span></div><div class="line">        [oldValue release];     <span class="comment">// 4</span></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>我们考虑两个线程同时进行<code>setObj:</code>赋值操作，当走到第4步时，两个线程同时尝试进行<code>release</code>操作，结果是一个线程成功的释放对象，而另一个线程会在<code>release</code>函数调用过程中访问已经释放的内存区域，这就导致了崩溃。</p>
+<h2 id="dealloc在哪个线程被调用"><a href="#dealloc在哪个线程被调用" class="headerlink" title="dealloc在哪个线程被调用"></a>dealloc在哪个线程被调用</h2><hr>
+<p><code>dealloc</code>并不总是在主线程中被调用，从如上<code>sidetable_release</code>方法，我们可得知，其调用线程为最后一个调用<code>release</code>方法的线程，当需要释放对象时，向对象实例发送<code>SEL_dealloc</code>（即<code>dealloc</code>）消息。</p>
+<p>也就是说,<code>dealloc</code>方法有可能在任何线程被调用，这就需要注意一点，就是在<code>dealloc</code>中进行<code>UIKit</code>相关<code>API</code>的操作（<code>UIKit</code>相关<code>API</code>只能在主线程操作）。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><hr>
+<ol>
+<li><a href="https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmPractical.html#//apple_ref/doc/uid/TP40004447-SW13" target="_blank" rel="external">https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmPractical.html#//apple_ref/doc/uid/TP40004447-SW13</a></li>
+</ol>
 
       
     </div>
@@ -441,12 +411,6 @@
           
             <a href="/tags/iOS/" rel="tag">#iOS</a>
           
-            <a href="/tags/Objective-C/" rel="tag">#Objective-C</a>
-          
-            <a href="/tags/项目开发/" rel="tag">#项目开发</a>
-          
-            <a href="/tags/知乎日报/" rel="tag">#知乎日报</a>
-          
         </div>
       
 
@@ -454,17 +418,13 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/08/13/hello-world/" rel="next" title="Hello World">
-                <i class="fa fa-chevron-left"></i> Hello World
+              <a href="/2017/09/01/实现Swift的Array/" rel="next" title="实现Swift的Array">
+                <i class="fa fa-chevron-left"></i> 实现Swift的Array
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/08/19/Swift的Designated和Convenience初始化器/" rel="prev" title="Swift的Designated和Convenience初始化器">
-                Swift的Designated和Convenience初始化器 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -516,8 +476,8 @@
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/08/18/知乎日报iOS/"
-           data-title="知乎日报iOS" data-url="https://zhongwuzw.github.io/2016/08/18/知乎日报iOS/">
+      <div class="ds-thread" data-thread-key="2017/09/21/聊聊dealloc/"
+           data-title="聊聊dealloc" data-url="https://zhongwuzw.github.io/2017/09/21/聊聊dealloc/">
       </div>
     
   </div>
@@ -662,7 +622,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#展示"><span class="nav-number">2.</span> <span class="nav-text">展示</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-应用主页部分："><span class="nav-number">2.1.</span> <span class="nav-text">1.应用主页部分：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-新闻详细页部分："><span class="nav-number">2.2.</span> <span class="nav-text">2.新闻详细页部分：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-主题日报部分："><span class="nav-number">2.3.</span> <span class="nav-text">3.主题日报部分：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-夜间部分："><span class="nav-number">2.4.</span> <span class="nav-text">4.夜间部分：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-设置-移动网络不下载图片"><span class="nav-number">2.5.</span> <span class="nav-text">5.设置-移动网络不下载图片</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Features-特性"><span class="nav-number">2.6.</span> <span class="nav-text">Features - 特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TODO-后续实现"><span class="nav-number">2.7.</span> <span class="nav-text">TODO - 后续实现</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dealloc调用时机"><span class="nav-number">2.</span> <span class="nav-text">dealloc调用时机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#并发赋值"><span class="nav-number">3.</span> <span class="nav-text">并发赋值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dealloc在哪个线程被调用"><span class="nav-number">4.</span> <span class="nav-text">dealloc在哪个线程被调用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
             
           </div>
         </section>

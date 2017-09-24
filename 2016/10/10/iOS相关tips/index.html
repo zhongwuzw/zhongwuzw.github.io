@@ -94,7 +94,7 @@
 <meta property="og:site_name" content="钟武的技术博客">
 <meta property="og:description" content="Tips  iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙盒，如果需要让自己的应用能够通过其访问，必须在应用的info.plist中添加UIFileSharingEnabled关键字，并赋值为YES，这样，就能访问其Documents目录了(注意，其它目录还是无法访问)。  使用UIWebView时，发现在首次加载网页时，加载时间异常的长，其原因是服务器需要花费一">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-04-16T14:59:24.000Z">
+<meta property="og:updated_time" content="2017-09-15T10:01:49.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS相关tips">
 <meta name="twitter:description" content="Tips  iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙盒，如果需要让自己的应用能够通过其访问，必须在应用的info.plist中添加UIFileSharingEnabled关键字，并赋值为YES，这样，就能访问其Documents目录了(注意，其它目录还是无法访问)。  使用UIWebView时，发现在首次加载网页时，加载时间异常的长，其原因是服务器需要花费一">
@@ -406,6 +406,10 @@
 </li>
 <li><p><code>UITableViewCell</code>默认分割线会在左侧留出一定的间距，如果想调整分割线的左、右间距，可以通过调整<code>UITableView</code>的<code>separatorInset</code>属性。</p>
 </li>
+<li><p>当使用<code>WKWebView</code>的<code>WKScriptMessageHandler</code>时，<code>WKUserContentController</code>会<code>retain</code> <code>message handler</code>，所以，要注意避免循环引用。</p>
+</li>
+<li><p><code>CAAnimation</code>的<code>delegate</code>是强引用的，强引用的，强引用的。可以通过操作完成后移除动画或设置一个代理对象作为<code>delegate</code>。</p>
+</li>
 </ul>
 
       
@@ -547,7 +551,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">35</span>
+              <span class="site-state-item-count">36</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
