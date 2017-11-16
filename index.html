@@ -298,6 +298,135 @@
             
               
                 
+                <a class="post-title-link" href="/2017/11/16/Objective-C-之内存管理/" itemprop="url">
+                  Objective-C++之内存管理
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-11-16T10:28:46+08:00" content="2017-11-16">
+              2017-11-16
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/iOS开发-语言/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发-语言</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/11/16/Objective-C-之内存管理/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/11/16/Objective-C-之内存管理/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="Objective-C-内存管理"><a href="#Objective-C-内存管理" class="headerlink" title="Objective-C++内存管理"></a>Objective-C++内存管理</h2><hr>
+<p>在项目开发时，有时会使用<code>C++</code>来进行混合开发，因为<code>C++</code>有很好的跨平台及性能优势。我们可以将<code>C++</code>对象作为<code>Objective-C</code>的属性或者反过来<code>Objective-C</code>作为<code>C++</code>对象的成员，当我们需要在App中使用C++库时，会很有用。</p>
+<p>当我们的文件同时使用了<code>Objective-C</code>和<code>C++</code>时，需要告知编译器来进行处理，方法为将该文件的后缀从<code>.m</code>改为<code>.mm</code>。</p>
+<p>如下示例展示了<code>Objective-C</code>和<code>C++</code>互相作为成员变量来关联：</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="comment">// Forward declare so that everything works below</span></div><div class="line"><span class="class"><span class="keyword">@class</span> <span class="title">ObjcClass</span>;</span></div><div class="line"><span class="keyword">class</span> CppClass;</div><div class="line"></div><div class="line"><span class="comment">// C++ class with an Objective-C member variable</span></div><div class="line"><span class="keyword">class</span> CppClass &#123;</div><div class="line">  public:</div><div class="line">    ObjcClass *objcClass;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="comment">// Objective-C class with a C++ object as a property</span></div><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ObjcClass</span> : <span class="title">NSObject</span></span></div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">assign</span>) std::shared_ptr&lt;CppClass&gt; cppClass;</div><div class="line"><span class="keyword">@end</span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ObjcClass</span></span></div><div class="line"><span class="keyword">@end</span></div><div class="line"></div><div class="line"><span class="comment">// Using the two classes above</span></div><div class="line">std::shared_ptr&lt;CppClass&gt; cppClass(new CppClass());</div><div class="line">ObjcClass *objcClass = [[ObjcClass alloc] init];</div><div class="line"></div><div class="line">cppClass-&gt;objcClass = objcClass;</div><div class="line">objcClass.cppClass = cppClass;</div></pre></td></tr></table></figure>
+<p>如上，我们注意到，属性声明成了<code>assign</code>，而不是我们通常使用的<code>strong</code>、<code>weak</code>，原因就是对于非<code>Objective-C</code>类型对象来说是没有意义的，编译器无法<code>retain</code>或<code>release</code>一个<code>C++</code>对象，因为它不是一个<code>Objective-C</code>对象类型。</p>
+<p>尽管声明属性为<code>assign</code>，但是内存管理依然能正确处理；不过这里要注意的是，如果我们使用原始指针来保存，这时候就需要自己进行内存管理了。</p>
+<p><code>Objective-C</code>对象实例总是在堆上分配，但是<code>C++</code>实例可以在栈或堆上。所以我们把分配在栈上的<code>C++</code>实例赋值给<code>Objective-C</code>的成员变量时，就有点奇怪，不过不用担心，它其实会放到堆上，因为整个<code>Objective-C</code>对象都是在堆上的。编译器实现这个转化的方式为：在<code>alloc</code>和<code>dealloc</code>方法中构建和析构<code>C++</code>对象，分别调用<code>object_cxxConstruct</code>、<code>object_cxxDestruct</code>方法，来处理<code>C++</code>对象。</p>
+<p>所以，对于所有基于栈的<code>C++</code>对象，不需要担心内存的问题，编译器自动接管。但是再强调一下，基于堆的<code>C++</code>对象，需要手动管理内存，如在<code>dealloc</code>中<code>delete``C++</code>对象。</p>
+<p><code>Game Over!!!</code></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2017/09/21/聊聊dealloc/" itemprop="url">
                   聊聊dealloc
                 </a>
@@ -373,7 +502,7 @@
 </blockquote>
 <p>在<code>iOS</code>开发中，我们经常会通过<code>dealloc</code>来判断对象实例是否被释放，依据是当对象实例的引用计数变为0时，运行时会调用对象实例的<code>dealloc</code>方法，我们可以利用该方法做一些扫尾的工作。</p>
 <h2 id="dealloc调用时机"><a href="#dealloc调用时机" class="headerlink" title="dealloc调用时机"></a>dealloc调用时机</h2><hr>
-<p><code>Objective-C</code>的引用计数管理有两种方式相结合，<code>sidetable</code>和<code>isa</code>指针（指针并不是对象的真正内存地址，而是某些位用来进行了一些标志位的存放）；接下来，我将以<code>sidetable</code>进行<code>release</code>来讨论<code>dealloc</code>的调用，直接上代码，如下<code>sidetable_release</code>（下文所有都会用<code>sidetable_release</code>来讨论）函数会在给对象发送<code>release</code>消息的时候调用，<code>sidetable_release</code>方法首先获取对象的引用计数，对引用计数相关标志位做操作，若对象实例可以被释放，将通过<code>objc_msgSend</code>发送<code>SEL_dealloc</code>消息，既调用对象的<code>dealloc</code>方法。</p>
+<p><code>Objective-C</code>的引用计数管理使用两种方式相结合，<code>sidetable</code>和<code>isa</code>指针（指针并不是对象的真正内存地址，而是某些位用来进行了一些标志位的存放）；接下来，我将以<code>sidetable</code>进行<code>release</code>来讨论<code>dealloc</code>的调用，直接上代码，如下<code>sidetable_release</code>（下文所有都会用<code>sidetable_release</code>来讨论）函数会在给对象发送<code>release</code>消息的时候调用，<code>sidetable_release</code>方法首先获取对象的引用计数，对引用计数相关标志位做操作，若对象实例可以被释放，将通过<code>objc_msgSend</code>发送<code>SEL_dealloc</code>消息，既调用对象的<code>dealloc</code>方法。</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">uintptr_t</span></div><div class="line">objc_object::sidetable_release(<span class="keyword">bool</span> performDealloc)</div><div class="line">&#123;</div><div class="line"><span class="meta">#<span class="meta-keyword">if</span> SUPPORT_NONPOINTER_ISA</span></div><div class="line">    assert(!isa.nonpointer);</div><div class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></div><div class="line">    SideTable&amp; table = SideTables()[<span class="keyword">this</span>];</div><div class="line"></div><div class="line">    <span class="keyword">bool</span> do_dealloc = <span class="literal">false</span>;</div><div class="line"></div><div class="line">    table.lock();</div><div class="line">    RefcountMap::iterator it = table.refcnts.find(<span class="keyword">this</span>);</div><div class="line">    <span class="keyword">if</span> (it == table.refcnts.end()) &#123;</div><div class="line">        do_dealloc = <span class="literal">true</span>;</div><div class="line">        table.refcnts[<span class="keyword">this</span>] = SIDE_TABLE_DEALLOCATING;</div><div class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (it-&gt;second &lt; SIDE_TABLE_DEALLOCATING) &#123;</div><div class="line">        <span class="comment">// SIDE_TABLE_WEAKLY_REFERENCED may be set. Don't change it.</span></div><div class="line">        do_dealloc = <span class="literal">true</span>;</div><div class="line">        it-&gt;second |= SIDE_TABLE_DEALLOCATING;</div><div class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (! (it-&gt;second &amp; SIDE_TABLE_RC_PINNED)) &#123;</div><div class="line">        it-&gt;second -= SIDE_TABLE_RC_ONE;</div><div class="line">    &#125;</div><div class="line">    table.unlock();</div><div class="line">    <span class="comment">// 进行释放操作，调用dealloc</span></div><div class="line">    <span class="keyword">if</span> (do_dealloc  &amp;&amp;  performDealloc) &#123;</div><div class="line">        ((<span class="keyword">void</span>(*)(objc_object *, SEL))objc_msgSend)(<span class="keyword">this</span>, SEL_dealloc);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> do_dealloc;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
           <div class="post-more-link text-center">
             <a class="btn" href="/2017/09/21/聊聊dealloc/#more" rel="contents">
@@ -802,133 +931,6 @@
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/06/05/GCD队列管理之YYDispatchQueuePool/" itemprop="url">
-                  GCD队列管理之YYDispatchQueuePool
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2017-06-05T21:33:44+08:00" content="2017-06-05">
-              2017-06-05
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/iOS开发-项目/" itemprop="url" rel="index">
-                    <span itemprop="name">iOS开发-项目</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2017/06/05/GCD队列管理之YYDispatchQueuePool/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/06/05/GCD队列管理之YYDispatchQueuePool/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><hr>
-<p><code>iOS</code>中，我们经常使用<code>GCD</code>来进行并发操作，我们并不需要关心线程的管理，<code>Dispatch Queue</code>会自动帮我们处理线程的创建和释放，在极大的简化并发操作的同时，某些情况下，<code>Dispatch Queue</code>的滥用可能会导致应用挂起，如向并发队列中添加阻塞的<code>Block</code>，阻塞的<code>Block</code>会导致系统创建更多的线程来处理任务，而<code>GCD</code>线程池的最大线程数为64个，所以一旦达到最大值，应用将挂起。<br>接下来，我将列出一些解决方案，来更好的使用<code>Dispatch Queue</code>。</p>
-<h2 id="YYDispatchQueue"><a href="#YYDispatchQueue" class="headerlink" title="YYDispatchQueue"></a>YYDispatchQueue</h2><hr>
-<p><a href="https://github.com/ibireme/YYDispatchQueuePool" target="_blank" rel="external">YYDispatchQueue</a>的主要思想是使用串行队列来替换并发队列，可以为指定的<code>NSQualityOfService</code>创建一个队列池，由<code>YYDispatchQueuePool</code>对象来进行管理，每一种<code>NSQualityOfService</code>最多可以创建32个串行队列，通过<code>- (dispatch_queue_t)queue;</code>方法来获取可用队列，其采用<code>Round Robin</code>轮询算法。</p>
-<p><img src="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-06-05%20%E4%B8%8B%E5%8D%8811.28.12.png" alt=""></p>
-<p>除了可以创建队列池来管理并发外，还可以通过<code>C</code>的全局函数（<code>dispatch_queue_t YYDispatchQueueGetForQOS(NSQualityOfService qos)</code>）来获取特定的<code>NSQualityOfService</code>串行队列，队列由全局的队列池来管理，每一种<code>NSQualityOfService</code>的串行队列数与核数相同，这样可以尽可能的减少线程之间的上下文切换。</p>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2017/06/05/GCD队列管理之YYDispatchQueuePool/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -974,7 +976,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">36</span>
+              <span class="site-state-item-count">37</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -991,7 +993,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">35</span>
+                <span class="site-state-item-count">36</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

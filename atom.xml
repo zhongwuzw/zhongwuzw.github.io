@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://zhongwuzw.github.io/"/>
-  <updated>2017-09-25T03:23:03.000Z</updated>
+  <updated>2017-11-16T03:37:41.711Z</updated>
   <id>https://zhongwuzw.github.io/</id>
   
   <author>
@@ -16,11 +16,46 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Objective-C++之内存管理</title>
+    <link href="https://zhongwuzw.github.io/2017/11/16/Objective-C-%E4%B9%8B%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/"/>
+    <id>https://zhongwuzw.github.io/2017/11/16/Objective-C-之内存管理/</id>
+    <published>2017-11-16T02:28:46.000Z</published>
+    <updated>2017-11-16T03:37:41.711Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="Objective-C-内存管理"><a href="#Objective-C-内存管理" class="headerlink" title="Objective-C++内存管理"></a>Objective-C++内存管理</h2><hr>
+<p>在项目开发时，有时会使用<code>C++</code>来进行混合开发，因为<code>C++</code>有很好的跨平台及性能优势。我们可以将<code>C++</code>对象作为<code>Objective-C</code>的属性或者反过来<code>Objective-C</code>作为<code>C++</code>对象的成员，当我们需要在App中使用C++库时，会很有用。</p>
+<p>当我们的文件同时使用了<code>Objective-C</code>和<code>C++</code>时，需要告知编译器来进行处理，方法为将该文件的后缀从<code>.m</code>改为<code>.mm</code>。</p>
+<p>如下示例展示了<code>Objective-C</code>和<code>C++</code>互相作为成员变量来关联：</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="comment">// Forward declare so that everything works below</span></div><div class="line"><span class="class"><span class="keyword">@class</span> <span class="title">ObjcClass</span>;</span></div><div class="line"><span class="keyword">class</span> CppClass;</div><div class="line"></div><div class="line"><span class="comment">// C++ class with an Objective-C member variable</span></div><div class="line"><span class="keyword">class</span> CppClass &#123;</div><div class="line">  public:</div><div class="line">    ObjcClass *objcClass;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="comment">// Objective-C class with a C++ object as a property</span></div><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ObjcClass</span> : <span class="title">NSObject</span></span></div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">assign</span>) std::shared_ptr&lt;CppClass&gt; cppClass;</div><div class="line"><span class="keyword">@end</span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ObjcClass</span></span></div><div class="line"><span class="keyword">@end</span></div><div class="line"></div><div class="line"><span class="comment">// Using the two classes above</span></div><div class="line">std::shared_ptr&lt;CppClass&gt; cppClass(new CppClass());</div><div class="line">ObjcClass *objcClass = [[ObjcClass alloc] init];</div><div class="line"></div><div class="line">cppClass-&gt;objcClass = objcClass;</div><div class="line">objcClass.cppClass = cppClass;</div></pre></td></tr></table></figure>
+<p>如上，我们注意到，属性声明成了<code>assign</code>，而不是我们通常使用的<code>strong</code>、<code>weak</code>，原因就是对于非<code>Objective-C</code>类型对象来说是没有意义的，编译器无法<code>retain</code>或<code>release</code>一个<code>C++</code>对象，因为它不是一个<code>Objective-C</code>对象类型。</p>
+<p>尽管声明属性为<code>assign</code>，但是内存管理依然能正确处理；不过这里要注意的是，如果我们使用原始指针来保存，这时候就需要自己进行内存管理了。</p>
+<p><code>Objective-C</code>对象实例总是在堆上分配，但是<code>C++</code>实例可以在栈或堆上。所以我们把分配在栈上的<code>C++</code>实例赋值给<code>Objective-C</code>的成员变量时，就有点奇怪，不过不用担心，它其实会放到堆上，因为整个<code>Objective-C</code>对象都是在堆上的。编译器实现这个转化的方式为：在<code>alloc</code>和<code>dealloc</code>方法中构建和析构<code>C++</code>对象，分别调用<code>object_cxxConstruct</code>、<code>object_cxxDestruct</code>方法，来处理<code>C++</code>对象。</p>
+<p>所以，对于所有基于栈的<code>C++</code>对象，不需要担心内存的问题，编译器自动接管。但是再强调一下，基于堆的<code>C++</code>对象，需要手动管理内存，如在<code>dealloc</code>中<code>delete``C++</code>对象。</p>
+<p><code>Game Over!!!</code></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Objective-C-内存管理&quot;&gt;&lt;a href=&quot;#Objective-C-内存管理&quot; class=&quot;headerlink&quot; title=&quot;Objective-C++内存管理&quot;&gt;&lt;/a&gt;Objective-C++内存管理&lt;/h2&gt;&lt;hr&gt;
+&lt;p&gt;在项目开发时，
+    
+    </summary>
+    
+      <category term="iOS开发-语言" scheme="https://zhongwuzw.github.io/categories/iOS%E5%BC%80%E5%8F%91-%E8%AF%AD%E8%A8%80/"/>
+    
+    
+      <category term="iOS" scheme="https://zhongwuzw.github.io/tags/iOS/"/>
+    
+      <category term="C++" scheme="https://zhongwuzw.github.io/tags/C/"/>
+    
+  </entry>
+  
+  <entry>
     <title>聊聊dealloc</title>
     <link href="https://zhongwuzw.github.io/2017/09/21/%E8%81%8A%E8%81%8Adealloc/"/>
     <id>https://zhongwuzw.github.io/2017/09/21/聊聊dealloc/</id>
     <published>2017-09-21T09:52:34.000Z</published>
-    <updated>2017-09-25T03:23:03.000Z</updated>
+    <updated>2017-09-25T03:25:49.000Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><hr>
 <blockquote>
@@ -28,7 +63,7 @@
 </blockquote>
 <p>在<code>iOS</code>开发中，我们经常会通过<code>dealloc</code>来判断对象实例是否被释放，依据是当对象实例的引用计数变为0时，运行时会调用对象实例的<code>dealloc</code>方法，我们可以利用该方法做一些扫尾的工作。</p>
 <h2 id="dealloc调用时机"><a href="#dealloc调用时机" class="headerlink" title="dealloc调用时机"></a>dealloc调用时机</h2><hr>
-<p><code>Objective-C</code>的引用计数管理有两种方式相结合，<code>sidetable</code>和<code>isa</code>指针（指针并不是对象的真正内存地址，而是某些位用来进行了一些标志位的存放）；接下来，我将以<code>sidetable</code>进行<code>release</code>来讨论<code>dealloc</code>的调用，直接上代码，如下<code>sidetable_release</code>（下文所有都会用<code>sidetable_release</code>来讨论）函数会在给对象发送<code>release</code>消息的时候调用，<code>sidetable_release</code>方法首先获取对象的引用计数，对引用计数相关标志位做操作，若对象实例可以被释放，将通过<code>objc_msgSend</code>发送<code>SEL_dealloc</code>消息，既调用对象的<code>dealloc</code>方法。</p>
+<p><code>Objective-C</code>的引用计数管理使用两种方式相结合，<code>sidetable</code>和<code>isa</code>指针（指针并不是对象的真正内存地址，而是某些位用来进行了一些标志位的存放）；接下来，我将以<code>sidetable</code>进行<code>release</code>来讨论<code>dealloc</code>的调用，直接上代码，如下<code>sidetable_release</code>（下文所有都会用<code>sidetable_release</code>来讨论）函数会在给对象发送<code>release</code>消息的时候调用，<code>sidetable_release</code>方法首先获取对象的引用计数，对引用计数相关标志位做操作，若对象实例可以被释放，将通过<code>objc_msgSend</code>发送<code>SEL_dealloc</code>消息，既调用对象的<code>dealloc</code>方法。</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">uintptr_t</span></div><div class="line">objc_object::sidetable_release(<span class="keyword">bool</span> performDealloc)</div><div class="line">&#123;</div><div class="line"><span class="meta">#<span class="meta-keyword">if</span> SUPPORT_NONPOINTER_ISA</span></div><div class="line">    assert(!isa.nonpointer);</div><div class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></div><div class="line">    SideTable&amp; table = SideTables()[<span class="keyword">this</span>];</div><div class="line"></div><div class="line">    <span class="keyword">bool</span> do_dealloc = <span class="literal">false</span>;</div><div class="line"></div><div class="line">    table.lock();</div><div class="line">    RefcountMap::iterator it = table.refcnts.find(<span class="keyword">this</span>);</div><div class="line">    <span class="keyword">if</span> (it == table.refcnts.end()) &#123;</div><div class="line">        do_dealloc = <span class="literal">true</span>;</div><div class="line">        table.refcnts[<span class="keyword">this</span>] = SIDE_TABLE_DEALLOCATING;</div><div class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (it-&gt;second &lt; SIDE_TABLE_DEALLOCATING) &#123;</div><div class="line">        <span class="comment">// SIDE_TABLE_WEAKLY_REFERENCED may be set. Don't change it.</span></div><div class="line">        do_dealloc = <span class="literal">true</span>;</div><div class="line">        it-&gt;second |= SIDE_TABLE_DEALLOCATING;</div><div class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (! (it-&gt;second &amp; SIDE_TABLE_RC_PINNED)) &#123;</div><div class="line">        it-&gt;second -= SIDE_TABLE_RC_ONE;</div><div class="line">    &#125;</div><div class="line">    table.unlock();</div><div class="line">    <span class="comment">// 进行释放操作，调用dealloc</span></div><div class="line">    <span class="keyword">if</span> (do_dealloc  &amp;&amp;  performDealloc) &#123;</div><div class="line">        ((<span class="keyword">void</span>(*)(objc_object *, SEL))objc_msgSend)(<span class="keyword">this</span>, SEL_dealloc);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> do_dealloc;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <a id="more"></a>
 <p><code>dealloc</code>方法的实现如下：</p>
@@ -60,7 +95,7 @@
 &lt;/blockquote&gt;
 &lt;p&gt;在&lt;code&gt;iOS&lt;/code&gt;开发中，我们经常会通过&lt;code&gt;dealloc&lt;/code&gt;来判断对象实例是否被释放，依据是当对象实例的引用计数变为0时，运行时会调用对象实例的&lt;code&gt;dealloc&lt;/code&gt;方法，我们可以利用该方法做一些扫尾的工作。&lt;/p&gt;
 &lt;h2 id=&quot;dealloc调用时机&quot;&gt;&lt;a href=&quot;#dealloc调用时机&quot; class=&quot;headerlink&quot; title=&quot;dealloc调用时机&quot;&gt;&lt;/a&gt;dealloc调用时机&lt;/h2&gt;&lt;hr&gt;
-&lt;p&gt;&lt;code&gt;Objective-C&lt;/code&gt;的引用计数管理有两种方式相结合，&lt;code&gt;sidetable&lt;/code&gt;和&lt;code&gt;isa&lt;/code&gt;指针（指针并不是对象的真正内存地址，而是某些位用来进行了一些标志位的存放）；接下来，我将以&lt;code&gt;sidetable&lt;/code&gt;进行&lt;code&gt;release&lt;/code&gt;来讨论&lt;code&gt;dealloc&lt;/code&gt;的调用，直接上代码，如下&lt;code&gt;sidetable_release&lt;/code&gt;（下文所有都会用&lt;code&gt;sidetable_release&lt;/code&gt;来讨论）函数会在给对象发送&lt;code&gt;release&lt;/code&gt;消息的时候调用，&lt;code&gt;sidetable_release&lt;/code&gt;方法首先获取对象的引用计数，对引用计数相关标志位做操作，若对象实例可以被释放，将通过&lt;code&gt;objc_msgSend&lt;/code&gt;发送&lt;code&gt;SEL_dealloc&lt;/code&gt;消息，既调用对象的&lt;code&gt;dealloc&lt;/code&gt;方法。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Objective-C&lt;/code&gt;的引用计数管理使用两种方式相结合，&lt;code&gt;sidetable&lt;/code&gt;和&lt;code&gt;isa&lt;/code&gt;指针（指针并不是对象的真正内存地址，而是某些位用来进行了一些标志位的存放）；接下来，我将以&lt;code&gt;sidetable&lt;/code&gt;进行&lt;code&gt;release&lt;/code&gt;来讨论&lt;code&gt;dealloc&lt;/code&gt;的调用，直接上代码，如下&lt;code&gt;sidetable_release&lt;/code&gt;（下文所有都会用&lt;code&gt;sidetable_release&lt;/code&gt;来讨论）函数会在给对象发送&lt;code&gt;release&lt;/code&gt;消息的时候调用，&lt;code&gt;sidetable_release&lt;/code&gt;方法首先获取对象的引用计数，对引用计数相关标志位做操作，若对象实例可以被释放，将通过&lt;code&gt;objc_msgSend&lt;/code&gt;发送&lt;code&gt;SEL_dealloc&lt;/code&gt;消息，既调用对象的&lt;code&gt;dealloc&lt;/code&gt;方法。&lt;/p&gt;
 &lt;figure class=&quot;highlight cpp&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;19&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;20&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;21&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;22&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;23&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;24&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;25&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;26&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;27&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;28&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;29&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;uintptr_t&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;objc_object::sidetable_release(&lt;span class=&quot;keyword&quot;&gt;bool&lt;/span&gt; performDealloc)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;meta&quot;&gt;#&lt;span class=&quot;meta-keyword&quot;&gt;if&lt;/span&gt; SUPPORT_NONPOINTER_ISA&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    assert(!isa.nonpointer);&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;meta&quot;&gt;#&lt;span class=&quot;meta-keyword&quot;&gt;endif&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    SideTable&amp;amp; table = SideTables()[&lt;span class=&quot;keyword&quot;&gt;this&lt;/span&gt;];&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;bool&lt;/span&gt; do_dealloc = &lt;span class=&quot;literal&quot;&gt;false&lt;/span&gt;;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    table.lock();&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    RefcountMap::iterator it = table.refcnts.find(&lt;span class=&quot;keyword&quot;&gt;this&lt;/span&gt;);&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;if&lt;/span&gt; (it == table.refcnts.end()) &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        do_dealloc = &lt;span class=&quot;literal&quot;&gt;true&lt;/span&gt;;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        table.refcnts[&lt;span class=&quot;keyword&quot;&gt;this&lt;/span&gt;] = SIDE_TABLE_DEALLOCATING;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125; &lt;span class=&quot;keyword&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;if&lt;/span&gt; (it-&amp;gt;second &amp;lt; SIDE_TABLE_DEALLOCATING) &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &lt;span class=&quot;comment&quot;&gt;// SIDE_TABLE_WEAKLY_REFERENCED may be set. Don&#39;t change it.&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        do_dealloc = &lt;span class=&quot;literal&quot;&gt;true&lt;/span&gt;;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        it-&amp;gt;second |= SIDE_TABLE_DEALLOCATING;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125; &lt;span class=&quot;keyword&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;if&lt;/span&gt; (! (it-&amp;gt;second &amp;amp; SIDE_TABLE_RC_PINNED)) &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        it-&amp;gt;second -= SIDE_TABLE_RC_ONE;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    table.unlock();&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;comment&quot;&gt;// 进行释放操作，调用dealloc&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;if&lt;/span&gt; (do_dealloc  &amp;amp;&amp;amp;  performDealloc) &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        ((&lt;span class=&quot;keyword&quot;&gt;void&lt;/span&gt;(*)(objc_object *, SEL))objc_msgSend)(&lt;span class=&quot;keyword&quot;&gt;this&lt;/span&gt;, SEL_dealloc);&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; do_dealloc;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
     
     </summary>
@@ -437,7 +472,7 @@
     <link href="https://zhongwuzw.github.io/2017/05/26/iOS%E6%B5%8F%E8%A7%88%E5%99%A8-WebBrowser/"/>
     <id>https://zhongwuzw.github.io/2017/05/26/iOS浏览器-WebBrowser/</id>
     <published>2017-05-26T10:22:11.000Z</published>
-    <updated>2017-08-25T01:17:12.000Z</updated>
+    <updated>2017-10-30T07:35:50.217Z</updated>
     
     <content type="html"><![CDATA[<p>一款用于网页浏览的APP（Web Browser For iOS)。<a href="https://github.com/zhongwuzw/WebBrowser" target="_blank" rel="external">Github地址</a></p>
 <h2 id="Features-功能"><a href="#Features-功能" class="headerlink" title="Features - 功能"></a>Features - 功能</h2><ol>
@@ -461,7 +496,11 @@
 <h2 id="Demo"><a href="#Demo" class="headerlink" title="Demo"></a>Demo</h2><h4 id="1-Home-Page-主页-："><a href="#1-Home-Page-主页-：" class="headerlink" title="1. Home Page (主页)："></a>1. Home Page (主页)：</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/home_scroll.gif" alt="home page"><br></p>
 
 
-<h4 id="2-Multi-tab-多窗口-："><a href="#2-Multi-tab-多窗口-：" class="headerlink" title="2. Multi-tab (多窗口)："></a>2. Multi-tab (多窗口)：</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/home_tab_switch.gif" alt="tab"><br></p><br><a id="more"></a><br><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/tab_manage.gif" alt="tab"><br></p>
+<h4 id="2-Multi-tab-多窗口-："><a href="#2-Multi-tab-多窗口-：" class="headerlink" title="2. Multi-tab (多窗口)："></a>2. Multi-tab (多窗口)：</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/home_tab_switch.gif" alt="tab"><br></p>
+
+<p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/tab_manage.gif" alt="tab"><br></p>
+
+<p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/multi_window_switch.gif" alt="tab"><br></p>
 
 <h4 id="3-Search-搜索-："><a href="#3-Search-搜索-：" class="headerlink" title="3. Search (搜索)："></a>3. Search (搜索)：</h4><p align="center"><br>  <img src="https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/home_search.gif" alt="search"><br></p>
 
@@ -509,28 +548,7 @@
     <summary type="html">
     
       &lt;p&gt;一款用于网页浏览的APP（Web Browser For iOS)。&lt;a href=&quot;https://github.com/zhongwuzw/WebBrowser&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Github地址&lt;/a&gt;&lt;/p&gt;
-&lt;h2 id=&quot;Features-功能&quot;&gt;&lt;a href=&quot;#Features-功能&quot; class=&quot;headerlink&quot; title=&quot;Features - 功能&quot;&gt;&lt;/a&gt;Features - 功能&lt;/h2&gt;&lt;ol&gt;
-&lt;li&gt;多Tab页浏览(multi-tab browsing)&lt;/li&gt;
-&lt;li&gt;冷启动恢复浏览记录，包括当前页及前进后退页面(session restore, includes current page and backforward list)&lt;/li&gt;
-&lt;li&gt;书签、历史记录管理(bookmark、history manage)&lt;/li&gt;
-&lt;li&gt;页内查找(find in page)&lt;/li&gt;
-&lt;li&gt;点击标题栏进行页面访问或搜索(tap the title bar to  input url for surf or key to search)&lt;/li&gt;
-&lt;li&gt;自动监控剪切板&lt;code&gt;URL&lt;/code&gt;，可在新窗口中打开&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h2 id=&quot;Usage-用法&quot;&gt;&lt;a href=&quot;#Usage-用法&quot; class=&quot;headerlink&quot; title=&quot;Usage - 用法&quot;&gt;&lt;/a&gt;Usage - 用法&lt;/h2&gt;&lt;ol&gt;
-&lt;li&gt;&lt;code&gt;clone&lt;/code&gt; or download zip file.&lt;/li&gt;
-&lt;li&gt;Run command &lt;code&gt;carthage update --platform iOS&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;Just run WebBrowser.xcodeproj&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h2 id=&quot;Requirements-依赖&quot;&gt;&lt;a href=&quot;#Requirements-依赖&quot; class=&quot;headerlink&quot; title=&quot;Requirements - 依赖&quot;&gt;&lt;/a&gt;Requirements - 依赖&lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;iOS 8.0 or higher&lt;/li&gt;
-&lt;li&gt;ARC&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;https://github.com/Carthage/Carthage&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Carthage&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&quot;Demo&quot;&gt;&lt;a href=&quot;#Demo&quot; class=&quot;headerlink&quot; title=&quot;Demo&quot;&gt;&lt;/a&gt;Demo&lt;/h2&gt;&lt;h4 id=&quot;1-Home-Page-主页-：&quot;&gt;&lt;a href=&quot;#1-Home-Page-主页-：&quot; class=&quot;headerlink&quot; title=&quot;1. Home Page (主页)：&quot;&gt;&lt;/a&gt;1. Home Page (主页)：&lt;/h4&gt;&lt;p align=&quot;center&quot;&gt;&lt;br&gt;  &lt;img src=&quot;https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/home_scroll.gif&quot; alt=&quot;home page&quot;&gt;&lt;br&gt;&lt;/p&gt;
-
-
-&lt;h4 id=&quot;2-Multi-tab-多窗口-：&quot;&gt;&lt;a href=&quot;#2-Multi-tab-多窗口-：&quot; class=&quot;headerlink&quot; title=&quot;2. Multi-tab (多窗口)：&quot;&gt;&lt;/a&gt;2. Multi-tab (多窗口)：&lt;/h4&gt;&lt;p align=&quot;center&quot;&gt;&lt;br&gt;  &lt;img src=&quot;https://raw.githubusercontent.com/zhongwuzw/WebBrowser/master/images/home_tab_switch.gif&quot; alt=&quot;tab&quot;&gt;&lt;br&gt;&lt;/p&gt;&lt;br&gt;
+&lt;h2 i
     
     </summary>
     
@@ -552,7 +570,7 @@
     <link href="https://zhongwuzw.github.io/2017/05/01/WWDC-Session406-%E4%BC%98%E5%8C%96App%E5%90%AF%E5%8A%A8%E6%97%B6%E9%97%B4/"/>
     <id>https://zhongwuzw.github.io/2017/05/01/WWDC-Session406-优化App启动时间/</id>
     <published>2017-05-01T15:46:05.000Z</published>
-    <updated>2017-08-27T15:33:43.000Z</updated>
+    <updated>2017-09-25T15:05:26.000Z</updated>
     
     <content type="html"><![CDATA[<h2 id="理论"><a href="#理论" class="headerlink" title="理论"></a>理论</h2><hr>
 <h3 id="Mach-O"><a href="#Mach-O" class="headerlink" title="Mach-O"></a>Mach-O</h3><h4 id="Mach-O相关术语"><a href="#Mach-O相关术语" class="headerlink" title="Mach-O相关术语"></a>Mach-O相关术语</h4><p><code>Mach-O</code>为<code>Mach Object</code>文件格式的缩写，它是一种用于可执行文件，目标代码，动态库，内核存储的文件格式。它包括多种文件类型：</p>
@@ -579,7 +597,7 @@
 <li>使用Swift，Swift做了很多优化，避免了很多操作。</li>
 <li>推荐用<code>+initialize</code>来替换<code>+load</code>。</li>
 <li>不要在初始化器中起线程。</li>
-<li><code>iOS11</code>后，可以通过<code>Instruments</code>来跟踪静态初始化器的时间。</li>
+<li><code>Xcode9</code>后，可以通过<code>Instruments</code>来跟踪静态初始化器的时间。</li>
 </ul>
 <h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><hr>
 <p><a href="https://github.com/kpwn/iOSRE/blob/master/wiki/Mach-O.md" target="_blank" rel="external">Mach-O</a><br><a href="https://developer.apple.com/videos/play/wwdc2016/406/?time=690" target="_blank" rel="external">Optimizing App Startup Time</a></p>
@@ -1337,47 +1355,6 @@
       <category term="iOS" scheme="https://zhongwuzw.github.io/tags/iOS/"/>
     
       <category term="UIWebView" scheme="https://zhongwuzw.github.io/tags/UIWebView/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>使用PyMySQL处理大结果集的方法</title>
-    <link href="https://zhongwuzw.github.io/2016/10/13/%E4%BD%BF%E7%94%A8PyMySQL%E5%A4%84%E7%90%86%E5%A4%A7%E7%BB%93%E6%9E%9C%E9%9B%86%E7%9A%84%E6%96%B9%E6%B3%95/"/>
-    <id>https://zhongwuzw.github.io/2016/10/13/使用PyMySQL处理大结果集的方法/</id>
-    <published>2016-10-13T06:53:30.000Z</published>
-    <updated>2016-10-23T03:09:08.000Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="使用PyMySQL处理大结果集的方法"><a href="#使用PyMySQL处理大结果集的方法" class="headerlink" title="使用PyMySQL处理大结果集的方法"></a>使用PyMySQL处理大结果集的方法</h2><hr>
-<p>最近公司项目需要向别的数据库中获取数据并同步到自己的数据库，由于是别人的库，所以没法直接使用<code>Master-Slave</code>同步，最终选择Python脚本来获取。</p>
-<p>选择了<a href="https://github.com/PyMySQL/PyMySQL" target="_blank" rel="external">PyMySQL</a>客户端库，按照其官方教程，代码比较简单，类似如下：</p>
-<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">import pymysql.cursors</div><div class="line"></div><div class="line"><span class="comment"># Connect to the database</span></div><div class="line">connection = pymysql.connect(host=<span class="string">'localhost'</span>,</div><div class="line">                             user=<span class="string">'user'</span>,</div><div class="line">                             password=<span class="string">'passwd'</span>,</div><div class="line">                             db=<span class="string">'db'</span>,</div><div class="line">                             charset=<span class="string">'utf8mb4'</span>,</div><div class="line">                             cursorclass=pymysql.cursors.DictCursor)</div><div class="line"></div><div class="line"><span class="keyword">try</span>:</div><div class="line">    <span class="keyword">with</span> connection.cursor() <span class="keyword">as</span> cursor:</div><div class="line">        <span class="comment"># Read a single record</span></div><div class="line">        sql = <span class="string">"SELECT `id`, `password` FROM `users`"</span></div><div class="line">        cursor.execute(sql)</div><div class="line">        <span class="built_in">result</span> = cursor.fetchall()</div><div class="line">        print(<span class="built_in">result</span>)</div><div class="line"><span class="keyword">finally</span>:</div><div class="line">    connection.<span class="built_in">close</span>()</div></pre></td></tr></table></figure>
-<p><code>PyMySQL</code>在获取数据时提供了<code>fetchone()</code>和<code>fetchall()</code>函数来获取结果集，后来调试的时候，发现，不管是哪种方法，都会一次将所有结果获取到，这在数据量很大时将会消耗大量内存，所以有考虑是否还有别的方法，比如<code>one-by-one</code>的迭代获取。</p>
-<p>在查看<code>DictCursor</code>游标代码时，发现了<code>SSCursor</code>游标类，其注释如下，意在解决数据量大的问题，正合我意。</p>
-<a id="more"></a>
-<figure class="highlight mizar"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">class SSCursor(Cursor):</div><div class="line">    """</div><div class="line">    Unbuffered Cursor, mainly useful <span class="keyword">for</span> queries <span class="keyword">that</span> return a lot <span class="keyword">of</span> data,</div><div class="line">    <span class="keyword">or</span> <span class="keyword">for</span> connections to remote servers over a slow network.</div><div class="line"></div><div class="line">    Instead <span class="keyword">of</span> copying every row <span class="keyword">of</span> data into a buffer, this will fetch</div><div class="line">    rows <span class="keyword">as</span> needed. The upside <span class="keyword">of</span> this, <span class="keyword">is</span> the client uses much less memory,</div><div class="line">    <span class="keyword">and</span> rows are returned much faster when traveling over a slow network,</div><div class="line">    <span class="keyword">or</span> if the result <span class="keyword">set</span> <span class="keyword">is</span> very big.</div><div class="line"></div><div class="line">    There are limitations, though. The MySQL protocol doesn't support</div><div class="line">    returning the total number <span class="keyword">of</span> rows, so the only way to tell how many rows</div><div class="line">    there are <span class="keyword">is</span> to iterate over every row returned. Also, it currently isn't</div><div class="line">    possible to scroll backwards, <span class="keyword">as</span> only the current row <span class="keyword">is</span> held <span class="keyword">in</span> memory.</div><div class="line">    """</div></pre></td></tr></table></figure>
-<p><code>DictCursor</code>游标类的方法返回都是一个迭代器，可以使用这个迭代器进行迭代获取，这样就不用一次将所有数据保存在内存中了。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">fetchall_unbuffered</span><span class="params">(self)</span>:</span></div><div class="line">    <span class="string">"""</span></div><div class="line">    Fetch all, implemented as a generator, which isn't to standard,</div><div class="line">    however, it doesn't make sense to return everything in a list, as that</div><div class="line">    would use ridiculous memory for large result sets.</div><div class="line">    """</div><div class="line">    <span class="keyword">return</span> iter(self.fetchone, <span class="keyword">None</span>)</div></pre></td></tr></table></figure>
-<p>使用方法如下：</p>
-<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">import pymysql.cursors</div><div class="line">src_pc_database = pymysql.connect(host=<span class="string">'192.168.39.51'</span>, port=<span class="number">5151</span>, user=<span class="string">'*'</span>, password=<span class="string">'*'</span>,</div><div class="line">                               db=<span class="string">'testdataanalyse'</span>,</div><div class="line">                               charset=<span class="string">'utf8mb4'</span>, cursorclass=pymysql.cursors.SSDictCursor)</div><div class="line"></div><div class="line"><span class="keyword">with</span> src_pc_database.cursor() <span class="keyword">as</span> src_cursor:</div><div class="line">    sql = <span class="string">"select * from user"</span></div><div class="line">    src_cursor.execute(sql)</div><div class="line">    <span class="built_in">result</span> = src_cursor.fetchone()</div><div class="line">    </div><div class="line">    <span class="keyword">while</span> <span class="built_in">result</span> is <span class="keyword">not</span> None:</div><div class="line">        <span class="built_in">result</span> = src_cursor.fetchone()</div><div class="line"></div><div class="line">src_pc_database.<span class="built_in">close</span>()</div></pre></td></tr></table></figure>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;使用PyMySQL处理大结果集的方法&quot;&gt;&lt;a href=&quot;#使用PyMySQL处理大结果集的方法&quot; class=&quot;headerlink&quot; title=&quot;使用PyMySQL处理大结果集的方法&quot;&gt;&lt;/a&gt;使用PyMySQL处理大结果集的方法&lt;/h2&gt;&lt;hr&gt;
-&lt;p&gt;最近公司项目需要向别的数据库中获取数据并同步到自己的数据库，由于是别人的库，所以没法直接使用&lt;code&gt;Master-Slave&lt;/code&gt;同步，最终选择Python脚本来获取。&lt;/p&gt;
-&lt;p&gt;选择了&lt;a href=&quot;https://github.com/PyMySQL/PyMySQL&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;PyMySQL&lt;/a&gt;客户端库，按照其官方教程，代码比较简单，类似如下：&lt;/p&gt;
-&lt;figure class=&quot;highlight livecodeserver&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;15&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;17&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;18&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;19&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;import pymysql.cursors&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;# Connect to the database&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;connection = pymysql.connect(host=&lt;span class=&quot;string&quot;&gt;&#39;localhost&#39;&lt;/span&gt;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;                             user=&lt;span class=&quot;string&quot;&gt;&#39;user&#39;&lt;/span&gt;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;                             password=&lt;span class=&quot;string&quot;&gt;&#39;passwd&#39;&lt;/span&gt;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;                             db=&lt;span class=&quot;string&quot;&gt;&#39;db&#39;&lt;/span&gt;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;                             charset=&lt;span class=&quot;string&quot;&gt;&#39;utf8mb4&#39;&lt;/span&gt;,&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;                             cursorclass=pymysql.cursors.DictCursor)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;try&lt;/span&gt;:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;with&lt;/span&gt; connection.cursor() &lt;span class=&quot;keyword&quot;&gt;as&lt;/span&gt; cursor:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &lt;span class=&quot;comment&quot;&gt;# Read a single record&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        sql = &lt;span class=&quot;string&quot;&gt;&quot;SELECT `id`, `password` FROM `users`&quot;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        cursor.execute(sql)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &lt;span class=&quot;built_in&quot;&gt;result&lt;/span&gt; = cursor.fetchall()&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        print(&lt;span class=&quot;built_in&quot;&gt;result&lt;/span&gt;)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;finally&lt;/span&gt;:&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    connection.&lt;span class=&quot;built_in&quot;&gt;close&lt;/span&gt;()&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;p&gt;&lt;code&gt;PyMySQL&lt;/code&gt;在获取数据时提供了&lt;code&gt;fetchone()&lt;/code&gt;和&lt;code&gt;fetchall()&lt;/code&gt;函数来获取结果集，后来调试的时候，发现，不管是哪种方法，都会一次将所有结果获取到，这在数据量很大时将会消耗大量内存，所以有考虑是否还有别的方法，比如&lt;code&gt;one-by-one&lt;/code&gt;的迭代获取。&lt;/p&gt;
-&lt;p&gt;在查看&lt;code&gt;DictCursor&lt;/code&gt;游标代码时，发现了&lt;code&gt;SSCursor&lt;/code&gt;游标类，其注释如下，意在解决数据量大的问题，正合我意。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="Python" scheme="https://zhongwuzw.github.io/categories/Python/"/>
-    
-    
-      <category term="Python" scheme="https://zhongwuzw.github.io/tags/Python/"/>
-    
-      <category term="MySQL" scheme="https://zhongwuzw.github.io/tags/MySQL/"/>
     
   </entry>
   
