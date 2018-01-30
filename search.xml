@@ -4,6 +4,25 @@
   
     
     <entry>
+      <title><![CDATA[Goroutines vs 多线程]]></title>
+      <url>https://zhongwuzw.github.io/2018/01/30/Goroutines-vs-%E5%A4%9A%E7%BA%BF%E7%A8%8B/</url>
+      <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><hr>
+<p><a href="https://golang.google.cn" target="_blank" rel="external">Golang</a>是由<code>Google</code>开发，天生支持并发的语言。<code>Go</code>有一个<code>goroutine</code>的机制，当我们在调用函数前加上<code>go</code>关键字，那么就会创建一个<code>goroutine</code>来异步执行该函数，如：<code>go foo()</code>，以此来实现并发的功能。本文，我们将讨论一下<code>goroutine</code>和线程的区别。</p>
+<h2 id="大小可调整的栈"><a href="#大小可调整的栈" class="headerlink" title="大小可调整的栈"></a>大小可调整的栈</h2><hr>
+<p>线程可以在启动前设置栈的大小，启动后，线程的栈大小就固定了，所以带来的弊端就是浪费内存空间，因为很多时候并不需要这么多内存。<br>相比于线程，<code>goroutine</code>的栈空间是可调整的，<code>goroutine</code>创建时，通常只会分配<code>2KB</code>大小的栈，随着<code>goroutine</code>的运行，比如不断的递归，创建变量等，相应的栈空间也会增大，反之也会按需减小，一个<code>goroutine</code>最大可分配栈空间通常为<code>1GB</code>。</p>
+<h2 id="goroutine-的调度"><a href="#goroutine-的调度" class="headerlink" title="goroutine 的调度"></a><code>goroutine</code> 的调度</h2><hr>
+<p>线程由系统内核进行调度，系统为了实现并发，会不断的切换线程的执行，由此会带来线程的上下文切换。<br>而<code>Go</code>的运行时有一套自己的调度系统，使用<code>m:n</code>策略，既复用<code>m</code>个<code>goroutine</code>到<code>n</code>个线程，<code>Go</code>的调度器类似于内核调度器，区别是它仅管理单个<code>Go</code>程序创建的<code>goroutine</code>。<br>相比于线程，<code>Go</code>的调度器并不会周期性的被硬件定时器调用，而是<code>Go</code>自己来处理，比如，当一个<code>goroutine</code>调用<code>time.Sleep</code>或阻塞与通道、互斥操作时，调度器会将<code>goroutine</code>休眠，然后运行另外的<code>goroutine</code>，这些并不需要内核的上下文切换，所以重新调度一个<code>goroutine</code>的开销会小于重新调度线程的开销。</p>
+<h2 id="GOMAXPROCS"><a href="#GOMAXPROCS" class="headerlink" title="GOMAXPROCS"></a><code>GOMAXPROCS</code></h2><hr>
+<p><code>Go</code>的调度器使用一个名为<code>GOMAXPROCS</code>的参数来确定真正的线程数，其默认值为机器的<code>CPU</code>的数量，如一台机器有8个<code>CPU</code>,那么调度器会同时创建8个线程（<code>GOMAXPROCS</code>就是如上所说<code>m:n</code>中的<code>n</code>)。休眠或阻塞中<code>goroutine</code>不需要线程，但是对于阻塞在<code>I/O</code>或系统调用、正在调用非<code>Go</code>函数的<code>goroutine</code>来说，需要一个系统线程，不过不占用<code>GOMAXPROCS</code>。</p>
+<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><hr>
+<ol>
+<li><a href="https://golang.google.cn" target="_blank" rel="external">https://golang.google.cn</a></li>
+<li><a href="http://www.gopl.io" target="_blank" rel="external">http://www.gopl.io</a></li>
+</ol>
+]]></content>
+    </entry>
+    
+    <entry>
       <title><![CDATA[Objective-C++之内存管理]]></title>
       <url>https://zhongwuzw.github.io/2017/11/16/Objective-C-%E4%B9%8B%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/</url>
       <content type="html"><![CDATA[<h2 id="Objective-C-内存管理"><a href="#Objective-C-内存管理" class="headerlink" title="Objective-C++内存管理"></a>Objective-C++内存管理</h2><hr>

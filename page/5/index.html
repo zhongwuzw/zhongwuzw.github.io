@@ -298,6 +298,139 @@
             
               
                 
+                <a class="post-title-link" href="/2016/10/20/UIWebView相关协议方法总结/" itemprop="url">
+                  UIWebView相关协议方法总结
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-10-20T09:59:55+08:00" content="2016-10-20">
+              2016-10-20
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/iOS开发-网络/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发-网络</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/10/20/UIWebView相关协议方法总结/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/20/UIWebView相关协议方法总结/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h2 id="UIWebView-Private-Method"><a href="#UIWebView-Private-Method" class="headerlink" title="UIWebView Private Method"></a>UIWebView Private Method</h2><hr>
+<ul>
+<li>UIWebView dump method:<a href="https://github.com/nst/iOS-Runtime-Headers/blob/f7f2c13158ff4ecd15b92eefb5c5d365b126db05/Frameworks/UIKit.framework/UIWebView.h" target="_blank" rel="external">UIWebView.h</a></li>
+<li>设置<code>UIWebView</code>在<code>WebThread</code>线程下进行渲染，不占用主线程，代码如下：<figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[_webView <span class="string">performSelector:</span><span class="meta">@selector</span>(<span class="string">_setDrawInWebThread:</span>) <span class="string">withObject:</span><span class="meta">@YES</span>];</div><div class="line">[_webView <span class="string">performSelector:</span><span class="meta">@selector</span>(<span class="string">_setDrawsCheckeredPattern:</span>) <span class="string">withObject:</span><span class="meta">@YES</span>];</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="WebResourceLoadDelegate-Protocol"><a href="#WebResourceLoadDelegate-Protocol" class="headerlink" title="WebResourceLoadDelegate Protocol"></a>WebResourceLoadDelegate Protocol</h2><hr>
+<ul>
+<li><p><code>- (id)webView:(WebView *)sender identifierForInitialRequest:(NSURLRequest *)request fromDataSource:(WebDataSource *)dataSource</code></p>
+<p>  该方法返回一个标识符对象，网页中的每一个资源都会调用该方法。资源包括网页中嵌入的图片、脚本、<code>CSS</code>、嵌入在<code>frame</code>中的页面。</p>
+</li>
+</ul>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/10/20/UIWebView相关协议方法总结/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2016/10/13/使用PyMySQL处理大结果集的方法/" itemprop="url">
                   使用PyMySQL处理大结果集的方法
                 </a>
@@ -795,129 +928,6 @@
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/09/21/epoll的两种工作模式/" itemprop="url">
-                  epoll的两种工作模式
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-09-21T18:13:52+08:00" content="2016-09-21">
-              2016-09-21
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/网络/" itemprop="url" rel="index">
-                    <span itemprop="name">网络</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/09/21/epoll的两种工作模式/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/09/21/epoll的两种工作模式/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><hr>
-<p><code>epoll</code>是<code>Linux</code>下的一个多路复用API，当处理大并发的事件时，其性能远强于古老的<code>poll</code>和<code>select</code>。<code>epoll</code>可以工作在两种模式下，<code>LT</code>（水平触发）、<code>ET</code>（边缘触发），接下来将讨论这两种模式的区别。</p>
-<h2 id="ET（边缘触发）和LT（水平触发）"><a href="#ET（边缘触发）和LT（水平触发）" class="headerlink" title="ET（边缘触发）和LT（水平触发）"></a><code>ET</code>（边缘触发）和<code>LT</code>（水平触发）</h2><hr>
-<p>默认情况下，<code>epoll</code>采用<code>LT</code>模式工作，该模式支持阻塞和非阻塞套接字，如果想采用<code>ET</code>模式，可以使用<code>EPOLLET</code>参数。<code>ET</code>模式只支持非阻塞套接字，其效率要高于<code>LT</code>模式，两者的区别在于，当一个新的事件到来时，<code>LT</code>、<code>ET</code>模式下都可以通过<code>epoll_wait</code>方法来获取到这个事件，但是如果这次没有把这个事件对应的套接字缓冲区处理完，在这个套接字没有新的事件再次到来时，在<code>ET</code>模式下是无法再次从<code>epoll_wait</code>方法中获取到这个事件的；而<code>LT</code>模式则可以再次获取到，进而再次进行处理，其只要一个事件对应的套接字缓冲区还有数据，就总能从<code>epoll_wait</code>中获取到这个事件，因此，如果采用<code>ET</code>模式进行开发时，要特别注意，如果没有彻底的将缓冲区中的数据处理完，则会导致缓冲区中的用户请求得不到响应。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -963,7 +973,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">37</span>
+              <span class="site-state-item-count">38</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -971,7 +981,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">13</span>
+                <span class="site-state-item-count">14</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -980,7 +990,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">36</span>
+                <span class="site-state-item-count">38</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
