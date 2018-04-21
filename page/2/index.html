@@ -317,6 +317,166 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2017/07/27/RxSwift之sentMessage、methodInvoked失效问题解决/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="钟武">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.JPG">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="钟武的技术博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/07/27/RxSwift之sentMessage、methodInvoked失效问题解决/" itemprop="url">RxSwift之sentMessage、methodInvoked失效问题解决</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-27T17:32:08+08:00">
+                2017-07-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS开发-项目/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发-项目</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/07/27/RxSwift之sentMessage、methodInvoked失效问题解决/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/07/27/RxSwift之sentMessage、methodInvoked失效问题解决/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h2 id="RxSwift的sentMessage、methodInvoked方法"><a href="#RxSwift的sentMessage、methodInvoked方法" class="headerlink" title="RxSwift的sentMessage、methodInvoked方法"></a>RxSwift的<code>sentMessage</code>、<code>methodInvoked</code>方法</h2><hr>
+<p><a href="https://github.com/ReactiveX/RxSwift" target="_blank" rel="external">RxSwift</a>是<a href="https://github.com/Reactive-Extensions/Rx.NET" target="_blank" rel="external">Rx</a>的<code>Swift</code>版本，用来实现函数式、响应式编程。</p>
+<p>具体<code>RxSwift</code>的很多用法不做介绍，接下来，只讨论<code>sentMessage</code>、<code>methodInvoked</code>这两个方法，其作用是返回一个<code>Observable&lt;[Any]</code>，可以作为观察者监控<code>NSObject</code>子类的某个<code>selector</code>，当执行该<code>selector</code>时，将在执行前、后分别执行注册了该<code>selector</code>的<code>sentMessage</code>、<code>methodInvoked</code>方法。</p>
+<h2 id="sentMessage、methodInvoked实现原理"><a href="#sentMessage、methodInvoked实现原理" class="headerlink" title="sentMessage、methodInvoked实现原理"></a><code>sentMessage</code>、<code>methodInvoked</code>实现原理</h2><hr>
+<p><code>sentMessage</code>、<code>methodInvoked</code>只针对某个实例起作用，其实现首先借鉴了<code>KVO</code>的实现方法，通过创建监听的对象的子类，然后重写方法的实现来实现。<code>sentMessage</code>、<code>methodInvoked</code>实现分两个版本，基础版、优化版。基础版通过<code>Swizzle</code> <code>forwardInvocation:</code>、<code>respondsToSelector:</code>、<code>methodSignatureForSelector:</code>等函数，将所有需要观察的<code>selector</code>调用时进入<code>forwardInvocation:</code>流程，从而进行拦截，以实现通知；优化版则在基础班的基础上通过<code>Type Encoding</code>来做一个缓存优化，避免每次调用都进入转发的过程。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/07/27/RxSwift之sentMessage、methodInvoked失效问题解决/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2017/06/17/Swift之Weak引用/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1017,169 +1177,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2017/03/14/服务器之从裸机到可用/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="钟武">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.JPG">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="钟武的技术博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/03/14/服务器之从裸机到可用/" itemprop="url">服务器之从裸机到可用</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-14T12:16:24+08:00">
-                2017-03-14
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/系统/" itemprop="url" rel="index">
-                    <span itemprop="name">系统</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/03/14/服务器之从裸机到可用/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/03/14/服务器之从裸机到可用/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><hr>
-<p>对于服务器，程序员们还是很熟悉的，任何一个互联网产品，背后几乎都离不开服务器，所有的服务，背后都是通过服务器来提供的，接下来，我将列出从裸机到可用的基本步骤，示例的服务器为<code>HP ProLiant Gen9</code>，当然，其他的服务器如<code>IBM</code>等，基本步骤也都是类似的。</p>
-<h2 id="配置管理口"><a href="#配置管理口" class="headerlink" title="配置管理口"></a>配置管理口</h2><hr>
-<p>通常来说，这一步是都是要走的，通过配置管理口，可以远程管理服务器，不用去机房插显示器、键盘。<code>HP ProLiant Gen9</code>的管理口称为<code>iLO</code>口，开机初始化后进入系统配置，进行配置，一般来说，服务器都是使用静态IP，所以需要禁掉<code>DHCP</code>，并配置<code>IP</code>地址、网关、子网掩码。重启后生效，这样就能够进行远程控制了。</p>
-<h2 id="做RAID"><a href="#做RAID" class="headerlink" title="做RAID"></a>做RAID</h2><hr>
-<p><a href="https://en.wikipedia.org/wiki/RAID" target="_blank" rel="external">磁盘阵列</a>（Redundant Arrays of Independent Disks，RAID），是由独立磁盘构成的具有冗余能力的阵列，将数据切割成许多区段，分别放在各个硬盘上，同时有冗余，数据重构等安全服务。</p>
-<p>做RAID有很多种方案，可以根据不同的需求，使用不同的方案，如RAID0（条带）、RAID1（镜像）、RAID5、RAID10、RAID50等（不同的方法，所要求的磁盘数也不一样），通常，对于存放数据的磁盘，会使用RAID10、RAID50。做完RAID后，就形成了逻辑分区。</p>
-<p>当然，并不是说服务器一定要做RAID，不做RAID的服务器也能装系统。</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/03/14/服务器之从裸机到可用/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1233,7 +1230,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-count">39</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1326,6 +1323,10 @@
                 
                   <li class="links-of-blogroll-item">
                     <a href="https://www.mikeash.com/pyblog/" title="Mikeash" target="_blank">Mikeash</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.sealiesoftware.com/blog/archive/index.html" title="Hamster Emporium" target="_blank">Hamster Emporium</a>
                   </li>
                 
               </ul>
