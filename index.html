@@ -317,6 +317,167 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2018/05/05/iOS知识小集之Swift闭包作为Objective-C方法参数/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="钟武">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.JPG">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="钟武的技术博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/05/05/iOS知识小集之Swift闭包作为Objective-C方法参数/" itemprop="url">iOS知识小集之Swift闭包作为Objective-C方法参数</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-05T23:30:30+08:00">
+                2018-05-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS开发-其它/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发-其它</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/05/05/iOS知识小集之Swift闭包作为Objective-C方法参数/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/05/05/iOS知识小集之Swift闭包作为Objective-C方法参数/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="Swift闭包作为Objective-C方法参数"><a href="#Swift闭包作为Objective-C方法参数" class="headerlink" title="Swift闭包作为Objective-C方法参数"></a>Swift闭包作为Objective-C方法参数</h2><hr>
+<p>在<code>Swift</code>开发时，有时我们需要调用带有<code>Block</code>参数的<code>Objective-C</code>方法，比如，我们通过<code>perform(_:with:afterDelay:inModes:)</code>来在特定的<code>Runloop</code>模式下运行某<code>selector</code>，如下所示，<code>doAnimation</code>方法接收一个<code>Optional</code>的<code>Block</code>，注意，该方法标注了<code>@objc</code>，所以是<code>Objective-C</code>方法，<code>animationBlock</code>参数为<code>Objective-C</code>的<code>Block</code>，那么我们怎么将<code>Swift</code>的<code>Closure</code>转化为<code>Block</code>呢，方法就是使用<code>@convention(block)</code>来声明兼容<code>Objective-C</code> <code>Block</code>的<code>Closure</code>，如下<code>[1]</code>所示：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">LocationMessageCell</span>: <span class="title">UICollectionViewCell</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">func</span> <span class="title">callSEL</span><span class="params">()</span></span> &#123;</div><div class="line">        <span class="keyword">let</span> block: <span class="meta">@convention</span>(block) (<span class="type">UIImageView</span>) -&gt; <span class="type">Void</span> = &#123; <span class="number">_</span> <span class="keyword">in</span>    <span class="comment">// [1]</span></div><div class="line">        ....</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">self</span>.perform(#selector(<span class="type">LocationMessageCell</span>.doAnimation(with:)), with: block, afterDelay: <span class="number">0</span>, inModes: [.defaultRunLoopMode])</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="meta">@objc</span> <span class="keyword">private</span> <span class="function"><span class="keyword">func</span> <span class="title">doAnimation</span><span class="params">(with animationBlock: <span class="params">(<span class="params">(UIImageView)</span></span></span></span> -&gt; <span class="type">Void</span>)!) &#123;</div><div class="line">        ....</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>除了显式的用<code>@convention(block)</code>来声明，我们也可以直接使用闭包，如：</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="selector-tag">UIView</span><span class="selector-class">.animate</span>(<span class="attribute">withDuration</span>: <span class="number">0.1</span>, <span class="attribute">animations</span>: &#123;</div><div class="line">    ...                </div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<p>注意，之所以我没有在之前的例子进行修改，是因为<code>func perform(_ aSelector: Selector, with anArgument: Any?, afterDelay delay: TimeInterval, inModes modes: [RunLoopMode])</code>的<code>anArgument</code>参数类型为<code>Any?</code>，编译器没有进行自动转换，这种情况只能显式的声明<code>@convention(block)</code>。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><hr>
+<ol>
+<li><a href="https://developer.apple.com/library/content/documentation/Swift/Conceptual/BuildingCocoaApps/InteractingWithObjective-CAPIs.html" target="_blank" rel="external">https://developer.apple.com/library/content/documentation/Swift/Conceptual/BuildingCocoaApps/InteractingWithObjective-CAPIs.html</a></li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2018/04/21/iOS知识小集之为什么objc-msgSend-是用汇编实现的/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -953,178 +1114,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2017/09/01/实现Swift的Array/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="钟武">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.JPG">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="钟武的技术博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/09/01/实现Swift的Array/" itemprop="url">实现Swift的Array</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-01T10:16:46+08:00">
-                2017-09-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/iOS开发-语言/" itemprop="url" rel="index">
-                    <span itemprop="name">iOS开发-语言</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/09/01/实现Swift的Array/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/09/01/实现Swift的Array/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>当我们从<code>Obj-C</code>转到<code>Swift</code>时，会发现<code>Swift</code>提供的数据结构大量使用值语义，如<code>Array</code>、<code>Dictionary</code>等，今天，我们将实现<code>Array</code>的基本功能，来理解值语义以及写时复制。</p>
-<h2 id="值和引用语义"><a href="#值和引用语义" class="headerlink" title="值和引用语义"></a>值和引用语义</h2><hr>
-<p>在实现之前，我们来简单讨论一下值语义和引用语义的区别。当我们使用<code>Obj-C</code>及大多数其他面向对象语言开发时，经常会使用对象指针或引用，而这就是常说的引用语义，我们可以赋值一个对象实例的引用给一个变量：</p>
-<p><code>MyClass *a = ...;</code></p>
-<p>接着，可以将该变量赋值给另一个变量：</p>
-<p><code>MyClass *b = a;</code></p>
-<p>此时，<code>a</code>和<code>b</code>将指向同一个对象，如果指向的对象是可变的，当我们修改对象的内容时，两者对其都可见。</p>
-<p>值语义相对比较简单，我们使用的如<code>int</code>、<code>struct</code>等都是值语义，声明为值语义的变量，其直接指向真正的值，而不是值的指针。所以当我们进行赋值时，将得到值的拷贝，如：</p>
-<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">int a = <span class="number">42</span><span class="comment">;</span></div><div class="line">int <span class="keyword">b </span>= a<span class="comment">;</span></div><div class="line"><span class="keyword">b++;</span></div></pre></td></tr></table></figure>
-<p>此时，<code>b</code>的值为<code>43</code>，而<code>a</code>依然为<code>42</code>。</p>
-<p>在<code>Swift</code>中，<code>class</code>类型仍然是引用语义，<code>struct</code>则为值语义，所以，如果对<code>class</code>类型进行赋值时，将得到一个指向同一个实例的引用，对实例对象内容的修改将对所有的引用可见；使用<code>struct</code>时，则不会，每个变量之间都是独立的。</p>
-<p>对于使用过<code>Obj-C</code>开发过的人来说，转到<code>Swift</code>使用其提供的数组和字典时，可能会不习惯，因为<code>Swift</code>中两者已经变成了值语义，如：</p>
-<figure class="highlight stylus"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="selector-tag">var</span> <span class="selector-tag">a</span> = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</div><div class="line"><span class="selector-tag">var</span> <span class="selector-tag">b</span> = <span class="selector-tag">a</span></div><div class="line"><span class="selector-tag">b</span>.append(<span class="number">4</span>)</div></pre></td></tr></table></figure>
-<p>对于大多数语言，如上代码的结果一般都是<code>a</code>和<code>b</code>都指向同一个数组<code>[1, 2, 3, 4]</code>。而在<code>Swift</code>中，<code>a</code>指向<code>[1, 2, 3]</code>，<code>b</code>则指向<code>[1, 2, 3, 4]</code>。</p>
-<h2 id="实现值语义"><a href="#实现值语义" class="headerlink" title="实现值语义"></a>实现值语义</h2><hr>
-<p>如果对象包含固定数量的数据，那么实现就比较简单：我们直接将数据放到<code>struct</code>中即可。比如想要一个2D <code>Point</code>类型且满足值语义，可以创建一个<code>struct</code>包含<code>x``y</code>的值：</p>
-<figure class="highlight excel"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">struct Point &#123;</div><div class="line">    <span class="built_in">var</span> <span class="symbol">x:</span> <span class="built_in">Int</span></div><div class="line">    <span class="built_in">var</span> <span class="symbol">y:</span> <span class="built_in">Int</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/09/01/实现Swift的Array/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1178,7 +1167,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">39</span>
+                  <span class="site-state-item-count">40</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1200,7 +1189,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-count">39</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>

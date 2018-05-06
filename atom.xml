@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://zhongwuzw.github.io/"/>
-  <updated>2018-04-21T15:49:57.553Z</updated>
+  <updated>2018-05-06T05:04:31.014Z</updated>
   <id>https://zhongwuzw.github.io/</id>
   
   <author>
@@ -14,6 +14,44 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>iOS知识小集之Swift闭包作为Objective-C方法参数</title>
+    <link href="https://zhongwuzw.github.io/2018/05/05/iOS%E7%9F%A5%E8%AF%86%E5%B0%8F%E9%9B%86%E4%B9%8BSwift%E9%97%AD%E5%8C%85%E4%BD%9C%E4%B8%BAObjective-C%E6%96%B9%E6%B3%95%E5%8F%82%E6%95%B0/"/>
+    <id>https://zhongwuzw.github.io/2018/05/05/iOS知识小集之Swift闭包作为Objective-C方法参数/</id>
+    <published>2018-05-05T15:30:30.000Z</published>
+    <updated>2018-05-06T05:04:31.014Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="Swift闭包作为Objective-C方法参数"><a href="#Swift闭包作为Objective-C方法参数" class="headerlink" title="Swift闭包作为Objective-C方法参数"></a>Swift闭包作为Objective-C方法参数</h2><hr>
+<p>在<code>Swift</code>开发时，有时我们需要调用带有<code>Block</code>参数的<code>Objective-C</code>方法，比如，我们通过<code>perform(_:with:afterDelay:inModes:)</code>来在特定的<code>Runloop</code>模式下运行某<code>selector</code>，如下所示，<code>doAnimation</code>方法接收一个<code>Optional</code>的<code>Block</code>，注意，该方法标注了<code>@objc</code>，所以是<code>Objective-C</code>方法，<code>animationBlock</code>参数为<code>Objective-C</code>的<code>Block</code>，那么我们怎么将<code>Swift</code>的<code>Closure</code>转化为<code>Block</code>呢，方法就是使用<code>@convention(block)</code>来声明兼容<code>Objective-C</code> <code>Block</code>的<code>Closure</code>，如下<code>[1]</code>所示：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">LocationMessageCell</span>: <span class="title">UICollectionViewCell</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">func</span> <span class="title">callSEL</span><span class="params">()</span></span> &#123;</div><div class="line">        <span class="keyword">let</span> block: <span class="meta">@convention</span>(block) (<span class="type">UIImageView</span>) -&gt; <span class="type">Void</span> = &#123; <span class="number">_</span> <span class="keyword">in</span>    <span class="comment">// [1]</span></div><div class="line">        ....</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">self</span>.perform(#selector(<span class="type">LocationMessageCell</span>.doAnimation(with:)), with: block, afterDelay: <span class="number">0</span>, inModes: [.defaultRunLoopMode])</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="meta">@objc</span> <span class="keyword">private</span> <span class="function"><span class="keyword">func</span> <span class="title">doAnimation</span><span class="params">(with animationBlock: <span class="params">(<span class="params">(UIImageView)</span></span></span></span> -&gt; <span class="type">Void</span>)!) &#123;</div><div class="line">        ....</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>除了显式的用<code>@convention(block)</code>来声明，我们也可以直接使用闭包，如：</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="selector-tag">UIView</span><span class="selector-class">.animate</span>(<span class="attribute">withDuration</span>: <span class="number">0.1</span>, <span class="attribute">animations</span>: &#123;</div><div class="line">    ...                </div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<p>注意，之所以我没有在之前的例子进行修改，是因为<code>func perform(_ aSelector: Selector, with anArgument: Any?, afterDelay delay: TimeInterval, inModes modes: [RunLoopMode])</code>的<code>anArgument</code>参数类型为<code>Any?</code>，编译器没有进行自动转换，这种情况只能显式的声明<code>@convention(block)</code>。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><hr>
+<ol>
+<li><a href="https://developer.apple.com/library/content/documentation/Swift/Conceptual/BuildingCocoaApps/InteractingWithObjective-CAPIs.html" target="_blank" rel="external">https://developer.apple.com/library/content/documentation/Swift/Conceptual/BuildingCocoaApps/InteractingWithObjective-CAPIs.html</a></li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Swift闭包作为Objective-C方法参数&quot;&gt;&lt;a href=&quot;#Swift闭包作为Objective-C方法参数&quot; class=&quot;headerlink&quot; title=&quot;Swift闭包作为Objective-C方法参数&quot;&gt;&lt;/a&gt;Swift闭包作为Objec
+    
+    </summary>
+    
+      <category term="iOS开发-其它" scheme="https://zhongwuzw.github.io/categories/iOS%E5%BC%80%E5%8F%91-%E5%85%B6%E5%AE%83/"/>
+    
+    
+      <category term="iOS" scheme="https://zhongwuzw.github.io/tags/iOS/"/>
+    
+      <category term="Swift" scheme="https://zhongwuzw.github.io/tags/Swift/"/>
+    
+      <category term="tips" scheme="https://zhongwuzw.github.io/tags/tips/"/>
+    
+      <category term="Closure" scheme="https://zhongwuzw.github.io/tags/Closure/"/>
+    
+  </entry>
   
   <entry>
     <title>iOS知识小集之为什么objc_msgSend()是用汇编实现的</title>
@@ -649,9 +687,9 @@
     
       <category term="Objective-C" scheme="https://zhongwuzw.github.io/tags/Objective-C/"/>
     
-      <category term="项目开发" scheme="https://zhongwuzw.github.io/tags/%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91/"/>
-    
       <category term="浏览器" scheme="https://zhongwuzw.github.io/tags/%E6%B5%8F%E8%A7%88%E5%99%A8/"/>
+    
+      <category term="项目开发" scheme="https://zhongwuzw.github.io/tags/%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91/"/>
     
   </entry>
   
@@ -1239,63 +1277,6 @@
       <category term="Shell" scheme="https://zhongwuzw.github.io/tags/Shell/"/>
     
       <category term="crontab" scheme="https://zhongwuzw.github.io/tags/crontab/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>NSURLSession之使用Keep-Alive长连接</title>
-    <link href="https://zhongwuzw.github.io/2016/11/12/NSURLSession%E4%B9%8B%E4%BD%BF%E7%94%A8keep-alive%E9%95%BF%E8%BF%9E%E6%8E%A5/"/>
-    <id>https://zhongwuzw.github.io/2016/11/12/NSURLSession之使用keep-alive长连接/</id>
-    <published>2016-11-12T14:13:57.000Z</published>
-    <updated>2016-11-12T15:28:54.000Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="HTTP-Keep-Alive"><a href="#HTTP-Keep-Alive" class="headerlink" title="HTTP Keep-Alive"></a>HTTP Keep-Alive</h2><hr>
-<p><code>HTTP</code>的<code>Keep-Alive</code>，是<code>HTTP 1.1</code>默认的功能（<code>HTTP 1.0</code>可以在请求头中设置<code>Keep-Alive</code>来显式开启），其表示持久连接，以前我们所使用的<code>HTTP</code>请求，当发出请求并接收完响应后，将关闭<code>TCP</code>连接，所以，如果我们短时间内进行大量的<code>HTTP</code>请求的话，会导致过多的<code>TCP</code>连接建立、关闭消耗.</p>
-<h2 id="HTTP-Keep-Alive-vs-TCP-KeepAlive"><a href="#HTTP-Keep-Alive-vs-TCP-KeepAlive" class="headerlink" title="HTTP Keep-Alive vs TCP KeepAlive"></a>HTTP Keep-Alive vs TCP KeepAlive</h2><hr>
-<p>注意，我们目前说的都是<code>HTTP</code>的<code>Keep-Alive</code>，其实，<code>TCP</code>也有<code>KeepAlive</code>的概念，它解决的主要问题是，当连接建立后，如果没有数据传输，或者隔一段时间才发送一次数据时，如何来确定<code>Client</code>是否在线，连接是否需要保持，<code>TCP</code>解决方法为，当超过一段时间后，<code>TCP</code>会自动发送一个数据为空的报文给<code>Client</code>，如果对方回应了，则连接继续保持，否则，在重试多次无果后将关闭连接。</p>
-<h2 id="Pipeline"><a href="#Pipeline" class="headerlink" title="Pipeline"></a>Pipeline</h2><hr>
-<p><code>HTTP 1.1</code>引入了<code>Pipeline</code>,其基于<code>Keep-Alive</code>，既利用一个连接做多次请求，当<code>Client</code>提交多个请求时，不需要等第一个请求的响应接收完就能发起第二个请求，既实现类似于流水作业的功能。目前主流服务器都支持<code>Keep-Alive</code>和<code>Pipeline</code>。</p>
-<h2 id="使用NSURLSession开启Keep-Alive、Pipeline"><a href="#使用NSURLSession开启Keep-Alive、Pipeline" class="headerlink" title="使用NSURLSession开启Keep-Alive、Pipeline"></a>使用NSURLSession开启Keep-Alive、Pipeline</h2><hr>
-<a id="more"></a>
-<ul>
-<li><p>开启<code>NSURLSession</code>配置<code>NSURLSessionConfiguration</code>的<code>HTTPShouldUsePipelining</code>属性为<code>YES</code>。</p>
-</li>
-<li><p>开启<code>NSMutableURLRequest</code>的<code>HTTPShouldUsePipelining</code>为<code>YES</code>。（<code>NSMutableURLRequest</code>可以继承<code>NSURLSessionConfiguration</code>的配置，所以如果<code>NSURLSession</code>配置了，则每个请求就不再需要单独配置可。）</p>
-</li>
-<li><p>确保发出的请求在同一个<code>NSURLSession</code>中，因为每一个<code>NSURLSession</code>使用单独的连接池，所以如果<code>NSURLSession</code>不同，那么就无法利用<code>Keep-Alive</code>、<code>Pipeline</code>了。</p>
-</li>
-<li><p>如果请求开启了认证，则相同的认证才能利用<code>Keep-Alive</code>、<code>Pipeline</code>。</p>
-</li>
-</ul>
-<h2 id="附"><a href="#附" class="headerlink" title="附"></a>附</h2><hr>
-<ul>
-<li><p>使用<code>SDWebImage</code>库的类别<code>UIImageView+WebCache</code>加载图片时，默认使用的共享的<code>NSURLSession</code>，且开启了<code>HTTPShouldUsePipelining</code>。</p>
-</li>
-<li><p>使用<code>AFNetworking</code>库时，每个<code>AFHTTPSessionManager</code>都会创建一个单独的<code>NSURLSession</code>。</p>
-</li>
-</ul>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;HTTP-Keep-Alive&quot;&gt;&lt;a href=&quot;#HTTP-Keep-Alive&quot; class=&quot;headerlink&quot; title=&quot;HTTP Keep-Alive&quot;&gt;&lt;/a&gt;HTTP Keep-Alive&lt;/h2&gt;&lt;hr&gt;
-&lt;p&gt;&lt;code&gt;HTTP&lt;/code&gt;的&lt;code&gt;Keep-Alive&lt;/code&gt;，是&lt;code&gt;HTTP 1.1&lt;/code&gt;默认的功能（&lt;code&gt;HTTP 1.0&lt;/code&gt;可以在请求头中设置&lt;code&gt;Keep-Alive&lt;/code&gt;来显式开启），其表示持久连接，以前我们所使用的&lt;code&gt;HTTP&lt;/code&gt;请求，当发出请求并接收完响应后，将关闭&lt;code&gt;TCP&lt;/code&gt;连接，所以，如果我们短时间内进行大量的&lt;code&gt;HTTP&lt;/code&gt;请求的话，会导致过多的&lt;code&gt;TCP&lt;/code&gt;连接建立、关闭消耗.&lt;/p&gt;
-&lt;h2 id=&quot;HTTP-Keep-Alive-vs-TCP-KeepAlive&quot;&gt;&lt;a href=&quot;#HTTP-Keep-Alive-vs-TCP-KeepAlive&quot; class=&quot;headerlink&quot; title=&quot;HTTP Keep-Alive vs TCP KeepAlive&quot;&gt;&lt;/a&gt;HTTP Keep-Alive vs TCP KeepAlive&lt;/h2&gt;&lt;hr&gt;
-&lt;p&gt;注意，我们目前说的都是&lt;code&gt;HTTP&lt;/code&gt;的&lt;code&gt;Keep-Alive&lt;/code&gt;，其实，&lt;code&gt;TCP&lt;/code&gt;也有&lt;code&gt;KeepAlive&lt;/code&gt;的概念，它解决的主要问题是，当连接建立后，如果没有数据传输，或者隔一段时间才发送一次数据时，如何来确定&lt;code&gt;Client&lt;/code&gt;是否在线，连接是否需要保持，&lt;code&gt;TCP&lt;/code&gt;解决方法为，当超过一段时间后，&lt;code&gt;TCP&lt;/code&gt;会自动发送一个数据为空的报文给&lt;code&gt;Client&lt;/code&gt;，如果对方回应了，则连接继续保持，否则，在重试多次无果后将关闭连接。&lt;/p&gt;
-&lt;h2 id=&quot;Pipeline&quot;&gt;&lt;a href=&quot;#Pipeline&quot; class=&quot;headerlink&quot; title=&quot;Pipeline&quot;&gt;&lt;/a&gt;Pipeline&lt;/h2&gt;&lt;hr&gt;
-&lt;p&gt;&lt;code&gt;HTTP 1.1&lt;/code&gt;引入了&lt;code&gt;Pipeline&lt;/code&gt;,其基于&lt;code&gt;Keep-Alive&lt;/code&gt;，既利用一个连接做多次请求，当&lt;code&gt;Client&lt;/code&gt;提交多个请求时，不需要等第一个请求的响应接收完就能发起第二个请求，既实现类似于流水作业的功能。目前主流服务器都支持&lt;code&gt;Keep-Alive&lt;/code&gt;和&lt;code&gt;Pipeline&lt;/code&gt;。&lt;/p&gt;
-&lt;h2 id=&quot;使用NSURLSession开启Keep-Alive、Pipeline&quot;&gt;&lt;a href=&quot;#使用NSURLSession开启Keep-Alive、Pipeline&quot; class=&quot;headerlink&quot; title=&quot;使用NSURLSession开启Keep-Alive、Pipeline&quot;&gt;&lt;/a&gt;使用NSURLSession开启Keep-Alive、Pipeline&lt;/h2&gt;&lt;hr&gt;
-    
-    </summary>
-    
-      <category term="iOS开发-网络" scheme="https://zhongwuzw.github.io/categories/iOS%E5%BC%80%E5%8F%91-%E7%BD%91%E7%BB%9C/"/>
-    
-    
-      <category term="iOS" scheme="https://zhongwuzw.github.io/tags/iOS/"/>
-    
-      <category term="NSURLSession" scheme="https://zhongwuzw.github.io/tags/NSURLSession/"/>
-    
-      <category term="网络" scheme="https://zhongwuzw.github.io/tags/%E7%BD%91%E7%BB%9C/"/>
     
   </entry>
   

@@ -317,6 +317,178 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2017/09/01/实现Swift的Array/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="钟武">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.JPG">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="钟武的技术博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/09/01/实现Swift的Array/" itemprop="url">实现Swift的Array</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-01T10:16:46+08:00">
+                2017-09-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS开发-语言/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发-语言</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/09/01/实现Swift的Array/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/09/01/实现Swift的Array/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>当我们从<code>Obj-C</code>转到<code>Swift</code>时，会发现<code>Swift</code>提供的数据结构大量使用值语义，如<code>Array</code>、<code>Dictionary</code>等，今天，我们将实现<code>Array</code>的基本功能，来理解值语义以及写时复制。</p>
+<h2 id="值和引用语义"><a href="#值和引用语义" class="headerlink" title="值和引用语义"></a>值和引用语义</h2><hr>
+<p>在实现之前，我们来简单讨论一下值语义和引用语义的区别。当我们使用<code>Obj-C</code>及大多数其他面向对象语言开发时，经常会使用对象指针或引用，而这就是常说的引用语义，我们可以赋值一个对象实例的引用给一个变量：</p>
+<p><code>MyClass *a = ...;</code></p>
+<p>接着，可以将该变量赋值给另一个变量：</p>
+<p><code>MyClass *b = a;</code></p>
+<p>此时，<code>a</code>和<code>b</code>将指向同一个对象，如果指向的对象是可变的，当我们修改对象的内容时，两者对其都可见。</p>
+<p>值语义相对比较简单，我们使用的如<code>int</code>、<code>struct</code>等都是值语义，声明为值语义的变量，其直接指向真正的值，而不是值的指针。所以当我们进行赋值时，将得到值的拷贝，如：</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">int a = <span class="number">42</span><span class="comment">;</span></div><div class="line">int <span class="keyword">b </span>= a<span class="comment">;</span></div><div class="line"><span class="keyword">b++;</span></div></pre></td></tr></table></figure>
+<p>此时，<code>b</code>的值为<code>43</code>，而<code>a</code>依然为<code>42</code>。</p>
+<p>在<code>Swift</code>中，<code>class</code>类型仍然是引用语义，<code>struct</code>则为值语义，所以，如果对<code>class</code>类型进行赋值时，将得到一个指向同一个实例的引用，对实例对象内容的修改将对所有的引用可见；使用<code>struct</code>时，则不会，每个变量之间都是独立的。</p>
+<p>对于使用过<code>Obj-C</code>开发过的人来说，转到<code>Swift</code>使用其提供的数组和字典时，可能会不习惯，因为<code>Swift</code>中两者已经变成了值语义，如：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="selector-tag">var</span> <span class="selector-tag">a</span> = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</div><div class="line"><span class="selector-tag">var</span> <span class="selector-tag">b</span> = <span class="selector-tag">a</span></div><div class="line"><span class="selector-tag">b</span>.append(<span class="number">4</span>)</div></pre></td></tr></table></figure>
+<p>对于大多数语言，如上代码的结果一般都是<code>a</code>和<code>b</code>都指向同一个数组<code>[1, 2, 3, 4]</code>。而在<code>Swift</code>中，<code>a</code>指向<code>[1, 2, 3]</code>，<code>b</code>则指向<code>[1, 2, 3, 4]</code>。</p>
+<h2 id="实现值语义"><a href="#实现值语义" class="headerlink" title="实现值语义"></a>实现值语义</h2><hr>
+<p>如果对象包含固定数量的数据，那么实现就比较简单：我们直接将数据放到<code>struct</code>中即可。比如想要一个2D <code>Point</code>类型且满足值语义，可以创建一个<code>struct</code>包含<code>x``y</code>的值：</p>
+<figure class="highlight excel"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">struct Point &#123;</div><div class="line">    <span class="built_in">var</span> <span class="symbol">x:</span> <span class="built_in">Int</span></div><div class="line">    <span class="built_in">var</span> <span class="symbol">y:</span> <span class="built_in">Int</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/09/01/实现Swift的Array/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2017/07/27/RxSwift之sentMessage、methodInvoked失效问题解决/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1011,172 +1183,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2017/05/01/WWDC-Session406-优化App启动时间/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="钟武">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.JPG">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="钟武的技术博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/05/01/WWDC-Session406-优化App启动时间/" itemprop="url">WWDC-Session406-优化App启动时间</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-01T23:46:05+08:00">
-                2017-05-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/iOS开发-项目/" itemprop="url" rel="index">
-                    <span itemprop="name">iOS开发-项目</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/05/01/WWDC-Session406-优化App启动时间/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/05/01/WWDC-Session406-优化App启动时间/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="理论"><a href="#理论" class="headerlink" title="理论"></a>理论</h2><hr>
-<h3 id="Mach-O"><a href="#Mach-O" class="headerlink" title="Mach-O"></a>Mach-O</h3><h4 id="Mach-O相关术语"><a href="#Mach-O相关术语" class="headerlink" title="Mach-O相关术语"></a>Mach-O相关术语</h4><p><code>Mach-O</code>为<code>Mach Object</code>文件格式的缩写，它是一种用于可执行文件，目标代码，动态库，内核存储的文件格式。它包括多种文件类型：</p>
-<ul>
-<li><code>Executable</code>(可执行文件)：App的主二进制文件</li>
-<li><code>Dylib</code>：动态库（如<code>DSO</code>、<code>DLL</code>)</li>
-<li><code>Bundle</code>：不能被链接的动态库，只能通过<code>dlopen()</code>，用于<code>Mac OS</code>。</li>
-</ul>
-<p><code>Image</code>：可以是可执行文件、动态库或者<code>bundle</code>。<br><code>Framework</code>：动态库，包含资源和头文件。</p>
-<h4 id="Mach-O-Image文件"><a href="#Mach-O-Image文件" class="headerlink" title="Mach-O Image文件"></a>Mach-O Image文件</h4><p>一个<code>Mach-O</code>文件由3部分组成：<code>Header</code>、<code>Load commands</code>、<code>Raw segment data</code>。<code>Header</code>描述了文件的目标架构等信息，如x86-64,PPC；<code>Load commands</code>列出了文件的逻辑结构及文件在虚拟内存中的布局;<code>Raw segment data</code>包含了在<code>Load commands</code>中指出的<code>segment</code>(<code>段</code>)。在<code>Mach-O</code>文件中，我们把<code>Header</code>、<code>Load commands</code>放在了<code>__TEXT``segment</code>(<code>段</code>)的开头，即第一个<code>segment</code>(<code>段</code>)的开头。每一个<code>段</code>由多个<code>page</code>(<code>页</code>)组成，<code>段</code>的大小为<code>页</code>大小的整数倍。如下图，<code>TEXT段</code>占3<code>页</code>，<code>DATA</code>、<code>LINKEDIT</code>分别占1<code>页</code>。<code>页</code>的大小取决于硬件，在<code>arm64</code>下，<code>页</code>大小为16K，其它则为4K。<br><img src="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-02%20%E4%B8%8B%E5%8D%8810.24.03.png" alt=""></p>
-<p>我们还可以从<code>section</code>(节)的角度来理解<code>段</code>,编译器对<code>section</code>是透明的，<code>section</code>仅仅是一个<code>段</code>的子区间，它没有任何的大小约束，但是<code>section</code>之间不会产生重叠。<br><img src="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-02%20%E4%B8%8B%E5%8D%8810.41.36.png" alt=""></p>
-<p>事实上，每一个二进制文件都包含<code>TEXT</code>、<code>DATA</code>、<code>LINKEDIT</code>这3个通用的<code>段</code>，<code>TEXT</code>位于文件的开始，它包括<code>Mach header</code>，机器指令，代码以及只读常量如C字符串，<code>DATA段</code>是可读写的，其包括所有的全局变量，静态变量等。<code>LINKEDIT</code>包含加载程序的<code>meta data</code>(元数据)，如符号，字符串，重定向表条目，供动态链接器使用。</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/05/01/WWDC-Session406-优化App启动时间/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1230,7 +1236,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">39</span>
+                  <span class="site-state-item-count">40</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1252,7 +1258,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-count">39</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>

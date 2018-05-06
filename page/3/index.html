@@ -317,6 +317,172 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2017/05/01/WWDC-Session406-优化App启动时间/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="钟武">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.JPG">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="钟武的技术博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/05/01/WWDC-Session406-优化App启动时间/" itemprop="url">WWDC-Session406-优化App启动时间</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-01T23:46:05+08:00">
+                2017-05-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS开发-项目/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发-项目</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/05/01/WWDC-Session406-优化App启动时间/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/05/01/WWDC-Session406-优化App启动时间/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h2 id="理论"><a href="#理论" class="headerlink" title="理论"></a>理论</h2><hr>
+<h3 id="Mach-O"><a href="#Mach-O" class="headerlink" title="Mach-O"></a>Mach-O</h3><h4 id="Mach-O相关术语"><a href="#Mach-O相关术语" class="headerlink" title="Mach-O相关术语"></a>Mach-O相关术语</h4><p><code>Mach-O</code>为<code>Mach Object</code>文件格式的缩写，它是一种用于可执行文件，目标代码，动态库，内核存储的文件格式。它包括多种文件类型：</p>
+<ul>
+<li><code>Executable</code>(可执行文件)：App的主二进制文件</li>
+<li><code>Dylib</code>：动态库（如<code>DSO</code>、<code>DLL</code>)</li>
+<li><code>Bundle</code>：不能被链接的动态库，只能通过<code>dlopen()</code>，用于<code>Mac OS</code>。</li>
+</ul>
+<p><code>Image</code>：可以是可执行文件、动态库或者<code>bundle</code>。<br><code>Framework</code>：动态库，包含资源和头文件。</p>
+<h4 id="Mach-O-Image文件"><a href="#Mach-O-Image文件" class="headerlink" title="Mach-O Image文件"></a>Mach-O Image文件</h4><p>一个<code>Mach-O</code>文件由3部分组成：<code>Header</code>、<code>Load commands</code>、<code>Raw segment data</code>。<code>Header</code>描述了文件的目标架构等信息，如x86-64,PPC；<code>Load commands</code>列出了文件的逻辑结构及文件在虚拟内存中的布局;<code>Raw segment data</code>包含了在<code>Load commands</code>中指出的<code>segment</code>(<code>段</code>)。在<code>Mach-O</code>文件中，我们把<code>Header</code>、<code>Load commands</code>放在了<code>__TEXT``segment</code>(<code>段</code>)的开头，即第一个<code>segment</code>(<code>段</code>)的开头。每一个<code>段</code>由多个<code>page</code>(<code>页</code>)组成，<code>段</code>的大小为<code>页</code>大小的整数倍。如下图，<code>TEXT段</code>占3<code>页</code>，<code>DATA</code>、<code>LINKEDIT</code>分别占1<code>页</code>。<code>页</code>的大小取决于硬件，在<code>arm64</code>下，<code>页</code>大小为16K，其它则为4K。<br><img src="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-02%20%E4%B8%8B%E5%8D%8810.24.03.png" alt=""></p>
+<p>我们还可以从<code>section</code>(节)的角度来理解<code>段</code>,编译器对<code>section</code>是透明的，<code>section</code>仅仅是一个<code>段</code>的子区间，它没有任何的大小约束，但是<code>section</code>之间不会产生重叠。<br><img src="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-02%20%E4%B8%8B%E5%8D%8810.41.36.png" alt=""></p>
+<p>事实上，每一个二进制文件都包含<code>TEXT</code>、<code>DATA</code>、<code>LINKEDIT</code>这3个通用的<code>段</code>，<code>TEXT</code>位于文件的开始，它包括<code>Mach header</code>，机器指令，代码以及只读常量如C字符串，<code>DATA段</code>是可读写的，其包括所有的全局变量，静态变量等。<code>LINKEDIT</code>包含加载程序的<code>meta data</code>(元数据)，如符号，字符串，重定向表条目，供动态链接器使用。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/05/01/WWDC-Session406-优化App启动时间/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2017/03/14/服务器之从裸机到可用/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -968,168 +1134,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2016/12/22/iOS设置shadow-带来的离屏渲染/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="钟武">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.JPG">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="钟武的技术博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/12/22/iOS设置shadow-带来的离屏渲染/" itemprop="url">iOS设置shadow*带来的离屏渲染</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-12-22T15:23:11+08:00">
-                2016-12-22
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/iOS开发-UI/" itemprop="url" rel="index">
-                    <span itemprop="name">iOS开发-UI</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2016/12/22/iOS设置shadow-带来的离屏渲染/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/12/22/iOS设置shadow-带来的离屏渲染/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><hr>
-<p>在项目中，当我们想要设置<code>View</code>的阴影效果时，可以通过<code>shadow*</code>相关方法实现，如：</p>
-<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">self.layer.<span class="keyword">shadowOffset </span>= CGSizeMake(<span class="number">4</span>, -<span class="number">2</span>)<span class="comment">;</span></div><div class="line">self.layer.<span class="keyword">shadowOpacity </span>= <span class="number">0</span>.<span class="number">5</span><span class="comment">;</span></div><div class="line">self.layer.<span class="keyword">shadowColor </span>= [[UIColor <span class="keyword">blackColor] </span>colorWithAlphaComponent:<span class="number">0</span>.<span class="number">5</span>].CGColor<span class="comment">;</span></div></pre></td></tr></table></figure>
-<p>实现效果如下：<br><img src="http://oc54pu02q.bkt.clouddn.com/shadow.png" width="500" height="" alt="" align="center"></p>
-<p>如上实现方式，有些情况下，你并不会发现有什么问题，但是一旦将其用在如<code>UITableViewCell</code>、<code>UICollectionViewCell</code>等时，你会发现，滑动时会导致大量掉帧的情况，其主要原因为，<code>shadow*</code>方法的使用将导致<code>Core Animation</code>进行离屏渲染，为了确定这一点，可以通过<code>Instruments</code>工具，选择<code>Core Animation</code>模板，选择开启<code>Color Offscreen-Rendered Yellow</code> <code>Debug</code>选项，当我们滑动<code>CollectionView</code>时，其帧率如下，产生了大量掉帧的情况，且正如我们所料，使用<code>shadow*</code>方法的视图被标黄，既使用了离屏渲染。</p>
-<p><img src="http://oc54pu02q.bkt.clouddn.com/bad-frame.png" width="500" height="" alt="" align="center"></p>
-<p>帧率情况如上，可以看到丢帧率很高。</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2016/12/22/iOS设置shadow-带来的离屏渲染/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1183,7 +1187,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">39</span>
+                  <span class="site-state-item-count">40</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1205,7 +1209,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-count">39</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
