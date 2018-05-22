@@ -4,6 +4,37 @@
   
     
     <entry>
+      <title><![CDATA[iOS知识小集之main-queue!=main-thread]]></title>
+      <url>https://zhongwuzw.github.io/2018/05/22/iOS%E7%9F%A5%E8%AF%86%E5%B0%8F%E9%9B%86%E4%B9%8Bmain-queue-main-thread/</url>
+      <content type="html"><![CDATA[<h2 id="GCD-main-queue和main-thread的关系"><a href="#GCD-main-queue和main-thread的关系" class="headerlink" title="GCD main queue和main thread的关系"></a>GCD <code>main queue</code>和<code>main thread</code>的关系</h2><hr>
+<p><code>dispatch_get_main_queue()</code>返回<code>main queue</code>，该队列会被绑定到<code>main thread</code>，所以我们如果我们将<code>block</code>提交到<code>main queue</code>，那么该<code>block</code>将会在主线程中执行。</p>
+<h2 id="dispatch-sync-queue-block-向-main-queue提交block"><a href="#dispatch-sync-queue-block-向-main-queue提交block" class="headerlink" title="dispatch_sync(queue, block)向 main queue提交block"></a><code>dispatch_sync(queue, block)</code>向 <code>main queue</code>提交<code>block</code></h2><hr>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/// Current thread is main thread</span></div><div class="line"><span class="selector-tag">dispatch_sync</span>(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, <span class="number">0</span>), ^&#123;</div><div class="line">        NSLog(@"Is main thread? %d", <span class="selector-attr">[NSThread isMainThread]</span>);</div><div class="line">    &#125;);</div><div class="line">    </div><div class="line"><span class="comment">/// output:</span></div><div class="line"><span class="comment">/// "Is main thread? 1"</span></div></pre></td></tr></table></figure>
+<p>大家有没有注意到，<code>Log</code>输出表明执行<code>Block</code>时的线程为主线程，根据我们以往的经验，<code>dispatch_get_global_queue</code>获取到的队列，队列中的<code>Block</code>应该是在<code>Secondly thread</code>中执行，为什么这里会是在主线程中呢。</p>
+<p>答案就是在<code>dispatch_sync</code>语句，<code>libdispatch</code>在<a href="https://github.com/apple/swift-corelibs-libdispatch/commit/e64e4b962e1f356d7561e7a6103b424f335d85f6" target="_blank" rel="external">commit</a>中进行了优化，只要目标<code>queue</code>不是<code>main queue</code>，那么提交的<code>Block</code>就会直接在原线程中执行，这就能解释为什么上面的<code>demo</code>程序中输出的<code>Log</code>显示是主线程。</p>
+<p>那么，这种会不会有潜在的问题呢？</p>
+<h2 id="isMainThread带来的潜在问题"><a href="#isMainThread带来的潜在问题" class="headerlink" title="isMainThread带来的潜在问题"></a><code>isMainThread</code>带来的潜在问题</h2><hr>
+<p>首先，我们看一个<a href="http://www.openradar.me/24025596" target="_blank" rel="external">Radar</a>，大概意思是，即使<code>MapKit</code>框架的<code>addOverlay</code>方法在主线程执行，但是由于其不是在<code>main queue</code>中执行的，会导致<code>Crash</code>，这是因为<code>MapKit</code>内部在<code>main queue</code>中使用<code>dispatch_queue_set_specific</code>设置了数据，当你在其它队列中执行时，会由于没有该数据从而导致<code>Crash</code>。</p>
+<h2 id="避免使用isMainThread"><a href="#避免使用isMainThread" class="headerlink" title="避免使用isMainThread"></a>避免使用<code>isMainThread</code></h2><hr>
+<p>所以，我们需要避免使用<code>isMainThread</code>，而是判断是不是<code>main queue</code>，我们可以使用两种方法来判断：</p>
+<ol>
+<li>使用<code>dispatch_queue_set_specific</code>在<code>main queue</code>上设置<code>flag</code>，然后做判断，有该<code>flag</code>即为<code>main queue</code>.</li>
+<li>判断<code>dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL) == dispatch_queue_get_label(dispatch_get_main_queue())</code>，<code>main queue</code>设置了<code>label</code>，可以通过其来判断。</li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><hr>
+<ol>
+<li><code>main queue</code>中的<code>Block</code>一定在主线程中执行。</li>
+<li>主线程可以对应多个<code>queue</code>，既可以有任意的队列，其<code>Block</code>可以在主线程中执行。</li>
+</ol>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><hr>
+<ol>
+<li><a href="https://github.com/ReactiveCocoa/ReactiveCocoa/issues/2635#issuecomment-170215083" target="_blank" rel="external">https://github.com/ReactiveCocoa/ReactiveCocoa/issues/2635#issuecomment-170215083</a></li>
+<li><a href="http://www.openradar.me/24025596" target="_blank" rel="external">http://www.openradar.me/24025596</a></li>
+</ol>
+]]></content>
+    </entry>
+    
+    <entry>
       <title><![CDATA[iOS知识小集之Swift闭包作为Objective-C方法参数]]></title>
       <url>https://zhongwuzw.github.io/2018/05/05/iOS%E7%9F%A5%E8%AF%86%E5%B0%8F%E9%9B%86%E4%B9%8BSwift%E9%97%AD%E5%8C%85%E4%BD%9C%E4%B8%BAObjective-C%E6%96%B9%E6%B3%95%E5%8F%82%E6%95%B0/</url>
       <content type="html"><![CDATA[<h2 id="Swift闭包作为Objective-C方法参数"><a href="#Swift闭包作为Objective-C方法参数" class="headerlink" title="Swift闭包作为Objective-C方法参数"></a>Swift闭包作为Objective-C方法参数</h2><hr>

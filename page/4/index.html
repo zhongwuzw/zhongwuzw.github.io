@@ -317,6 +317,176 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2016/12/27/SSO单点登录之CAS-Server/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="钟武">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.JPG">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="钟武的技术博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2016/12/27/SSO单点登录之CAS-Server/" itemprop="url">SSO单点登录之CAS-Server</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-12-27T18:15:15+08:00">
+                2016-12-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Web开发/" itemprop="url" rel="index">
+                    <span itemprop="name">Web开发</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/12/27/SSO单点登录之CAS-Server/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/12/27/SSO单点登录之CAS-Server/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h2 id="Prerequisites"><a href="#Prerequisites" class="headerlink" title="Prerequisites"></a>Prerequisites</h2><hr>
+<ul>
+<li><code>CAS Server 3.5.x.</code>，下文以<code>$CAS-SERVER</code>表示。</li>
+<li><code>CAS Client 3.3.x.</code>，下文以<code>$CAS-CLIENT</code>表示。</li>
+<li><code>Tomcat 7.x</code>，下文以<code>$CAS_TOMCAT_HOME</code>表示。</li>
+<li><code>GateIn-3.8.1.Final-tomcat-7</code>，下文以<code>$GATEIN_HOME</code>表示。</li>
+</ul>
+<blockquote>
+<p>最近公司需要对之前的多个Web应用系统进行整合，希望用户在登录某个应用系统时，能直接访问其他的Web应用系统，且不需要再次登录。既我们经常说的单点登录，最后，我选择了<a href="https://www.apereo.org/projects/cas/download-cas" target="_blank" rel="external"><code>CAS</code></a>，并将其整合进了<a href="http://gatein.jboss.org/" target="_blank" rel="external">GateIn portal</a>。接下来，将整理一下原理和整合步骤。<br>所有项目代码示例可在<a href="https://github.com/CAS-GateInPortal" target="_blank" rel="external">github</a>上下载。</p>
+</blockquote>
+<h2 id="CAS介绍"><a href="#CAS介绍" class="headerlink" title="CAS介绍"></a>CAS介绍</h2><hr>
+<p><a href="https://www.apereo.org/projects/cas/download-cas" target="_blank" rel="external"><code>CAS</code></a>（Central Authentication Service）是<code>Yale</code>大学发起的一个开源项目，旨在为<code>Web</code>应用系统提供一种可靠的单点登录。单点登录，既在多个应用系统中，用户只需登录一次就可以访问所有相互信任的应用系统。<code>CAS Client</code>支持非常多的客户端，包括<code>JAVA、PHP、Ruby</code>等。</p>
+<p>接下来，接介绍一下<code>CAS</code>系统。</p>
+<h3 id="CAS-系统组成"><a href="#CAS-系统组成" class="headerlink" title="CAS 系统组成"></a>CAS 系统组成</h3><hr>
+<p><code>CAS</code>系统架构由两部分组成，<code>CAS Server</code>、<code>CAS Clients</code>，两者可以通过多种协议进行通信。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/12/27/SSO单点登录之CAS-Server/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2016/12/22/iOS设置shadow-带来的离屏渲染/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -955,173 +1125,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2016/11/28/crontab执行Shell脚本时的工作目录/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="钟武">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.JPG">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="钟武的技术博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/11/28/crontab执行Shell脚本时的工作目录/" itemprop="url">crontab执行Shell脚本时的工作目录</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-11-28T17:30:00+08:00">
-                2016-11-28
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/系统/" itemprop="url" rel="index">
-                    <span itemprop="name">系统</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2016/11/28/crontab执行Shell脚本时的工作目录/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/11/28/crontab执行Shell脚本时的工作目录/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="crontab执行Shell脚本时的工作目录"><a href="#crontab执行Shell脚本时的工作目录" class="headerlink" title="crontab执行Shell脚本时的工作目录"></a>crontab执行Shell脚本时的工作目录</h2><hr>
-<p>由于工作需要，创建了一个<code>crontab</code>定时任务，用来在每天固定时间执行一个<code>Shell</code>脚本，在<code>Shell</code>脚本中，有对该脚本所在目录的相关文件进行操作的逻辑，在一开始实现时，对当前目录的文件操作时都是使用的相对目录，即<code>./*</code>。在终端直接<code>sh</code>执行时没有任何问题，正常结束，而一旦在<code>crontab</code>中定时执行时，就出现问题，如提示<code>file not found</code>等错误。</p>
-<h2 id="解决工作目录问题"><a href="#解决工作目录问题" class="headerlink" title="解决工作目录问题"></a>解决工作目录问题</h2><hr>
-<p>出现问题后，我在脚本中试着打印出<code>crontab</code>执行时的当前目录，如<code>curPath=$(pwd)</code>，执行后发现，打印出的结果为<code>$HOME</code>的目录，而非脚本所在的原始目录，这就造成了在脚本中使用相对路径时出现找不到的情况。</p>
-<p>找到问题后，解决方法有两个：</p>
-<ol>
-<li>将相对路径替换为绝对路径。（ps：如脚本中包含某些<code>Shell</code>命令，且命令的某些参数为默认当前目录的，都需要显式的给出绝对路径）</li>
-<li>在操作相对路径之前，使用<code>cd /....../</code>，在执行脚本时强制进入到该目录。</li>
-</ol>
-<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><hr>
-<p>系统在执行定时任务时，是不会加载任何环境变量的，所以当脚本需要<code>Java</code>或其他环境变量时，可以通过在脚本中添加<code>source /etc/profile</code>命令来使配置生效。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1170,7 +1178,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">40</span>
+                  <span class="site-state-item-count">41</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1192,7 +1200,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">39</span>
+                  <span class="site-state-item-count">40</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
