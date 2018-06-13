@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://zhongwuzw.github.io/"/>
-  <updated>2018-05-22T13:47:38.533Z</updated>
+  <updated>2018-06-13T10:05:35.065Z</updated>
   <id>https://zhongwuzw.github.io/</id>
   
   <author>
@@ -14,6 +14,45 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>iOS内存管理之Swapped Memory</title>
+    <link href="https://zhongwuzw.github.io/2018/06/13/iOS%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%B9%8BSwapped-Memory/"/>
+    <id>https://zhongwuzw.github.io/2018/06/13/iOS内存管理之Swapped-Memory/</id>
+    <published>2018-06-13T09:00:10.000Z</published>
+    <updated>2018-06-13T10:05:35.065Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="Swap-Space"><a href="#Swap-Space" class="headerlink" title="Swap Space"></a>Swap Space</h2><hr>
+<p><code>Linux</code>、<code>Macos</code>等系统有一个<code>Swap space</code>的概念，当物理内存紧张时，系统会将<code>inactive</code>的<code>pages</code>放到<code>Swap Space</code>，<code>Swap Space</code>为磁盘上的某个区域，一般是文件形式，这样能节省出来一部分的物理内存，不过，当我们需要访问已经放到磁盘中的内存时，由于已经不在物理内存中，会引发缺页中断，需要再次从磁盘中重新读取，所以会比直接从内存获取要慢。</p>
+<p>不过<code>iOS</code>系统并没有<code>Swap Space</code>，原因可能有二，其一是<code>iPhone</code>的<code>Flash</code>闪存空间受限；其二是<code>CPU</code>受限，因为手机的<code>CPU</code>相比电脑还是有一定差距。</p>
+<h2 id="Swapped-Size"><a href="#Swapped-Size" class="headerlink" title="Swapped Size"></a>Swapped Size</h2><hr>
+<p><code>iOS</code>中，内存分为两种，一种为<code>Clean memory</code>，另一种为<code>Dirty memory</code>；<br><code>Clean memory</code>的<code>page</code>可以换出，既磁盘中有其对应内容，系统可以在内存紧张时将<code>Clean memory</code>的<code>page</code>换出，当再次访问时，可以重新从磁盘中读取，我们使用的图片、<code>mapped files</code>、<code>Framework</code>的数据段常量以及代码段等，这些都是<code>Clean memory</code>。<br><code>Dirty memory</code>是无法换出的，我们所有的堆上的分配等都是属于<code>Dirty memory</code>,所以我们一定要尽可能的减少<code>Dirty memory</code>的使用。</p>
+<p>从<code>iOS7</code>开始，<code>iOS</code>引入了<code>Compression</code>的概念，如下图为<code>Instruments</code>的<code>Allocations template</code>，我们可以从标红的地方看到，有一个<code>Swapped Size</code>的指标，从<a href="https://devstreaming-cdn.apple.com/videos/wwdc/2018/416n2fmzz0fz88f/416/416_ios_memory_deep_dive.pdf" target="_blank" rel="external">WWDC 2018 416</a>得知，该指标的含义为<code>compression size</code>，即系统可以把最近最少使用的<code>Dirty memory</code>进行压缩，这样可以腾出一些<code>pages</code>供使用，当再次需要访问内容时，系统将其解压，这时，原来内容占多少<code>pages</code>，解压后同样会是相同数量的<code>pages</code>。</p>
+<p><img src="https://raw.githubusercontent.com/zhongwuzw/zhongwuzw.github.io.resource/b14b5edf5c614b290b9ad0d5cdcbb81c1a6583d7/images/blog/ios-swapped-size.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/zhongwuzw/zhongwuzw.github.io.resource/b14b5edf5c614b290b9ad0d5cdcbb81c1a6583d7/images/blog/ios-memory-compression.png" alt=""></p>
+<p>上图为<code>JetsamEvent</code>的log，展示了<code>compression size</code>等指标，<code>jetsam_thread</code>线程运行在阻塞的循环中，当唤起时，根据内存列表来<code>kill</code>掉处于<code>top</code>的进程，当内存足够时，再次进入休眠。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><hr>
+<ol>
+<li><a href="https://devstreaming-cdn.apple.com/videos/wwdc/2018/416n2fmzz0fz88f/416/416_ios_memory_deep_dive.pdf" target="_blank" rel="external">https://devstreaming-cdn.apple.com/videos/wwdc/2018/416n2fmzz0fz88f/416/416_ios_memory_deep_dive.pdf</a></li>
+<li><a href="http://newosxbook.com/articles/MemoryPressure.html" target="_blank" rel="external">http://newosxbook.com/articles/MemoryPressure.html</a></li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Swap-Space&quot;&gt;&lt;a href=&quot;#Swap-Space&quot; class=&quot;headerlink&quot; title=&quot;Swap Space&quot;&gt;&lt;/a&gt;Swap Space&lt;/h2&gt;&lt;hr&gt;
+&lt;p&gt;&lt;code&gt;Linux&lt;/code&gt;、&lt;code&gt;Macos&lt;/c
+    
+    </summary>
+    
+      <category term="iOS开发-其它" scheme="https://zhongwuzw.github.io/categories/iOS%E5%BC%80%E5%8F%91-%E5%85%B6%E5%AE%83/"/>
+    
+    
+      <category term="iOS" scheme="https://zhongwuzw.github.io/tags/iOS/"/>
+    
+      <category term="内存" scheme="https://zhongwuzw.github.io/tags/%E5%86%85%E5%AD%98/"/>
+    
+  </entry>
   
   <entry>
     <title>iOS知识小集之main-queue!=main-thread</title>
@@ -1266,39 +1305,6 @@
       <category term="iOS" scheme="https://zhongwuzw.github.io/tags/iOS/"/>
     
       <category term="Swift" scheme="https://zhongwuzw.github.io/tags/Swift/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>解决HTTPS混合HTTP的问题</title>
-    <link href="https://zhongwuzw.github.io/2016/12/02/%E8%A7%A3%E5%86%B3https%E6%B7%B7%E5%90%88http%E7%9A%84%E9%97%AE%E9%A2%98/"/>
-    <id>https://zhongwuzw.github.io/2016/12/02/解决https混合http的问题/</id>
-    <published>2016-12-02T04:13:44.000Z</published>
-    <updated>2016-12-02T11:13:40.000Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="HTTPS页面混合不安全的HTTP请求"><a href="#HTTPS页面混合不安全的HTTP请求" class="headerlink" title="HTTPS页面混合不安全的HTTP请求"></a>HTTPS页面混合不安全的HTTP请求</h2><hr>
-<p>在启用<code>HTTPS</code>页面时，如果出现<code>HTTP</code>请求，那么浏览器会报错，如下：</p>
-<figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Mixed <span class="string">Content:</span> The page at ‘<span class="string">https:</span><span class="comment">//www.taobao.com/‘ was loaded over HTTPS, but requested an insecure image ‘http://g.alicdn.com/s.gif’. This content should also be served over HTTPS.</span></div></pre></td></tr></table></figure>
-<p>既浏览器会<code>Block</code>掉不安全的<code>HTTP</code>请求，所以解决方法有三种：</p>
-<ol>
-<li>最简单的，将<code>HTTP</code>替换为<code>HTTPS</code>。</li>
-<li>去掉<code>URL</code>中的<code>http://</code>或<code>https://</code>，将其替换为<code>//</code>，这样，浏览器就可以根据当前页面的请求方式来动态切换了。</li>
-<li>如果涉及到第三方的资源，无法直接修改源代码，如腾讯公益404的<code>JavaScript</code>代码如下，<code>document.write</code>函数写入两个<code>JavaScript</code>文件，而这两个文件中包含了<code>HTTP</code>的请求。这个时候，我们可以在<code>&lt;head&gt;</code>中添加<code>&lt;meta http-equiv=&quot;Content-Security-Policy&quot; content=&quot;upgrade-insecure-requests&quot;&gt;</code>,浏览器会在加载<code>HTTP</code>资源时自动替换成<code>HTTPS</code>请求。</li>
-</ol>
-<figure class="highlight scala"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> _base = '<span class="comment">//qzone.qq.com/gy/404/';</span></div><div class="line">document.write('&lt;scri' + <span class="symbol">'pt</span> <span class="class"><span class="keyword">type</span></span>=<span class="string">"text/javascript"</span> src=<span class="string">"' + _base + 'data.js"</span> charset=<span class="string">"utf-8"</span>&gt;&lt;/sc' + <span class="symbol">'ript</span>&gt;');</div><div class="line">document.write('&lt;scri' + <span class="symbol">'pt</span> <span class="class"><span class="keyword">type</span></span>=<span class="string">"text/javascript"</span> src=<span class="string">"' + _base + 'page.js"</span> charset=<span class="string">"utf-8"</span>&gt;&lt;/sc' + <span class="symbol">'ript</span>&gt;');</div></pre></td></tr></table></figure>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;HTTPS页面混合不安全的HTTP请求&quot;&gt;&lt;a href=&quot;#HTTPS页面混合不安全的HTTP请求&quot; class=&quot;headerlink&quot; title=&quot;HTTPS页面混合不安全的HTTP请求&quot;&gt;&lt;/a&gt;HTTPS页面混合不安全的HTTP请求&lt;/h2&gt;&lt;hr&gt;
-
-    
-    </summary>
-    
-      <category term="Web开发" scheme="https://zhongwuzw.github.io/categories/Web%E5%BC%80%E5%8F%91/"/>
-    
-    
-      <category term="JavaScript" scheme="https://zhongwuzw.github.io/tags/JavaScript/"/>
     
   </entry>
   

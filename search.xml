@@ -4,6 +4,26 @@
   
     
     <entry>
+      <title><![CDATA[iOS内存管理之Swapped Memory]]></title>
+      <url>https://zhongwuzw.github.io/2018/06/13/iOS%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%B9%8BSwapped-Memory/</url>
+      <content type="html"><![CDATA[<h2 id="Swap-Space"><a href="#Swap-Space" class="headerlink" title="Swap Space"></a>Swap Space</h2><hr>
+<p><code>Linux</code>、<code>Macos</code>等系统有一个<code>Swap space</code>的概念，当物理内存紧张时，系统会将<code>inactive</code>的<code>pages</code>放到<code>Swap Space</code>，<code>Swap Space</code>为磁盘上的某个区域，一般是文件形式，这样能节省出来一部分的物理内存，不过，当我们需要访问已经放到磁盘中的内存时，由于已经不在物理内存中，会引发缺页中断，需要再次从磁盘中重新读取，所以会比直接从内存获取要慢。</p>
+<p>不过<code>iOS</code>系统并没有<code>Swap Space</code>，原因可能有二，其一是<code>iPhone</code>的<code>Flash</code>闪存空间受限；其二是<code>CPU</code>受限，因为手机的<code>CPU</code>相比电脑还是有一定差距。</p>
+<h2 id="Swapped-Size"><a href="#Swapped-Size" class="headerlink" title="Swapped Size"></a>Swapped Size</h2><hr>
+<p><code>iOS</code>中，内存分为两种，一种为<code>Clean memory</code>，另一种为<code>Dirty memory</code>；<br><code>Clean memory</code>的<code>page</code>可以换出，既磁盘中有其对应内容，系统可以在内存紧张时将<code>Clean memory</code>的<code>page</code>换出，当再次访问时，可以重新从磁盘中读取，我们使用的图片、<code>mapped files</code>、<code>Framework</code>的数据段常量以及代码段等，这些都是<code>Clean memory</code>。<br><code>Dirty memory</code>是无法换出的，我们所有的堆上的分配等都是属于<code>Dirty memory</code>,所以我们一定要尽可能的减少<code>Dirty memory</code>的使用。</p>
+<p>从<code>iOS7</code>开始，<code>iOS</code>引入了<code>Compression</code>的概念，如下图为<code>Instruments</code>的<code>Allocations template</code>，我们可以从标红的地方看到，有一个<code>Swapped Size</code>的指标，从<a href="https://devstreaming-cdn.apple.com/videos/wwdc/2018/416n2fmzz0fz88f/416/416_ios_memory_deep_dive.pdf" target="_blank" rel="external">WWDC 2018 416</a>得知，该指标的含义为<code>compression size</code>，即系统可以把最近最少使用的<code>Dirty memory</code>进行压缩，这样可以腾出一些<code>pages</code>供使用，当再次需要访问内容时，系统将其解压，这时，原来内容占多少<code>pages</code>，解压后同样会是相同数量的<code>pages</code>。</p>
+<p><img src="https://raw.githubusercontent.com/zhongwuzw/zhongwuzw.github.io.resource/b14b5edf5c614b290b9ad0d5cdcbb81c1a6583d7/images/blog/ios-swapped-size.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/zhongwuzw/zhongwuzw.github.io.resource/b14b5edf5c614b290b9ad0d5cdcbb81c1a6583d7/images/blog/ios-memory-compression.png" alt=""></p>
+<p>上图为<code>JetsamEvent</code>的log，展示了<code>compression size</code>等指标，<code>jetsam_thread</code>线程运行在阻塞的循环中，当唤起时，根据内存列表来<code>kill</code>掉处于<code>top</code>的进程，当内存足够时，再次进入休眠。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><hr>
+<ol>
+<li><a href="https://devstreaming-cdn.apple.com/videos/wwdc/2018/416n2fmzz0fz88f/416/416_ios_memory_deep_dive.pdf" target="_blank" rel="external">https://devstreaming-cdn.apple.com/videos/wwdc/2018/416n2fmzz0fz88f/416/416_ios_memory_deep_dive.pdf</a></li>
+<li><a href="http://newosxbook.com/articles/MemoryPressure.html" target="_blank" rel="external">http://newosxbook.com/articles/MemoryPressure.html</a></li>
+</ol>
+]]></content>
+    </entry>
+    
+    <entry>
       <title><![CDATA[iOS知识小集之main-queue!=main-thread]]></title>
       <url>https://zhongwuzw.github.io/2018/05/22/iOS%E7%9F%A5%E8%AF%86%E5%B0%8F%E9%9B%86%E4%B9%8Bmain-queue-main-thread/</url>
       <content type="html"><![CDATA[<h2 id="GCD-main-queue和main-thread的关系"><a href="#GCD-main-queue和main-thread的关系" class="headerlink" title="GCD main queue和main thread的关系"></a>GCD <code>main queue</code>和<code>main thread</code>的关系</h2><hr>
