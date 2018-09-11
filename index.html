@@ -317,6 +317,171 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2018/09/11/iOS之获取Block-retain的objects/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="钟武">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.JPG">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="钟武的技术博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/09/11/iOS之获取Block-retain的objects/" itemprop="url">iOS之获取Block retain的objects</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-11T17:33:31+08:00">
+                2018-09-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS开发-语言/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发-语言</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/09/11/iOS之获取Block-retain的objects/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/09/11/iOS之获取Block-retain的objects/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="Block管理Objective-C对象实例的原理"><a href="#Block管理Objective-C对象实例的原理" class="headerlink" title="Block管理Objective-C对象实例的原理"></a>Block管理<code>Objective-C</code>对象实例的原理</h2><hr>
+<p><code>Block</code>的实现结构体见如下图所示，<code>Block</code>对于捕获的<code>Objective-C</code>对象实例，会在<code>Block</code>实现的结构体中创建一个变量指向<code>Objective-C</code>对象实例，当<code>Block</code>将要释放时，会调用<code>dispose_helper</code>函数，该函数会调用所有需要进行内存管理的所捕获的对象，如<code>Block</code>、<code>__block</code>变量、<code>__attribute__((NSObject))</code>变量或有<code>constructor/destructor</code>的<code>C++</code> <code>const</code>对象。</p>
+<p><img src="https://raw.githubusercontent.com/zhongwuzw/zhongwuzw.github.io.resource/master/images/blog/Block.png" alt=""></p>
+<h2 id="获取Block-retain的Objective-C对象实例"><a href="#获取Block-retain的Objective-C对象实例" class="headerlink" title="获取Block retain的Objective-C对象实例"></a>获取Block retain的Objective-C对象实例</h2><hr>
+<p>所以，怎么能够拿到<code>retain</code>的<code>Objective-C</code>对象实例呢，方法为创建<code>fake</code>对象，来模拟捕获的<code>Objective-C</code>对象实例，然后我们程序来调用<code>Block</code>的<code>dispose_helper</code>方法（<code>dispose_helper</code>方法接收一个参数，值为<code>Block</code>的指针），该方法会调用对象实例的<code>release</code>方法，我们只需要在<code>fake</code>对象中实现<code>release</code>方法，如果<code>release</code>方法被调用，所以该<code>fake</code>对象对应的真实变量为<code>Objective-C</code>对象实例。</p>
+<p>那么需要创建多少个<code>fake</code>对象呢，首先，<code>Objective-C</code>对象实例在<code>Block</code>的<code>struct</code>中的位置是指针对齐的，所以我们可以获取<code>Block</code>结构体的大小，除以指针的大小取上即为需要创建的<code>fake</code>对象的数量,<code>Block</code>结构体的<code>size</code>可以通过<code>block-&gt;descriptor-&gt;size</code>来获取。</p>
+<p>得到需要创建<code>fake</code>对象的数量<code>count</code>后，创建一个数组，再创建<code>count</code>个<code>fake</code>对象，将数组指针传入<code>dispose_helper</code>即可。对于调用了<code>release</code>方法的对象，记录其索引值，通过访问<code>block[index]</code>即可拿到真正的<code>Objective-C</code>对象实例。</p>
+<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><hr>
+<p>如上所说的捕获的<code>Objective-C</code>对象实例，不包括使用<code>__block</code>创建的实例，因为使用<code>__block</code>创建的变量，会加一层间接层，并不会在<code>Block</code>结构体中创建指向实例对象的变量，而是指向另一个间接层结构体。</p>
+<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><hr>
+<ol>
+<li><a href="https://clang.llvm.org/docs/Block-ABI-Apple.html" target="_blank" rel="external">https://clang.llvm.org/docs/Block-ABI-Apple.html</a></li>
+<li><a href="https://github.com/mikeash/Circle/blob/master/Circle/CircleIVarLayout.m" target="_blank" rel="external">https://github.com/mikeash/Circle/blob/master/Circle/CircleIVarLayout.m</a></li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2018/06/13/iOS内存管理之Swapped-Memory/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -967,170 +1132,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2018/01/30/Goroutines-vs-多线程/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="钟武">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.JPG">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="钟武的技术博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/01/30/Goroutines-vs-多线程/" itemprop="url">Goroutines vs 多线程</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-30T10:56:47+08:00">
-                2018-01-30
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Go/" itemprop="url" rel="index">
-                    <span itemprop="name">Go</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/01/30/Goroutines-vs-多线程/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/01/30/Goroutines-vs-多线程/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><hr>
-<p><a href="https://golang.google.cn" target="_blank" rel="external">Golang</a>是由<code>Google</code>开发，天生支持并发的语言。<code>Go</code>有一个<code>goroutine</code>的机制，当我们在调用函数前加上<code>go</code>关键字，那么就会创建一个<code>goroutine</code>来异步执行该函数，如：<code>go foo()</code>，以此来实现并发的功能。本文，我们将讨论一下<code>goroutine</code>和线程的区别。</p>
-<h2 id="大小可调整的栈"><a href="#大小可调整的栈" class="headerlink" title="大小可调整的栈"></a>大小可调整的栈</h2><hr>
-<p>线程可以在启动前设置栈的大小，启动后，线程的栈大小就固定了，所以带来的弊端就是浪费内存空间，因为很多时候并不需要这么多内存。<br>相比于线程，<code>goroutine</code>的栈空间是可调整的，<code>goroutine</code>创建时，通常只会分配<code>2KB</code>大小的栈，随着<code>goroutine</code>的运行，比如不断的递归，创建变量等，相应的栈空间也会增大，反之也会按需减小，一个<code>goroutine</code>最大可分配栈空间通常为<code>1GB</code>。</p>
-<h2 id="goroutine-的调度"><a href="#goroutine-的调度" class="headerlink" title="goroutine 的调度"></a><code>goroutine</code> 的调度</h2><hr>
-<p>线程由系统内核进行调度，系统为了实现并发，会不断的切换线程的执行，由此会带来线程的上下文切换。<br>而<code>Go</code>的运行时有一套自己的调度系统，使用<code>m:n</code>策略，既复用<code>m</code>个<code>goroutine</code>到<code>n</code>个线程，<code>Go</code>的调度器类似于内核调度器，区别是它仅管理单个<code>Go</code>程序创建的<code>goroutine</code>。<br>相比于线程，<code>Go</code>的调度器并不会周期性的被硬件定时器调用，而是<code>Go</code>自己来处理，比如，当一个<code>goroutine</code>调用<code>time.Sleep</code>或阻塞与通道、互斥操作时，调度器会将<code>goroutine</code>休眠，然后运行另外的<code>goroutine</code>，这些并不需要内核的上下文切换，所以重新调度一个<code>goroutine</code>的开销会小于重新调度线程的开销。</p>
-<h2 id="GOMAXPROCS"><a href="#GOMAXPROCS" class="headerlink" title="GOMAXPROCS"></a><code>GOMAXPROCS</code></h2><hr>
-<p><code>Go</code>的调度器使用一个名为<code>GOMAXPROCS</code>的参数来确定真正的线程数，其默认值为机器的<code>CPU</code>的数量，如一台机器有8个<code>CPU</code>,那么调度器会同时创建8个线程（<code>GOMAXPROCS</code>就是如上所说<code>m:n</code>中的<code>n</code>)。休眠或阻塞中<code>goroutine</code>不需要线程，但是对于阻塞在<code>I/O</code>或系统调用、正在调用非<code>Go</code>函数的<code>goroutine</code>来说，需要一个系统线程，不过不占用<code>GOMAXPROCS</code>。</p>
-<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><hr>
-<ol>
-<li><a href="https://golang.google.cn" target="_blank" rel="external">https://golang.google.cn</a></li>
-<li><a href="http://www.gopl.io" target="_blank" rel="external">http://www.gopl.io</a></li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1184,7 +1185,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">42</span>
+                  <span class="site-state-item-count">43</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1206,7 +1207,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">41</span>
+                  <span class="site-state-item-count">42</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>

@@ -4,6 +4,26 @@
   
     
     <entry>
+      <title><![CDATA[iOS之获取Block retain的objects]]></title>
+      <url>https://zhongwuzw.github.io/2018/09/11/iOS%E4%B9%8B%E8%8E%B7%E5%8F%96Block-retain%E7%9A%84objects/</url>
+      <content type="html"><![CDATA[<h2 id="Block管理Objective-C对象实例的原理"><a href="#Block管理Objective-C对象实例的原理" class="headerlink" title="Block管理Objective-C对象实例的原理"></a>Block管理<code>Objective-C</code>对象实例的原理</h2><hr>
+<p><code>Block</code>的实现结构体见如下图所示，<code>Block</code>对于捕获的<code>Objective-C</code>对象实例，会在<code>Block</code>实现的结构体中创建一个变量指向<code>Objective-C</code>对象实例，当<code>Block</code>将要释放时，会调用<code>dispose_helper</code>函数，该函数会调用所有需要进行内存管理的所捕获的对象，如<code>Block</code>、<code>__block</code>变量、<code>__attribute__((NSObject))</code>变量或有<code>constructor/destructor</code>的<code>C++</code> <code>const</code>对象。</p>
+<p><img src="https://raw.githubusercontent.com/zhongwuzw/zhongwuzw.github.io.resource/master/images/blog/Block.png" alt=""></p>
+<h2 id="获取Block-retain的Objective-C对象实例"><a href="#获取Block-retain的Objective-C对象实例" class="headerlink" title="获取Block retain的Objective-C对象实例"></a>获取Block retain的Objective-C对象实例</h2><hr>
+<p>所以，怎么能够拿到<code>retain</code>的<code>Objective-C</code>对象实例呢，方法为创建<code>fake</code>对象，来模拟捕获的<code>Objective-C</code>对象实例，然后我们程序来调用<code>Block</code>的<code>dispose_helper</code>方法（<code>dispose_helper</code>方法接收一个参数，值为<code>Block</code>的指针），该方法会调用对象实例的<code>release</code>方法，我们只需要在<code>fake</code>对象中实现<code>release</code>方法，如果<code>release</code>方法被调用，所以该<code>fake</code>对象对应的真实变量为<code>Objective-C</code>对象实例。</p>
+<p>那么需要创建多少个<code>fake</code>对象呢，首先，<code>Objective-C</code>对象实例在<code>Block</code>的<code>struct</code>中的位置是指针对齐的，所以我们可以获取<code>Block</code>结构体的大小，除以指针的大小取上即为需要创建的<code>fake</code>对象的数量,<code>Block</code>结构体的<code>size</code>可以通过<code>block-&gt;descriptor-&gt;size</code>来获取。</p>
+<p>得到需要创建<code>fake</code>对象的数量<code>count</code>后，创建一个数组，再创建<code>count</code>个<code>fake</code>对象，将数组指针传入<code>dispose_helper</code>即可。对于调用了<code>release</code>方法的对象，记录其索引值，通过访问<code>block[index]</code>即可拿到真正的<code>Objective-C</code>对象实例。</p>
+<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><hr>
+<p>如上所说的捕获的<code>Objective-C</code>对象实例，不包括使用<code>__block</code>创建的实例，因为使用<code>__block</code>创建的变量，会加一层间接层，并不会在<code>Block</code>结构体中创建指向实例对象的变量，而是指向另一个间接层结构体。</p>
+<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><hr>
+<ol>
+<li><a href="https://clang.llvm.org/docs/Block-ABI-Apple.html" target="_blank" rel="external">https://clang.llvm.org/docs/Block-ABI-Apple.html</a></li>
+<li><a href="https://github.com/mikeash/Circle/blob/master/Circle/CircleIVarLayout.m" target="_blank" rel="external">https://github.com/mikeash/Circle/blob/master/Circle/CircleIVarLayout.m</a></li>
+</ol>
+]]></content>
+    </entry>
+    
+    <entry>
       <title><![CDATA[iOS内存管理之Swapped Memory]]></title>
       <url>https://zhongwuzw.github.io/2018/06/13/iOS%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%B9%8BSwapped-Memory/</url>
       <content type="html"><![CDATA[<h2 id="Swap-Space"><a href="#Swap-Space" class="headerlink" title="Swap Space"></a>Swap Space</h2><hr>
@@ -501,7 +521,7 @@
 <li><code>Bundle</code>：不能被链接的动态库，只能通过<code>dlopen()</code>，用于<code>Mac OS</code>。</li>
 </ul>
 <p><code>Image</code>：可以是可执行文件、动态库或者<code>bundle</code>。<br><code>Framework</code>：动态库，包含资源和头文件。</p>
-<h4 id="Mach-O-Image文件"><a href="#Mach-O-Image文件" class="headerlink" title="Mach-O Image文件"></a>Mach-O Image文件</h4><p>一个<code>Mach-O</code>文件由3部分组成：<code>Header</code>、<code>Load commands</code>、<code>Raw segment data</code>。<code>Header</code>描述了文件的目标架构等信息，如x86-64,PPC；<code>Load commands</code>列出了文件的逻辑结构及文件在虚拟内存中的布局;<code>Raw segment data</code>包含了在<code>Load commands</code>中指出的<code>segment</code>(<code>段</code>)。在<code>Mach-O</code>文件中，我们把<code>Header</code>、<code>Load commands</code>放在了<code>__TEXT``segment</code>(<code>段</code>)的开头，即第一个<code>segment</code>(<code>段</code>)的开头。每一个<code>段</code>由多个<code>page</code>(<code>页</code>)组成，<code>段</code>的大小为<code>页</code>大小的整数倍。如下图，<code>TEXT段</code>占3<code>页</code>，<code>DATA</code>、<code>LINKEDIT</code>分别占1<code>页</code>。<code>页</code>的大小取决于硬件，在<code>arm64</code>下，<code>页</code>大小为16K，其它则为4K。<br><img src="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-02%20%E4%B8%8B%E5%8D%8810.24.03.png" alt=""></p>
+<h4 id="Mach-O-Image文件"><a href="#Mach-O-Image文件" class="headerlink" title="Mach-O Image文件"></a>Mach-O Image文件</h4><p>一个<code>Mach-O</code>文件由3部分组成：<code>Header</code>、<code>Load commands</code>、<code>Raw segment data</code>。<code>Header</code>描述了文件的目标架构等信息，如x86-64,PPC；<code>Load commands</code>列出了文件的逻辑结构及文件在虚拟内存中的布局;<code>Raw segment data</code>包含了在<code>Load commands</code>中指出的<code>segment</code>(<code>段</code>)。在<code>Mach-O</code>文件中，我们把<code>Header</code>、<code>Load commands</code>放在了<code>__TEXT</code> <code>segment</code>(<code>段</code>)的开头，即第一个<code>segment</code>(<code>段</code>)的开头。每一个<code>段</code>由多个<code>page</code>(<code>页</code>)组成，<code>段</code>的大小为<code>页</code>大小的整数倍。如下图，<code>TEXT段</code>占3<code>页</code>，<code>DATA</code>、<code>LINKEDIT</code>分别占1<code>页</code>。<code>页</code>的大小取决于硬件，在<code>arm64</code>下，<code>页</code>大小为16K，其它则为4K。<br><img src="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-02%20%E4%B8%8B%E5%8D%8810.24.03.png" alt=""></p>
 <p>我们还可以从<code>section</code>(节)的角度来理解<code>段</code>,编译器对<code>section</code>是透明的，<code>section</code>仅仅是一个<code>段</code>的子区间，它没有任何的大小约束，但是<code>section</code>之间不会产生重叠。<br><img src="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-02%20%E4%B8%8B%E5%8D%8810.41.36.png" alt=""></p>
 <p>事实上，每一个二进制文件都包含<code>TEXT</code>、<code>DATA</code>、<code>LINKEDIT</code>这3个通用的<code>段</code>，<code>TEXT</code>位于文件的开始，它包括<code>Mach header</code>，机器指令，代码以及只读常量如C字符串，<code>DATA段</code>是可读写的，其包括所有的全局变量，静态变量等。<code>LINKEDIT</code>包含加载程序的<code>meta data</code>(元数据)，如符号，字符串，重定向表条目，供动态链接器使用。</p>
 <a id="more"></a>

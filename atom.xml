@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://zhongwuzw.github.io/"/>
-  <updated>2018-06-13T10:05:35.065Z</updated>
+  <updated>2018-09-11T10:25:30.421Z</updated>
   <id>https://zhongwuzw.github.io/</id>
   
   <author>
@@ -14,6 +14,44 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>iOS之获取Block retain的objects</title>
+    <link href="https://zhongwuzw.github.io/2018/09/11/iOS%E4%B9%8B%E8%8E%B7%E5%8F%96Block-retain%E7%9A%84objects/"/>
+    <id>https://zhongwuzw.github.io/2018/09/11/iOS之获取Block-retain的objects/</id>
+    <published>2018-09-11T09:33:31.000Z</published>
+    <updated>2018-09-11T10:25:30.421Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="Block管理Objective-C对象实例的原理"><a href="#Block管理Objective-C对象实例的原理" class="headerlink" title="Block管理Objective-C对象实例的原理"></a>Block管理<code>Objective-C</code>对象实例的原理</h2><hr>
+<p><code>Block</code>的实现结构体见如下图所示，<code>Block</code>对于捕获的<code>Objective-C</code>对象实例，会在<code>Block</code>实现的结构体中创建一个变量指向<code>Objective-C</code>对象实例，当<code>Block</code>将要释放时，会调用<code>dispose_helper</code>函数，该函数会调用所有需要进行内存管理的所捕获的对象，如<code>Block</code>、<code>__block</code>变量、<code>__attribute__((NSObject))</code>变量或有<code>constructor/destructor</code>的<code>C++</code> <code>const</code>对象。</p>
+<p><img src="https://raw.githubusercontent.com/zhongwuzw/zhongwuzw.github.io.resource/master/images/blog/Block.png" alt=""></p>
+<h2 id="获取Block-retain的Objective-C对象实例"><a href="#获取Block-retain的Objective-C对象实例" class="headerlink" title="获取Block retain的Objective-C对象实例"></a>获取Block retain的Objective-C对象实例</h2><hr>
+<p>所以，怎么能够拿到<code>retain</code>的<code>Objective-C</code>对象实例呢，方法为创建<code>fake</code>对象，来模拟捕获的<code>Objective-C</code>对象实例，然后我们程序来调用<code>Block</code>的<code>dispose_helper</code>方法（<code>dispose_helper</code>方法接收一个参数，值为<code>Block</code>的指针），该方法会调用对象实例的<code>release</code>方法，我们只需要在<code>fake</code>对象中实现<code>release</code>方法，如果<code>release</code>方法被调用，所以该<code>fake</code>对象对应的真实变量为<code>Objective-C</code>对象实例。</p>
+<p>那么需要创建多少个<code>fake</code>对象呢，首先，<code>Objective-C</code>对象实例在<code>Block</code>的<code>struct</code>中的位置是指针对齐的，所以我们可以获取<code>Block</code>结构体的大小，除以指针的大小取上即为需要创建的<code>fake</code>对象的数量,<code>Block</code>结构体的<code>size</code>可以通过<code>block-&gt;descriptor-&gt;size</code>来获取。</p>
+<p>得到需要创建<code>fake</code>对象的数量<code>count</code>后，创建一个数组，再创建<code>count</code>个<code>fake</code>对象，将数组指针传入<code>dispose_helper</code>即可。对于调用了<code>release</code>方法的对象，记录其索引值，通过访问<code>block[index]</code>即可拿到真正的<code>Objective-C</code>对象实例。</p>
+<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><hr>
+<p>如上所说的捕获的<code>Objective-C</code>对象实例，不包括使用<code>__block</code>创建的实例，因为使用<code>__block</code>创建的变量，会加一层间接层，并不会在<code>Block</code>结构体中创建指向实例对象的变量，而是指向另一个间接层结构体。</p>
+<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><hr>
+<ol>
+<li><a href="https://clang.llvm.org/docs/Block-ABI-Apple.html" target="_blank" rel="external">https://clang.llvm.org/docs/Block-ABI-Apple.html</a></li>
+<li><a href="https://github.com/mikeash/Circle/blob/master/Circle/CircleIVarLayout.m" target="_blank" rel="external">https://github.com/mikeash/Circle/blob/master/Circle/CircleIVarLayout.m</a></li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Block管理Objective-C对象实例的原理&quot;&gt;&lt;a href=&quot;#Block管理Objective-C对象实例的原理&quot; class=&quot;headerlink&quot; title=&quot;Block管理Objective-C对象实例的原理&quot;&gt;&lt;/a&gt;Block管理&lt;cod
+    
+    </summary>
+    
+      <category term="iOS开发-语言" scheme="https://zhongwuzw.github.io/categories/iOS%E5%BC%80%E5%8F%91-%E8%AF%AD%E8%A8%80/"/>
+    
+    
+      <category term="iOS" scheme="https://zhongwuzw.github.io/tags/iOS/"/>
+    
+      <category term="Block" scheme="https://zhongwuzw.github.io/tags/Block/"/>
+    
+  </entry>
   
   <entry>
     <title>iOS内存管理之Swapped Memory</title>
@@ -141,9 +179,9 @@
     
       <category term="tips" scheme="https://zhongwuzw.github.io/tags/tips/"/>
     
-      <category term="知识小集" scheme="https://zhongwuzw.github.io/tags/%E7%9F%A5%E8%AF%86%E5%B0%8F%E9%9B%86/"/>
-    
       <category term="Closure" scheme="https://zhongwuzw.github.io/tags/Closure/"/>
+    
+      <category term="知识小集" scheme="https://zhongwuzw.github.io/tags/%E7%9F%A5%E8%AF%86%E5%B0%8F%E9%9B%86/"/>
     
   </entry>
   
@@ -794,7 +832,7 @@
     <link href="https://zhongwuzw.github.io/2017/05/01/WWDC-Session406-%E4%BC%98%E5%8C%96App%E5%90%AF%E5%8A%A8%E6%97%B6%E9%97%B4/"/>
     <id>https://zhongwuzw.github.io/2017/05/01/WWDC-Session406-优化App启动时间/</id>
     <published>2017-05-01T15:46:05.000Z</published>
-    <updated>2017-09-25T15:05:26.000Z</updated>
+    <updated>2018-09-03T03:16:49.706Z</updated>
     
     <content type="html"><![CDATA[<h2 id="理论"><a href="#理论" class="headerlink" title="理论"></a>理论</h2><hr>
 <h3 id="Mach-O"><a href="#Mach-O" class="headerlink" title="Mach-O"></a>Mach-O</h3><h4 id="Mach-O相关术语"><a href="#Mach-O相关术语" class="headerlink" title="Mach-O相关术语"></a>Mach-O相关术语</h4><p><code>Mach-O</code>为<code>Mach Object</code>文件格式的缩写，它是一种用于可执行文件，目标代码，动态库，内核存储的文件格式。它包括多种文件类型：</p>
@@ -804,7 +842,7 @@
 <li><code>Bundle</code>：不能被链接的动态库，只能通过<code>dlopen()</code>，用于<code>Mac OS</code>。</li>
 </ul>
 <p><code>Image</code>：可以是可执行文件、动态库或者<code>bundle</code>。<br><code>Framework</code>：动态库，包含资源和头文件。</p>
-<h4 id="Mach-O-Image文件"><a href="#Mach-O-Image文件" class="headerlink" title="Mach-O Image文件"></a>Mach-O Image文件</h4><p>一个<code>Mach-O</code>文件由3部分组成：<code>Header</code>、<code>Load commands</code>、<code>Raw segment data</code>。<code>Header</code>描述了文件的目标架构等信息，如x86-64,PPC；<code>Load commands</code>列出了文件的逻辑结构及文件在虚拟内存中的布局;<code>Raw segment data</code>包含了在<code>Load commands</code>中指出的<code>segment</code>(<code>段</code>)。在<code>Mach-O</code>文件中，我们把<code>Header</code>、<code>Load commands</code>放在了<code>__TEXT``segment</code>(<code>段</code>)的开头，即第一个<code>segment</code>(<code>段</code>)的开头。每一个<code>段</code>由多个<code>page</code>(<code>页</code>)组成，<code>段</code>的大小为<code>页</code>大小的整数倍。如下图，<code>TEXT段</code>占3<code>页</code>，<code>DATA</code>、<code>LINKEDIT</code>分别占1<code>页</code>。<code>页</code>的大小取决于硬件，在<code>arm64</code>下，<code>页</code>大小为16K，其它则为4K。<br><img src="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-02%20%E4%B8%8B%E5%8D%8810.24.03.png" alt=""></p>
+<h4 id="Mach-O-Image文件"><a href="#Mach-O-Image文件" class="headerlink" title="Mach-O Image文件"></a>Mach-O Image文件</h4><p>一个<code>Mach-O</code>文件由3部分组成：<code>Header</code>、<code>Load commands</code>、<code>Raw segment data</code>。<code>Header</code>描述了文件的目标架构等信息，如x86-64,PPC；<code>Load commands</code>列出了文件的逻辑结构及文件在虚拟内存中的布局;<code>Raw segment data</code>包含了在<code>Load commands</code>中指出的<code>segment</code>(<code>段</code>)。在<code>Mach-O</code>文件中，我们把<code>Header</code>、<code>Load commands</code>放在了<code>__TEXT</code> <code>segment</code>(<code>段</code>)的开头，即第一个<code>segment</code>(<code>段</code>)的开头。每一个<code>段</code>由多个<code>page</code>(<code>页</code>)组成，<code>段</code>的大小为<code>页</code>大小的整数倍。如下图，<code>TEXT段</code>占3<code>页</code>，<code>DATA</code>、<code>LINKEDIT</code>分别占1<code>页</code>。<code>页</code>的大小取决于硬件，在<code>arm64</code>下，<code>页</code>大小为16K，其它则为4K。<br><img src="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-02%20%E4%B8%8B%E5%8D%8810.24.03.png" alt=""></p>
 <p>我们还可以从<code>section</code>(节)的角度来理解<code>段</code>,编译器对<code>section</code>是透明的，<code>section</code>仅仅是一个<code>段</code>的子区间，它没有任何的大小约束，但是<code>section</code>之间不会产生重叠。<br><img src="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-02%20%E4%B8%8B%E5%8D%8810.41.36.png" alt=""></p>
 <p>事实上，每一个二进制文件都包含<code>TEXT</code>、<code>DATA</code>、<code>LINKEDIT</code>这3个通用的<code>段</code>，<code>TEXT</code>位于文件的开始，它包括<code>Mach header</code>，机器指令，代码以及只读常量如C字符串，<code>DATA段</code>是可读写的，其包括所有的全局变量，静态变量等。<code>LINKEDIT</code>包含加载程序的<code>meta data</code>(元数据)，如符号，字符串，重定向表条目，供动态链接器使用。</p>
 <a id="more"></a>
@@ -837,7 +875,7 @@
 &lt;li&gt;&lt;code&gt;Bundle&lt;/code&gt;：不能被链接的动态库，只能通过&lt;code&gt;dlopen()&lt;/code&gt;，用于&lt;code&gt;Mac OS&lt;/code&gt;。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;&lt;code&gt;Image&lt;/code&gt;：可以是可执行文件、动态库或者&lt;code&gt;bundle&lt;/code&gt;。&lt;br&gt;&lt;code&gt;Framework&lt;/code&gt;：动态库，包含资源和头文件。&lt;/p&gt;
-&lt;h4 id=&quot;Mach-O-Image文件&quot;&gt;&lt;a href=&quot;#Mach-O-Image文件&quot; class=&quot;headerlink&quot; title=&quot;Mach-O Image文件&quot;&gt;&lt;/a&gt;Mach-O Image文件&lt;/h4&gt;&lt;p&gt;一个&lt;code&gt;Mach-O&lt;/code&gt;文件由3部分组成：&lt;code&gt;Header&lt;/code&gt;、&lt;code&gt;Load commands&lt;/code&gt;、&lt;code&gt;Raw segment data&lt;/code&gt;。&lt;code&gt;Header&lt;/code&gt;描述了文件的目标架构等信息，如x86-64,PPC；&lt;code&gt;Load commands&lt;/code&gt;列出了文件的逻辑结构及文件在虚拟内存中的布局;&lt;code&gt;Raw segment data&lt;/code&gt;包含了在&lt;code&gt;Load commands&lt;/code&gt;中指出的&lt;code&gt;segment&lt;/code&gt;(&lt;code&gt;段&lt;/code&gt;)。在&lt;code&gt;Mach-O&lt;/code&gt;文件中，我们把&lt;code&gt;Header&lt;/code&gt;、&lt;code&gt;Load commands&lt;/code&gt;放在了&lt;code&gt;__TEXT``segment&lt;/code&gt;(&lt;code&gt;段&lt;/code&gt;)的开头，即第一个&lt;code&gt;segment&lt;/code&gt;(&lt;code&gt;段&lt;/code&gt;)的开头。每一个&lt;code&gt;段&lt;/code&gt;由多个&lt;code&gt;page&lt;/code&gt;(&lt;code&gt;页&lt;/code&gt;)组成，&lt;code&gt;段&lt;/code&gt;的大小为&lt;code&gt;页&lt;/code&gt;大小的整数倍。如下图，&lt;code&gt;TEXT段&lt;/code&gt;占3&lt;code&gt;页&lt;/code&gt;，&lt;code&gt;DATA&lt;/code&gt;、&lt;code&gt;LINKEDIT&lt;/code&gt;分别占1&lt;code&gt;页&lt;/code&gt;。&lt;code&gt;页&lt;/code&gt;的大小取决于硬件，在&lt;code&gt;arm64&lt;/code&gt;下，&lt;code&gt;页&lt;/code&gt;大小为16K，其它则为4K。&lt;br&gt;&lt;img src=&quot;http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-02%20%E4%B8%8B%E5%8D%8810.24.03.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h4 id=&quot;Mach-O-Image文件&quot;&gt;&lt;a href=&quot;#Mach-O-Image文件&quot; class=&quot;headerlink&quot; title=&quot;Mach-O Image文件&quot;&gt;&lt;/a&gt;Mach-O Image文件&lt;/h4&gt;&lt;p&gt;一个&lt;code&gt;Mach-O&lt;/code&gt;文件由3部分组成：&lt;code&gt;Header&lt;/code&gt;、&lt;code&gt;Load commands&lt;/code&gt;、&lt;code&gt;Raw segment data&lt;/code&gt;。&lt;code&gt;Header&lt;/code&gt;描述了文件的目标架构等信息，如x86-64,PPC；&lt;code&gt;Load commands&lt;/code&gt;列出了文件的逻辑结构及文件在虚拟内存中的布局;&lt;code&gt;Raw segment data&lt;/code&gt;包含了在&lt;code&gt;Load commands&lt;/code&gt;中指出的&lt;code&gt;segment&lt;/code&gt;(&lt;code&gt;段&lt;/code&gt;)。在&lt;code&gt;Mach-O&lt;/code&gt;文件中，我们把&lt;code&gt;Header&lt;/code&gt;、&lt;code&gt;Load commands&lt;/code&gt;放在了&lt;code&gt;__TEXT&lt;/code&gt; &lt;code&gt;segment&lt;/code&gt;(&lt;code&gt;段&lt;/code&gt;)的开头，即第一个&lt;code&gt;segment&lt;/code&gt;(&lt;code&gt;段&lt;/code&gt;)的开头。每一个&lt;code&gt;段&lt;/code&gt;由多个&lt;code&gt;page&lt;/code&gt;(&lt;code&gt;页&lt;/code&gt;)组成，&lt;code&gt;段&lt;/code&gt;的大小为&lt;code&gt;页&lt;/code&gt;大小的整数倍。如下图，&lt;code&gt;TEXT段&lt;/code&gt;占3&lt;code&gt;页&lt;/code&gt;，&lt;code&gt;DATA&lt;/code&gt;、&lt;code&gt;LINKEDIT&lt;/code&gt;分别占1&lt;code&gt;页&lt;/code&gt;。&lt;code&gt;页&lt;/code&gt;的大小取决于硬件，在&lt;code&gt;arm64&lt;/code&gt;下，&lt;code&gt;页&lt;/code&gt;大小为16K，其它则为4K。&lt;br&gt;&lt;img src=&quot;http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-02%20%E4%B8%8B%E5%8D%8810.24.03.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;p&gt;我们还可以从&lt;code&gt;section&lt;/code&gt;(节)的角度来理解&lt;code&gt;段&lt;/code&gt;,编译器对&lt;code&gt;section&lt;/code&gt;是透明的，&lt;code&gt;section&lt;/code&gt;仅仅是一个&lt;code&gt;段&lt;/code&gt;的子区间，它没有任何的大小约束，但是&lt;code&gt;section&lt;/code&gt;之间不会产生重叠。&lt;br&gt;&lt;img src=&quot;http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-02%20%E4%B8%8B%E5%8D%8810.41.36.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;p&gt;事实上，每一个二进制文件都包含&lt;code&gt;TEXT&lt;/code&gt;、&lt;code&gt;DATA&lt;/code&gt;、&lt;code&gt;LINKEDIT&lt;/code&gt;这3个通用的&lt;code&gt;段&lt;/code&gt;，&lt;code&gt;TEXT&lt;/code&gt;位于文件的开始，它包括&lt;code&gt;Mach header&lt;/code&gt;，机器指令，代码以及只读常量如C字符串，&lt;code&gt;DATA段&lt;/code&gt;是可读写的，其包括所有的全局变量，静态变量等。&lt;code&gt;LINKEDIT&lt;/code&gt;包含加载程序的&lt;code&gt;meta data&lt;/code&gt;(元数据)，如符号，字符串，重定向表条目，供动态链接器使用。&lt;/p&gt;
     
@@ -1233,78 +1271,6 @@
       <category term="源码分析" scheme="https://zhongwuzw.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/"/>
     
       <category term="Alamofire" scheme="https://zhongwuzw.github.io/tags/Alamofire/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Swift之类型引用</title>
-    <link href="https://zhongwuzw.github.io/2016/12/11/Swift%E4%B9%8B%E7%B1%BB%E5%9E%8B%E5%BC%95%E7%94%A8/"/>
-    <id>https://zhongwuzw.github.io/2016/12/11/Swift之类型引用/</id>
-    <published>2016-12-11T13:58:35.000Z</published>
-    <updated>2016-12-12T06:20:13.000Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="类型引用"><a href="#类型引用" class="headerlink" title="类型引用"></a>类型引用</h2><hr>
-<p>在开发中，我们经常用到实例的类型，希望实例与其真正的对象类型关联，既面向对象中的多态性。接下来将通过一个例子来进行讨论，比如，定义一个<code>Dog</code>类，用来描述狗，如下：</p>
-<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dog</span> </span>&#123;</div><div class="line">    <span class="class"><span class="keyword">class</span> <span class="title">var</span> <span class="title">whatDogsSay</span> : <span class="title">String</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="string">"Woof"</span></div><div class="line">    &#125;</div><div class="line">    <span class="function"><span class="keyword">func</span> <span class="title">bark</span><span class="params">()</span></span> &#123;</div><div class="line">        <span class="built_in">print</span>(<span class="type">Dog</span>.whatDogsSay)</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><code>Dog</code>类的<code>bark</code>为狗叫所定义的方法，实现中直接硬编码<code>Dog.whatDogsSay</code>，这种方法会很不灵活，尤其是其如果作为父类被子类时。</p>
-<p>在<code>Swift</code>中，可以使用<code>type(of:)</code>方法来访问对象实际的类型，既会返回实例对象真正的类型，所以，可以对之前的<code>Dog</code>进行改进，如下：</p>
-<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dog</span> </span>&#123;</div><div class="line">    <span class="class"><span class="keyword">class</span> <span class="title">var</span> <span class="title">whatDogsSay</span> : <span class="type">String &#123;</span></span></div><div class="line">        <span class="keyword">return</span> <span class="string">"Woof"</span></div><div class="line">    &#125;</div><div class="line">    func bark() &#123;</div><div class="line">        print(type(of:self).whatDogsSay)</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">NoisyDog</span> : <span class="type">Dog &#123;</span></span></div><div class="line">    <span class="keyword">override</span> <span class="class"><span class="keyword">class</span> <span class="title">var</span> <span class="title">whatDogsSay</span> : <span class="type">String &#123;</span></span></div><div class="line">        <span class="keyword">return</span> <span class="string">"Woof woof woof"</span></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>如上定义，结果如下：</p>
-<figure class="highlight ceylon"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">let</span> nd = NoisyDog()</div><div class="line">nd.bark() <span class="comment">// Woof woof woof</span></div></pre></td></tr></table></figure>
-<p>如果向<code>NoisyDog</code>实例发送<code>bark</code>消息，结果为”Woof woof woof”。这就是<code>type(of:)</code>方法的作用，他会指向实例真正的类型。<code>self</code>表示实例，类型为<code>NoisyDog</code>，所以<code>type(of:self)</code>返回<code>NoisyDog</code>类，所以会调用<code>NoisyDog</code>类的<code>whatDogsSay</code>类属性。</p>
-<p>有时候，需要传递一个对象类型作为参数：</p>
-<ul>
-<li>声明对象的类型时，可以使用类型名加<code>.</code>再加关键字<code>Type</code>。</li>
-<li><p>如果使用一个对象作为值时，比如，将类型赋值给一个变量或者作为参数值传递给函数时，可以使用类型名加<code>self</code>关键字，或者<code>type(of:)</code>方法。</p>
-<a id="more"></a>
-</li>
-</ul>
-<p>例如，有一个函数<code>dogTypeExpecter</code>，接收<code>Dog</code>类型作为参数：</p>
-<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">dogTypeExpecter</span><span class="params">(<span class="number">_</span> whattype:Dog.<span class="keyword">Type</span>)</span></span> &#123;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>调用方式如下：</p>
-<figure class="highlight stylus"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="title">dogTypeExpecter</span><span class="params">(Dog.self)</span></span></div></pre></td></tr></table></figure>
-<p>或：</p>
-<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">let d = Dog()</div><div class="line">dogTypeExpecter(<span class="name">type</span>(<span class="name">of</span><span class="symbol">:d</span>))</div><div class="line"></div><div class="line">dogTypeExpecter(<span class="name">NoisyDog</span>.self)</div><div class="line">let nd = NoisyDog()</div><div class="line">dogTypeExpecter(<span class="name">type</span>(<span class="name">of</span><span class="symbol">:nd</span>))</div></pre></td></tr></table></figure>
-<p>这种情况经常出现在工厂方法中，既给定某个类型，创建该类型的实例，<code>Swift</code>中使用<code>init</code>来定义初始化器，如：</p>
-<figure class="highlight dart"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dog</span> </span>&#123;</div><div class="line">    <span class="keyword">var</span> name : <span class="built_in">String</span></div><div class="line">    init(name:<span class="built_in">String</span>) &#123;</div><div class="line">        self.name = name</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">NoisyDog</span> : <span class="title">Dog</span> </span>&#123;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>如下为一个工厂方法来创建<code>Dog</code>或<code>NoisyDog</code>，通过参数来指明类型：</p>
-<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">dogMakerAndNamer</span><span class="params">(<span class="number">_</span> whattype:Dog.<span class="keyword">Type</span>)</span></span> -&gt; <span class="type">Dog</span> &#123;</div><div class="line">    <span class="keyword">let</span> d = whattype.<span class="keyword">init</span>(name:<span class="string">"Fido"</span>) <span class="comment">// compile error</span></div><div class="line">    <span class="keyword">return</span> d</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>如上定义后，编译器会报错，原因是编译器无法确保<code>Dog</code>的每一个子类都会实现<code>init(name:)</code>初始化方法，所以，我们可以通过添加<code>required</code>关键字来强制<code>Dog</code>子类实现或继承该初始化方法。</p>
-<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dog</span> </span>&#123;</div><div class="line">    <span class="keyword">var</span> name : <span class="type">String</span></div><div class="line">    <span class="keyword">required</span> <span class="keyword">init</span>(name:<span class="type">String</span>) &#123;</div><div class="line">        <span class="keyword">self</span>.name = name</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">NoisyDog</span> : <span class="title">Dog</span> </span>&#123;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>调用结果：</p>
-<figure class="highlight lasso"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">let</span> d = dogMakerAndNamer(Dog.<span class="built_in">self</span>) <span class="comment">// d is a Dog named Fido</span></div><div class="line"><span class="keyword">let</span> d2 = dogMakerAndNamer(NoisyDog.<span class="built_in">self</span>) <span class="comment">// d2 is a NoisyDog named Fido</span></div></pre></td></tr></table></figure>
-<p>在类方法中，<code>self</code>代表类，在实例方法中，<code>self</code>表示类实例，在工厂方法中，我们在返回类型中使用了<code>Self</code>关键字，其具有动态性，代表返回的真正类型，其也可以用在实例方法的声明中。</p>
-<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dog</span> </span>&#123;</div><div class="line">    <span class="keyword">var</span> name : <span class="type">String</span></div><div class="line">    <span class="keyword">required</span> <span class="keyword">init</span>(name:<span class="type">String</span>) &#123;</div><div class="line">        <span class="keyword">self</span>.name = name</div><div class="line">    &#125;</div><div class="line">    <span class="class"><span class="keyword">class</span> <span class="title">func</span> <span class="title">makeAndName</span>() -&gt; <span class="title">Self</span> </span>&#123;</div><div class="line">        <span class="keyword">let</span> d = <span class="keyword">self</span>.<span class="keyword">init</span>(name:<span class="string">"Fido"</span>)</div><div class="line">        <span class="keyword">return</span> d</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">NoisyDog</span> : <span class="title">Dog</span> </span>&#123;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><hr>
-<p><code>type(of:)</code>：返回对象实例所指向的真正对象类型。<br><code>.Type</code>：在类型声明时使用，比如，在函数参数声明时，期望参数为<code>Dog</code>类型或其子类类型，可以写成<code>Dog.Type</code>。<br><code>.self</code>：代表一个类型，如，函数参数需要<code>Dog.Type</code>类型时，可以传递<code>Dog.self</code>。<br><code>Self</code>：在方法声明时，在返回类型中使用<code>Self</code>关键字，具有动态性。</p>
-<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><hr>
-<p>在<code>Swift</code>中，静态变量、静态方法可以使用<code>static</code>、<code>class</code>两种关键字，但是需要注意的是，<code>static</code>声明的无法重载，但是<code>class</code>关键字可以，不过<code>class</code>只能使用在类中，不能用在结构体、枚举等中。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;类型引用&quot;&gt;&lt;a href=&quot;#类型引用&quot; class=&quot;headerlink&quot; title=&quot;类型引用&quot;&gt;&lt;/a&gt;类型引用&lt;/h2&gt;&lt;hr&gt;
-&lt;p&gt;在开发中，我们经常用到实例的类型，希望实例与其真正的对象类型关联，既面向对象中的多态性。接下来将通过一个例子来进行讨论，比如，定义一个&lt;code&gt;Dog&lt;/code&gt;类，用来描述狗，如下：&lt;/p&gt;
-&lt;figure class=&quot;highlight swift&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;Dog&lt;/span&gt; &lt;/span&gt;&amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;whatDogsSay&lt;/span&gt; : &lt;span class=&quot;title&quot;&gt;String&lt;/span&gt; &lt;/span&gt;&amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;&quot;Woof&quot;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;func&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;bark&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;()&lt;/span&gt;&lt;/span&gt; &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &lt;span class=&quot;built_in&quot;&gt;print&lt;/span&gt;(&lt;span class=&quot;type&quot;&gt;Dog&lt;/span&gt;.whatDogsSay)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;p&gt;&lt;code&gt;Dog&lt;/code&gt;类的&lt;code&gt;bark&lt;/code&gt;为狗叫所定义的方法，实现中直接硬编码&lt;code&gt;Dog.whatDogsSay&lt;/code&gt;，这种方法会很不灵活，尤其是其如果作为父类被子类时。&lt;/p&gt;
-&lt;p&gt;在&lt;code&gt;Swift&lt;/code&gt;中，可以使用&lt;code&gt;type(of:)&lt;/code&gt;方法来访问对象实际的类型，既会返回实例对象真正的类型，所以，可以对之前的&lt;code&gt;Dog&lt;/code&gt;进行改进，如下：&lt;/p&gt;
-&lt;figure class=&quot;highlight kotlin&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;Dog&lt;/span&gt; &lt;/span&gt;&amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;whatDogsSay&lt;/span&gt; : &lt;span class=&quot;type&quot;&gt;String &amp;#123;&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;&quot;Woof&quot;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    func bark() &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        print(type(of:self).whatDogsSay)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;NoisyDog&lt;/span&gt; : &lt;span class=&quot;type&quot;&gt;Dog &amp;#123;&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;override&lt;/span&gt; &lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;whatDogsSay&lt;/span&gt; : &lt;span class=&quot;type&quot;&gt;String &amp;#123;&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;&quot;Woof woof woof&quot;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;    &amp;#125;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;#125;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;p&gt;如上定义，结果如下：&lt;/p&gt;
-&lt;figure class=&quot;highlight ceylon&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;let&lt;/span&gt; nd = NoisyDog()&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;nd.bark() &lt;span class=&quot;comment&quot;&gt;// Woof woof woof&lt;/span&gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;p&gt;如果向&lt;code&gt;NoisyDog&lt;/code&gt;实例发送&lt;code&gt;bark&lt;/code&gt;消息，结果为”Woof woof woof”。这就是&lt;code&gt;type(of:)&lt;/code&gt;方法的作用，他会指向实例真正的类型。&lt;code&gt;self&lt;/code&gt;表示实例，类型为&lt;code&gt;NoisyDog&lt;/code&gt;，所以&lt;code&gt;type(of:self)&lt;/code&gt;返回&lt;code&gt;NoisyDog&lt;/code&gt;类，所以会调用&lt;code&gt;NoisyDog&lt;/code&gt;类的&lt;code&gt;whatDogsSay&lt;/code&gt;类属性。&lt;/p&gt;
-&lt;p&gt;有时候，需要传递一个对象类型作为参数：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;声明对象的类型时，可以使用类型名加&lt;code&gt;.&lt;/code&gt;再加关键字&lt;code&gt;Type&lt;/code&gt;。&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;如果使用一个对象作为值时，比如，将类型赋值给一个变量或者作为参数值传递给函数时，可以使用类型名加&lt;code&gt;self&lt;/code&gt;关键字，或者&lt;code&gt;type(of:)&lt;/code&gt;方法。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="iOS开发-语言" scheme="https://zhongwuzw.github.io/categories/iOS%E5%BC%80%E5%8F%91-%E8%AF%AD%E8%A8%80/"/>
-    
-    
-      <category term="iOS" scheme="https://zhongwuzw.github.io/tags/iOS/"/>
-    
-      <category term="Swift" scheme="https://zhongwuzw.github.io/tags/Swift/"/>
     
   </entry>
   

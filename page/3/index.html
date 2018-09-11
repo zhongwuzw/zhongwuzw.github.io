@@ -317,6 +317,172 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2017/06/17/Swift之Weak引用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="钟武">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.JPG">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="钟武的技术博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/06/17/Swift之Weak引用/" itemprop="url">Swift3之Weak引用</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-17T21:33:22+08:00">
+                2017-06-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS开发-语言/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发-语言</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/06/17/Swift之Weak引用/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/06/17/Swift之Weak引用/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <blockquote>
+<p>由于不同的<code>Swift</code>版本引用计数实现会有不同，该文讨论的引用计数原理都基于<code>Swift3</code></p>
+</blockquote>
+<h2 id="弱引用"><a href="#弱引用" class="headerlink" title="弱引用"></a>弱引用</h2><hr>
+<p>做<code>iOS</code>开发时经常会遇到循环引用，如果处理不当会导致内存泄露，我们通常会使用<code>weak reference</code>弱引用来解决该问题，因为弱引用不会<code>retain</code>对象，当对象引用计数变为0时，弱引用指针将会被赋<code>nil</code>。</p>
+<h2 id="实现过程"><a href="#实现过程" class="headerlink" title="实现过程"></a>实现过程</h2><hr>
+<p>通常如果实现弱引用，可以让每一个对象维护所有指向该对象的一个弱引用列表，当一个弱引用指向一个对象时，该引用被添加进列表，当弱引用重新赋值或生命期结束，则将其从列表中移除，当一个对象<code>dealloced</code>后，列表中的所有引用会被赋<code>nil</code>。在多线程环境中，需要对获得弱引用和释放对象的操作进行同步，以避免竞态条件，既当一个线程在释放最后一个强引用对象的同时，另一个线程正尝试加载该对象的弱引用。</p>
+<p><code>Objective-C</code>实现的过程为，每一个弱引用是一个指向目标对象的指针，编译器会使用<code>helper</code>函数，来避免直接读写指针，确保读取弱引用对象时不会返回正在被释放的对象指针。</p>
+<h2 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h2><hr>
+<p>接下来，我们将创建几个方法来观察弱引用的过程。<br>首先我们想要能够<code>dump</code>出一个对象的内存，如下方法将获取一块内存，将其分成指针大小的块，再将其内容转成16进制，以便于观察：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">// Swift <span class="keyword">version</span>: Swift3</div><div class="line"></div><div class="line">func contents(<span class="keyword">ptr</span>: UnsafeRawPointer, _ length: Int) -&gt; String &#123;</div><div class="line">    <span class="keyword">let</span> wordPtr = <span class="keyword">ptr</span>.assumingMemoryBound(<span class="keyword">to</span>: UInt.self)</div><div class="line">    </div><div class="line">    <span class="keyword">let</span> words = length / MemoryLayout<span class="symbol">&lt;UInt&gt;</span>.size</div><div class="line">    <span class="keyword">let</span> wordChars = MemoryLayout<span class="symbol">&lt;UInt&gt;</span>.size * <span class="number">2</span></div><div class="line">    </div><div class="line">    <span class="keyword">let</span> <span class="keyword">buffer</span> = UnsafeBufferPointer<span class="symbol">&lt;UInt&gt;</span>(<span class="keyword">star</span><span class="variable">t:</span> wordPtr, coun<span class="variable">t:</span> words)</div><div class="line">    <span class="keyword">let</span> wordStrings = <span class="keyword">buffer</span>.<span class="keyword">map</span>(&#123; word -&gt; String in</div><div class="line">        var wordString = String(word, radix: <span class="number">16</span>)</div><div class="line">        <span class="keyword">while</span> wordString.characters.<span class="built_in">count</span> &lt; wordChars &#123;</div><div class="line">            wordString = <span class="string">"0"</span> + wordString</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> wordString</div><div class="line">    &#125;)</div><div class="line">    <span class="keyword">return</span> wordStrings.joined(separator: <span class="string">" "</span>)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/06/17/Swift之Weak引用/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2017/06/05/GCD队列管理之YYDispatchQueuePool/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -808,7 +974,7 @@
 <li><code>Bundle</code>：不能被链接的动态库，只能通过<code>dlopen()</code>，用于<code>Mac OS</code>。</li>
 </ul>
 <p><code>Image</code>：可以是可执行文件、动态库或者<code>bundle</code>。<br><code>Framework</code>：动态库，包含资源和头文件。</p>
-<h4 id="Mach-O-Image文件"><a href="#Mach-O-Image文件" class="headerlink" title="Mach-O Image文件"></a>Mach-O Image文件</h4><p>一个<code>Mach-O</code>文件由3部分组成：<code>Header</code>、<code>Load commands</code>、<code>Raw segment data</code>。<code>Header</code>描述了文件的目标架构等信息，如x86-64,PPC；<code>Load commands</code>列出了文件的逻辑结构及文件在虚拟内存中的布局;<code>Raw segment data</code>包含了在<code>Load commands</code>中指出的<code>segment</code>(<code>段</code>)。在<code>Mach-O</code>文件中，我们把<code>Header</code>、<code>Load commands</code>放在了<code>__TEXT``segment</code>(<code>段</code>)的开头，即第一个<code>segment</code>(<code>段</code>)的开头。每一个<code>段</code>由多个<code>page</code>(<code>页</code>)组成，<code>段</code>的大小为<code>页</code>大小的整数倍。如下图，<code>TEXT段</code>占3<code>页</code>，<code>DATA</code>、<code>LINKEDIT</code>分别占1<code>页</code>。<code>页</code>的大小取决于硬件，在<code>arm64</code>下，<code>页</code>大小为16K，其它则为4K。<br><img src="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-02%20%E4%B8%8B%E5%8D%8810.24.03.png" alt=""></p>
+<h4 id="Mach-O-Image文件"><a href="#Mach-O-Image文件" class="headerlink" title="Mach-O Image文件"></a>Mach-O Image文件</h4><p>一个<code>Mach-O</code>文件由3部分组成：<code>Header</code>、<code>Load commands</code>、<code>Raw segment data</code>。<code>Header</code>描述了文件的目标架构等信息，如x86-64,PPC；<code>Load commands</code>列出了文件的逻辑结构及文件在虚拟内存中的布局;<code>Raw segment data</code>包含了在<code>Load commands</code>中指出的<code>segment</code>(<code>段</code>)。在<code>Mach-O</code>文件中，我们把<code>Header</code>、<code>Load commands</code>放在了<code>__TEXT</code> <code>segment</code>(<code>段</code>)的开头，即第一个<code>segment</code>(<code>段</code>)的开头。每一个<code>段</code>由多个<code>page</code>(<code>页</code>)组成，<code>段</code>的大小为<code>页</code>大小的整数倍。如下图，<code>TEXT段</code>占3<code>页</code>，<code>DATA</code>、<code>LINKEDIT</code>分别占1<code>页</code>。<code>页</code>的大小取决于硬件，在<code>arm64</code>下，<code>页</code>大小为16K，其它则为4K。<br><img src="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-02%20%E4%B8%8B%E5%8D%8810.24.03.png" alt=""></p>
 <p>我们还可以从<code>section</code>(节)的角度来理解<code>段</code>,编译器对<code>section</code>是透明的，<code>section</code>仅仅是一个<code>段</code>的子区间，它没有任何的大小约束，但是<code>section</code>之间不会产生重叠。<br><img src="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-02%20%E4%B8%8B%E5%8D%8810.41.36.png" alt=""></p>
 <p>事实上，每一个二进制文件都包含<code>TEXT</code>、<code>DATA</code>、<code>LINKEDIT</code>这3个通用的<code>段</code>，<code>TEXT</code>位于文件的开始，它包括<code>Mach header</code>，机器指令，代码以及只读常量如C字符串，<code>DATA段</code>是可读写的，其包括所有的全局变量，静态变量等。<code>LINKEDIT</code>包含加载程序的<code>meta data</code>(元数据)，如符号，字符串，重定向表条目，供动态链接器使用。</p>
           <!--noindex-->
@@ -1014,167 +1180,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2017/02/09/AppDelegate解耦之JSDecoupledAppDelegate/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="钟武">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.JPG">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="钟武的技术博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/02/09/AppDelegate解耦之JSDecoupledAppDelegate/" itemprop="url">AppDelegate解耦之JSDecoupledAppDelegate</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-09T14:52:34+08:00">
-                2017-02-09
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/iOS开发-项目/" itemprop="url" rel="index">
-                    <span itemprop="name">iOS开发-项目</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/02/09/AppDelegate解耦之JSDecoupledAppDelegate/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/02/09/AppDelegate解耦之JSDecoupledAppDelegate/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="AppDelegate解耦"><a href="#AppDelegate解耦" class="headerlink" title="AppDelegate解耦"></a>AppDelegate解耦</h2><hr>
-<p>说到<code>AppDelegate</code>，大家想必都不陌生，它作为应用(<code>UIApplication</code>)的委托对象，在<code>UIApplicationMain</code>方法中被创建，当发生应用相关事件时，提供开发者响应的机会。</p>
-<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span> main(<span class="keyword">int</span> argc, <span class="keyword">char</span> * argv[]) &#123;</div><div class="line">    <span class="keyword">@autoreleasepool</span> &#123;</div><div class="line">        <span class="keyword">return</span> <span class="built_in">UIApplicationMain</span>(argc, argv, <span class="literal">nil</span>, <span class="built_in">NSStringFromClass</span>([AppDelegate <span class="keyword">class</span>]));</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><code>AppDelegate</code>是<code>UIResponder</code>的子类，应用将<code>AppDelegate</code>加入响应链中。<code>UIApplication</code>作为响应链中的最上层，当<code>UIApplication</code>任然无法处理特定事件时，会将事件转发给<code>AppDelegate</code>来处理。</p>
-<p><img src="http://oc54pu02q.bkt.clouddn.com/iOS_and_OSX_responder_chain_2x.png" width="500" height="" alt="" align="center"></p>
-<p>当然，<code>AppDelegate</code>的主要职责还是响应应用事件，它满足<code>UIApplicationDelegate</code>协议，<code>UIApplicationDelegate</code>协议包含大量的委托方法，包括处理应用状态、状态恢复、后台下载数据、通知、URL Route等很多方面，这就会导致，随着程序的开发，<code>AppDelegate</code>将变得越来越臃肿，为了解决该问题，就需要进行解耦。</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/02/09/AppDelegate解耦之JSDecoupledAppDelegate/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1228,7 +1233,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">42</span>
+                  <span class="site-state-item-count">43</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1250,7 +1255,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">41</span>
+                  <span class="site-state-item-count">42</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>

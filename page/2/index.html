@@ -317,6 +317,170 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2018/01/30/Goroutines-vs-多线程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="钟武">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.JPG">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="钟武的技术博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/01/30/Goroutines-vs-多线程/" itemprop="url">Goroutines vs 多线程</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-30T10:56:47+08:00">
+                2018-01-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Go/" itemprop="url" rel="index">
+                    <span itemprop="name">Go</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/30/Goroutines-vs-多线程/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/01/30/Goroutines-vs-多线程/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><hr>
+<p><a href="https://golang.google.cn" target="_blank" rel="external">Golang</a>是由<code>Google</code>开发，天生支持并发的语言。<code>Go</code>有一个<code>goroutine</code>的机制，当我们在调用函数前加上<code>go</code>关键字，那么就会创建一个<code>goroutine</code>来异步执行该函数，如：<code>go foo()</code>，以此来实现并发的功能。本文，我们将讨论一下<code>goroutine</code>和线程的区别。</p>
+<h2 id="大小可调整的栈"><a href="#大小可调整的栈" class="headerlink" title="大小可调整的栈"></a>大小可调整的栈</h2><hr>
+<p>线程可以在启动前设置栈的大小，启动后，线程的栈大小就固定了，所以带来的弊端就是浪费内存空间，因为很多时候并不需要这么多内存。<br>相比于线程，<code>goroutine</code>的栈空间是可调整的，<code>goroutine</code>创建时，通常只会分配<code>2KB</code>大小的栈，随着<code>goroutine</code>的运行，比如不断的递归，创建变量等，相应的栈空间也会增大，反之也会按需减小，一个<code>goroutine</code>最大可分配栈空间通常为<code>1GB</code>。</p>
+<h2 id="goroutine-的调度"><a href="#goroutine-的调度" class="headerlink" title="goroutine 的调度"></a><code>goroutine</code> 的调度</h2><hr>
+<p>线程由系统内核进行调度，系统为了实现并发，会不断的切换线程的执行，由此会带来线程的上下文切换。<br>而<code>Go</code>的运行时有一套自己的调度系统，使用<code>m:n</code>策略，既复用<code>m</code>个<code>goroutine</code>到<code>n</code>个线程，<code>Go</code>的调度器类似于内核调度器，区别是它仅管理单个<code>Go</code>程序创建的<code>goroutine</code>。<br>相比于线程，<code>Go</code>的调度器并不会周期性的被硬件定时器调用，而是<code>Go</code>自己来处理，比如，当一个<code>goroutine</code>调用<code>time.Sleep</code>或阻塞与通道、互斥操作时，调度器会将<code>goroutine</code>休眠，然后运行另外的<code>goroutine</code>，这些并不需要内核的上下文切换，所以重新调度一个<code>goroutine</code>的开销会小于重新调度线程的开销。</p>
+<h2 id="GOMAXPROCS"><a href="#GOMAXPROCS" class="headerlink" title="GOMAXPROCS"></a><code>GOMAXPROCS</code></h2><hr>
+<p><code>Go</code>的调度器使用一个名为<code>GOMAXPROCS</code>的参数来确定真正的线程数，其默认值为机器的<code>CPU</code>的数量，如一台机器有8个<code>CPU</code>,那么调度器会同时创建8个线程（<code>GOMAXPROCS</code>就是如上所说<code>m:n</code>中的<code>n</code>)。休眠或阻塞中<code>goroutine</code>不需要线程，但是对于阻塞在<code>I/O</code>或系统调用、正在调用非<code>Go</code>函数的<code>goroutine</code>来说，需要一个系统线程，不过不占用<code>GOMAXPROCS</code>。</p>
+<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><hr>
+<ol>
+<li><a href="https://golang.google.cn" target="_blank" rel="external">https://golang.google.cn</a></li>
+<li><a href="http://www.gopl.io" target="_blank" rel="external">http://www.gopl.io</a></li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2017/11/16/Objective-C-之内存管理/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -960,172 +1124,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2017/06/17/Swift之Weak引用/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="钟武">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.JPG">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="钟武的技术博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/06/17/Swift之Weak引用/" itemprop="url">Swift3之Weak引用</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-17T21:33:22+08:00">
-                2017-06-17
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/iOS开发-语言/" itemprop="url" rel="index">
-                    <span itemprop="name">iOS开发-语言</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/06/17/Swift之Weak引用/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/06/17/Swift之Weak引用/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <blockquote>
-<p>由于不同的<code>Swift</code>版本引用计数实现会有不同，该文讨论的引用计数原理都基于<code>Swift3</code></p>
-</blockquote>
-<h2 id="弱引用"><a href="#弱引用" class="headerlink" title="弱引用"></a>弱引用</h2><hr>
-<p>做<code>iOS</code>开发时经常会遇到循环引用，如果处理不当会导致内存泄露，我们通常会使用<code>weak reference</code>弱引用来解决该问题，因为弱引用不会<code>retain</code>对象，当对象引用计数变为0时，弱引用指针将会被赋<code>nil</code>。</p>
-<h2 id="实现过程"><a href="#实现过程" class="headerlink" title="实现过程"></a>实现过程</h2><hr>
-<p>通常如果实现弱引用，可以让每一个对象维护所有指向该对象的一个弱引用列表，当一个弱引用指向一个对象时，该引用被添加进列表，当弱引用重新赋值或生命期结束，则将其从列表中移除，当一个对象<code>dealloced</code>后，列表中的所有引用会被赋<code>nil</code>。在多线程环境中，需要对获得弱引用和释放对象的操作进行同步，以避免竞态条件，既当一个线程在释放最后一个强引用对象的同时，另一个线程正尝试加载该对象的弱引用。</p>
-<p><code>Objective-C</code>实现的过程为，每一个弱引用是一个指向目标对象的指针，编译器会使用<code>helper</code>函数，来避免直接读写指针，确保读取弱引用对象时不会返回正在被释放的对象指针。</p>
-<h2 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h2><hr>
-<p>接下来，我们将创建几个方法来观察弱引用的过程。<br>首先我们想要能够<code>dump</code>出一个对象的内存，如下方法将获取一块内存，将其分成指针大小的块，再将其内容转成16进制，以便于观察：</p>
-<figure class="highlight vim"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">// Swift <span class="keyword">version</span>: Swift3</div><div class="line"></div><div class="line">func contents(<span class="keyword">ptr</span>: UnsafeRawPointer, _ length: Int) -&gt; String &#123;</div><div class="line">    <span class="keyword">let</span> wordPtr = <span class="keyword">ptr</span>.assumingMemoryBound(<span class="keyword">to</span>: UInt.self)</div><div class="line">    </div><div class="line">    <span class="keyword">let</span> words = length / MemoryLayout<span class="symbol">&lt;UInt&gt;</span>.size</div><div class="line">    <span class="keyword">let</span> wordChars = MemoryLayout<span class="symbol">&lt;UInt&gt;</span>.size * <span class="number">2</span></div><div class="line">    </div><div class="line">    <span class="keyword">let</span> <span class="keyword">buffer</span> = UnsafeBufferPointer<span class="symbol">&lt;UInt&gt;</span>(<span class="keyword">star</span><span class="variable">t:</span> wordPtr, coun<span class="variable">t:</span> words)</div><div class="line">    <span class="keyword">let</span> wordStrings = <span class="keyword">buffer</span>.<span class="keyword">map</span>(&#123; word -&gt; String in</div><div class="line">        var wordString = String(word, radix: <span class="number">16</span>)</div><div class="line">        <span class="keyword">while</span> wordString.characters.<span class="built_in">count</span> &lt; wordChars &#123;</div><div class="line">            wordString = <span class="string">"0"</span> + wordString</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> wordString</div><div class="line">    &#125;)</div><div class="line">    <span class="keyword">return</span> wordStrings.joined(separator: <span class="string">" "</span>)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/06/17/Swift之Weak引用/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1179,7 +1177,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">42</span>
+                  <span class="site-state-item-count">43</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1201,7 +1199,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">41</span>
+                  <span class="site-state-item-count">42</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
