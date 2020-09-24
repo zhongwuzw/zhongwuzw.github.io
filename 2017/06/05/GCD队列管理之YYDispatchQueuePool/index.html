@@ -90,7 +90,7 @@
 <meta property="og:description" content="前言 iOS中，我们经常使用GCD来进行并发操作，我们并不需要关心线程的管理，Dispatch Queue会自动帮我们处理线程的创建和释放，在极大的简化并发操作的同时，某些情况下，Dispatch Queue的滥用可能会导致应用挂起，如向并发队列中添加阻塞的Block，阻塞的Block会导致系统创建更多的线程来处理任务，而GCD线程池的最大线程数为64个，所以一旦达到最大值，应用将挂起。接下来，我">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-06-05%20%E4%B8%8B%E5%8D%8811.28.12.png">
-<meta property="og:updated_time" content="2017-06-06T01:26:58.000Z">
+<meta property="og:updated_time" content="2018-11-23T13:38:17.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="GCD队列管理之YYDispatchQueuePool">
 <meta name="twitter:description" content="前言 iOS中，我们经常使用GCD来进行并发操作，我们并不需要关心线程的管理，Dispatch Queue会自动帮我们处理线程的创建和释放，在极大的简化并发操作的同时，某些情况下，Dispatch Queue的滥用可能会导致应用挂起，如向并发队列中添加阻塞的Block，阻塞的Block会导致系统创建更多的线程来处理任务，而GCD线程池的最大线程数为64个，所以一旦达到最大值，应用将挂起。接下来，我">
@@ -431,7 +431,7 @@
 <p><img src="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-06-05%20%E4%B8%8B%E5%8D%8811.28.12.png" alt=""></p>
 <p>除了可以创建队列池来管理并发外，还可以通过<code>C</code>的全局函数（<code>dispatch_queue_t YYDispatchQueueGetForQOS(NSQualityOfService qos)</code>）来获取特定的<code>NSQualityOfService</code>串行队列，队列由全局的队列池来管理，每一种<code>NSQualityOfService</code>的串行队列数与核数相同，这样可以尽可能的减少线程之间的上下文切换。</p>
 <a id="more"></a>
-<p><code>YYDispatchQueuePool</code>对象使用<code>YYDispatchContext``struct</code>来管理队列池，代码目前还存在内存泄露的问题，因为<code>struct</code>是在堆上分配的内存，最后使用<code>YYDispatchContextRelease</code>释放<code>context</code>时只释放了结构体成员的内存空间，而没有释放结构体自己申请的空间，解决方法如下注释，加上<code>free(context)</code>即可。</p>
+<p><code>YYDispatchQueuePool</code>对象使用<code>YYDispatchContext</code> <code>struct</code>来管理队列池，代码目前还存在内存泄露的问题，因为<code>struct</code>是在堆上分配的内存，最后使用<code>YYDispatchContextRelease</code>释放<code>context</code>时只释放了结构体成员的内存空间，而没有释放结构体自己申请的空间，解决方法如下注释，加上<code>free(context)</code>即可。</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> &#123;</div><div class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *name;</div><div class="line">    <span class="keyword">void</span> **queues;</div><div class="line">    <span class="keyword">uint32_t</span> queueCount;</div><div class="line">    <span class="keyword">int32_t</span> counter;</div><div class="line">&#125; YYDispatchContext;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">YYDispatchContextRelease</span><span class="params">(YYDispatchContext *context)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (!context) <span class="keyword">return</span>;</div><div class="line">    <span class="keyword">if</span> (context-&gt;queues) &#123;</div><div class="line">        <span class="keyword">for</span> (NSUInteger i = <span class="number">0</span>; i &lt; context-&gt;queueCount; i++) &#123;</div><div class="line">            <span class="keyword">void</span> *queuePointer = context-&gt;queues[i];</div><div class="line">            <span class="keyword">dispatch_queue_t</span> <span class="built_in">queue</span> = (<span class="number">__b</span>ridge_transfer <span class="keyword">dispatch_queue_t</span>)(queuePointer);</div><div class="line">            <span class="keyword">const</span> <span class="keyword">char</span> *name = dispatch_queue_get_label(<span class="built_in">queue</span>);</div><div class="line">            <span class="keyword">if</span> (name) <span class="built_in">strlen</span>(name); <span class="comment">// avoid compiler warning</span></div><div class="line">            <span class="built_in">queue</span> = nil;</div><div class="line">        &#125;</div><div class="line">        <span class="built_in">free</span>(context-&gt;queues);</div><div class="line">        context-&gt;queues = <span class="literal">NULL</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span> (context-&gt;name) <span class="built_in">free</span>((<span class="keyword">void</span> *)context-&gt;name);</div><div class="line">    <span class="comment">//内存泄露，需添加  free(context);</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <h2 id="NSOperationQueue"><a href="#NSOperationQueue" class="headerlink" title="NSOperationQueue"></a>NSOperationQueue</h2><hr>
 <p>使用<code>NSOperationQueue</code>，设置<code>maxConcurrentOperationCount</code>来控制并发量。</p>
@@ -613,7 +613,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">43</span>
+                  <span class="site-state-item-count">45</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -624,7 +624,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-count">15</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -635,7 +635,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">42</span>
+                  <span class="site-state-item-count">44</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -756,7 +756,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; 2016 &mdash; <span itemprop="copyrightYear">2018</span>
+        <div class="copyright">&copy; 2016 &mdash; <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

@@ -317,6 +317,353 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2020/09/24/Flutter-InheritedWidget实现原理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="钟武">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.JPG">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="钟武的技术博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/09/24/Flutter-InheritedWidget实现原理/" itemprop="url">Flutter InheritedWidget实现原理</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-09-24T10:50:54+08:00">
+                2020-09-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Flutter/" itemprop="url" rel="index">
+                    <span itemprop="name">Flutter</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/09/24/Flutter-InheritedWidget实现原理/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2020/09/24/Flutter-InheritedWidget实现原理/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><hr>
+<p>在Flutter开发中，对于一些简单的数据传递，我们可以使用Widget constructor直接传递进去，但是当某个后代Widget依赖上层的祖先Widget或者多个Widget同时依赖祖先Widget的情形时，直接传递的方式就会暴露出很多的问题：需要连续传递很难维护以及依赖的祖先Widget数据改变时，所有子Widget都需要rebuild。</p>
+<p>Flutter提供了另外一个机制来解决这个问题，InheritedWidget，当InheritedWidget数据发生变化时，只通知依赖其数据变化的Widgets，接下来将按步骤分析实现细节。（ <a href="https://github.com/rrousselGit/provider?spm=ata.13261165.0.0.36547ede70zxv7" target="_blank" rel="external">Provider</a>也是基于InheritedWidget进行的封装）</p>
+<p><img src="/images/flutter_inheritedWidget.png" alt=""></p>
+<h2 id="实现细节"><a href="#实现细节" class="headerlink" title="实现细节"></a>实现细节</h2><hr>
+<p>我们通过一个小demo来展示使用方法，假设数据Color需要被后代Widget访问，且当Color变化，后代Widget能监听到变化。步骤比较简单，先子类InheritedWidget，如下代码示例，FrogColor定义了一个名为of的静态方法，该方法由后代Widget进行调用，调用时将后代Widget的Element作为context传入。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">FrogColor</span> <span class="keyword">extends</span> <span class="title">InheritedWidget</span> </span>&#123;</div><div class="line">  const <span class="type">FrogColor</span>(&#123;</div><div class="line">    <span class="type">Key</span> key,</div><div class="line">    <span class="meta">@required</span> <span class="keyword">this</span>.color,</div><div class="line">    <span class="meta">@required</span> <span class="type">Widget</span> child,</div><div class="line">  &#125;) : assert(color != <span class="literal">null</span>),</div><div class="line">       assert(child != <span class="literal">null</span>),</div><div class="line">       <span class="keyword">super</span>(key: key, child: child);</div><div class="line"></div><div class="line">  <span class="keyword">final</span> <span class="type">Color</span> color;</div><div class="line"></div><div class="line">  static <span class="type">FrogColor</span> of(<span class="type">BuildContext</span> context) &#123;</div><div class="line">    <span class="keyword">return</span> context.dependOnInheritedWidgetOfExactType&lt;<span class="type">FrogColor</span>&gt;();</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="meta">@override</span></div><div class="line">  bool updateShouldNotify(<span class="type">FrogColor</span> old) =&gt; color != old.color;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>我们看下of静态方法的实现，实际调用的是后代Widget对应Element的 dependOnInheritedWidgetOfExactType，该方法首先会去_inheritedWidgets里找是否有需要的InheritedWidget，如果找到，返回找到的InheritedWidget，并将自己作为依赖注册到InheritedWidget里，这样InheritedWidget就能知道哪些Widget依赖它，如果InheritedWidget发生了变化，会通知依赖方。_inheritedWidgets会在InheritedWidget mount的时候从父Element获取当前所有的InheritedWidgets，并且把自己也加到里边，也就是说，所有的Element都有一个Map来收集当前祖先所有的InheritedWidget。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@override</span></div><div class="line">T dependOnInheritedWidgetOfExactType&lt;T <span class="keyword">extends</span> InheritedWidget&gt;(&#123;<span class="built_in">Object</span> aspect&#125;) &#123;</div><div class="line">  <span class="keyword">assert</span>(_debugCheckStateIsActiveForAncestorLookup());</div><div class="line">  <span class="keyword">final</span> InheritedElement ancestor = _inheritedWidgets == <span class="keyword">null</span> ? <span class="keyword">null</span> : _inheritedWidgets[T];</div><div class="line">  <span class="keyword">if</span> (ancestor != <span class="keyword">null</span>) &#123;</div><div class="line">    <span class="keyword">assert</span>(ancestor <span class="keyword">is</span> InheritedElement);</div><div class="line">    <span class="keyword">return</span> dependOnInheritedElement(ancestor, aspect: aspect) <span class="keyword">as</span> T;</div><div class="line">  &#125;</div><div class="line">  _hadUnsatisfiedDependencies = <span class="keyword">true</span>;</div><div class="line">  <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>重新回到FrogColor类，另一个方法updateShouldNotify，当FrogColor widget rebuild时，FrogColor的Element会通过updated方法来判断是否需要通知所有依赖它的后代Widgets，super.updated(oldWidget)用来通知所有的dependencies 依赖方。</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@override</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">updated</span><span class="params">(InheritedWidget oldWidget)</span> </span>&#123;</div><div class="line">  <span class="keyword">if</span> (widget.updateShouldNotify(oldWidget))</div><div class="line">    <span class="keyword">super</span>.updated(oldWidget);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>当需要通知依赖方的时候，调用依赖Widget对应Element的didChangeDependencies方法，Element将自己标记为dirty，并加到BuildOwner的dirty列表中，当下一帧绘制时，会重新build Widget。</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@mustCallSuper</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">didChangeDependencies</span><span class="params">()</span> </span>&#123;</div><div class="line">  <span class="keyword">assert</span>(_active); <span class="comment">// otherwise markNeedsBuild is a no-op</span></div><div class="line">  <span class="keyword">assert</span>(_debugCheckOwnerBuildTargetExists(<span class="string">'didChangeDependencies'</span>));</div><div class="line">  markNeedsBuild();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><hr>
+<p>综上，我们可以看到，InheritedWidget不仅能解决多层传递带来的业务复杂度，也能非常高效的进行rebuild操作。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2020/09/24/Flutter-Dart垃圾回收/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="钟武">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.JPG">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="钟武的技术博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/09/24/Flutter-Dart垃圾回收/" itemprop="url">Flutter Dart垃圾回收</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-09-24T10:15:48+08:00">
+                2020-09-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Flutter/" itemprop="url" rel="index">
+                    <span itemprop="name">Flutter</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/09/24/Flutter-Dart垃圾回收/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2020/09/24/Flutter-Dart垃圾回收/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <hr>
+<p>Flutter使用Dart作为开发语言以及运行时，Dart 运行时存在于Debug和Release模式，不过两个模式中的运行时有很大的区别。</p>
+<p>Debug模式下，Dart运行时，JIT编译器/解释器（Android是JIT，iOS是解释器），Debug和Profile工具都会加载到设备上。而Release模式下，JIT编译器/解释器和Debug服务被移除，只包括运行时。</p>
+<p><img src="/images/flutter_debug_release.png" alt=""></p>
+<p> Dart运行时包含垃圾回收器，在对象创建和销毁时分配和释放内存。Flutter在运行中，会创建大量的对象，比如，伴随着在界面展示，不可见，app 状态变化等，会创建很多Staleless Widgets，其中很多生命周期都很短。一个比较复杂的UI界面，widgets数量能上千。</p>
+<p> 那么Flutter 开发者是否需要关心垃圾回收？Flutter在高频次创建和销毁对象的情况下，开发者是否需要采取措施来限制这种行为？很多人会对不会变的widgets创建引用，保存在state中，来避免重建和销毁。其实这些是没有必要的，因为Dart垃圾回收器基于分代架构，且针对对象的快速创建和销毁做了优化，大多数情况下，让引擎自己管理所有widgets创建和销毁即可。</p>
+<h2 id="Dart垃圾回收器"><a href="#Dart垃圾回收器" class="headerlink" title="Dart垃圾回收器"></a>Dart垃圾回收器</h2><hr>
+<p>Dart的垃圾回收器由两部分组成：新生代scavenger和并发标记清除回收器。</p>
+<h3 id="调度"><a href="#调度" class="headerlink" title="调度"></a>调度</h3><p>为了降低垃圾回收对UI性能的影响，垃圾回收器提供了hooks给flutter engine，当没有用户交互或app处于闲时状态时，flutter engine会通知垃圾回收器来进行收集，而不会影响想能。</p>
+<p>当处于闲时状态时，垃圾回收器也能进行内存碎片整理，减少内存碎片。</p>
+<h3 id="年轻代Scavenger"><a href="#年轻代Scavenger" class="headerlink" title="年轻代Scavenger"></a>年轻代Scavenger</h3><p>该阶段主要用来清理生命周期短的临时对象，如stateless widgets，会比次代标记/清除阶段更快，极大减小app运行过程中可能带来的卡顿。</p>
+<p>对象创建时会在一片连续的内存空间进行分配，每次创建对象，都会再这片空间区域查找是否有可用的空间，当可用空间被占满，Dart会使用bump pointer（指针碰撞）的方式来快速分配新的空间。</p>
+<p>新的空间分为两部分，称为半空间，任何时候，只有一半是处于激活的，另一半则处于非激活状态。新创建的对象会在激活的那部分空间进行分配，当激活部分被占满，引用不可释放的对象会从激活空间移到非激活空间，非激活空间将变为激活空间，以此反复。</p>
+<p>为了确定当前的对象是否可释放，收集器会从根对象，如栈变量，来检测是否是否还有引用，引用的对象会被移动到非激活空间，最后，剩下的对象就是可释放对象，在后续的垃圾回收时，引用对象会直接覆盖之前的可释放对象占用的空间。更多细节，参看<a href="https://en.wikipedia.org/wiki/Cheney%27s_algorithm?spm=ata.13261165.0.0.1f0058e56w9Oaq" target="_blank" rel="external">Cheney’s 算法</a>。</p>
+<p><img src="/images/flutter_scavenger.png" alt=""></p>
+<h3 id="并行标记和并发清除"><a href="#并行标记和并发清除" class="headerlink" title="并行标记和并发清除"></a>并行标记和并发清除</h3><p>当对象到达一定的生命周期，他们会被移入新的内存空间（老年代），由次代收集器（标记/清除）进行内存管理，收集器同样分两部分：首先会遍历对象图，标记还在使用的对象。遍历完成后，未被标记的对象会被回收。</p>
+<p>注意，这种形式的垃圾回收会在标记阶段阻塞UI线程，且不能进行内存修改操作。不过，这个阶段发生的频率很低，因为生命周期短的对象都被年轻代scavenger处理了。</p>
+<p>当然，如果开发的app不满足弱分代假说（即大多数对象会在年轻时死亡，生命周期短）的情况，那么该形式的垃圾回收会更容易发生。</p>
+<h3 id="Heap-Map"><a href="#Heap-Map" class="headerlink" title="Heap Map"></a>Heap Map</h3><p>Observatory下可以通过heap map来观察某一时刻特定Isolate老年代的内存分配，如下图，不同的颜色代表不同的内存块，白色代表空闲空间，如果我们看到很多小的白色块，说明产生了内存碎片，可能考虑有内存泄漏了。</p>
+<p><img src="/images/flutter_heap_map.png" alt=""></p>
+<h2 id="Isolates"><a href="#Isolates" class="headerlink" title="Isolates"></a>Isolates</h2><hr>
+<p>Dart的每个Isolate有自己的堆空间，每个Isolate也都运行在单独的线程中，垃圾回收时，互不影响性能，所以Isolate可以避免阻塞UI，进行CPU密集型、IO、网络等操作。</p>
+<p><img src="/images/fkutter_isolates.png" alt=""></p>
+<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><hr>
+<ol>
+<li><a href="https://mrale.ph/dartvm/" target="_blank" rel="external">https://mrale.ph/dartvm/</a></li>
+<li><a href="https://medium.com/flutter/flutter-dont-fear-the-garbage-collector-d69b3ff1ca30" target="_blank" rel="external">https://medium.com/flutter/flutter-dont-fear-the-garbage-collector-d69b3ff1ca30</a></li>
+<li><a href="https://dart-lang.github.io/observatory/heap-map.html" target="_blank" rel="external">https://dart-lang.github.io/observatory/heap-map.html</a></li>
+<li><a href="https://dart-lang.github.io/observatory/glossary.html?spm=ata.13261165.0.0.1f0058e56w9Oaq#memory-leak" target="_blank" rel="external">https://dart-lang.github.io/observatory/glossary.html?spm=ata.13261165.0.0.1f0058e56w9Oaq#memory-leak</a></li>
+</ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2018/09/11/iOS之获取Block-retain的objects/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -810,328 +1157,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2018/05/05/iOS知识小集之Swift闭包作为Objective-C方法参数/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="钟武">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.JPG">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="钟武的技术博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/05/05/iOS知识小集之Swift闭包作为Objective-C方法参数/" itemprop="url">iOS知识小集之Swift闭包作为Objective-C方法参数</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-05T23:30:30+08:00">
-                2018-05-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/iOS开发-其它/" itemprop="url" rel="index">
-                    <span itemprop="name">iOS开发-其它</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/05/05/iOS知识小集之Swift闭包作为Objective-C方法参数/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/05/05/iOS知识小集之Swift闭包作为Objective-C方法参数/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="Swift闭包作为Objective-C方法参数"><a href="#Swift闭包作为Objective-C方法参数" class="headerlink" title="Swift闭包作为Objective-C方法参数"></a>Swift闭包作为Objective-C方法参数</h2><hr>
-<p>在<code>Swift</code>开发时，有时我们需要调用带有<code>Block</code>参数的<code>Objective-C</code>方法，比如，我们通过<code>perform(_:with:afterDelay:inModes:)</code>来在特定的<code>Runloop</code>模式下运行某<code>selector</code>，如下所示，<code>doAnimation</code>方法接收一个<code>Optional</code>的<code>Block</code>，注意，该方法标注了<code>@objc</code>，所以是<code>Objective-C</code>方法，<code>animationBlock</code>参数为<code>Objective-C</code>的<code>Block</code>，那么我们怎么将<code>Swift</code>的<code>Closure</code>转化为<code>Block</code>呢，方法就是使用<code>@convention(block)</code>来声明兼容<code>Objective-C</code> <code>Block</code>的<code>Closure</code>，如下<code>[1]</code>所示：</p>
-<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">LocationMessageCell</span>: <span class="title">UICollectionViewCell</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">func</span> <span class="title">callSEL</span><span class="params">()</span></span> &#123;</div><div class="line">        <span class="keyword">let</span> block: <span class="meta">@convention</span>(block) (<span class="type">UIImageView</span>) -&gt; <span class="type">Void</span> = &#123; <span class="number">_</span> <span class="keyword">in</span>    <span class="comment">// [1]</span></div><div class="line">        ....</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">self</span>.perform(#selector(<span class="type">LocationMessageCell</span>.doAnimation(with:)), with: block, afterDelay: <span class="number">0</span>, inModes: [.defaultRunLoopMode])</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="meta">@objc</span> <span class="keyword">private</span> <span class="function"><span class="keyword">func</span> <span class="title">doAnimation</span><span class="params">(with animationBlock: <span class="params">(<span class="params">(UIImageView)</span></span></span></span> -&gt; <span class="type">Void</span>)!) &#123;</div><div class="line">        ....</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>除了显式的用<code>@convention(block)</code>来声明，我们也可以直接使用闭包，如：</p>
-<figure class="highlight less"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="selector-tag">UIView</span><span class="selector-class">.animate</span>(<span class="attribute">withDuration</span>: <span class="number">0.1</span>, <span class="attribute">animations</span>: &#123;</div><div class="line">    ...                </div><div class="line">&#125;)</div></pre></td></tr></table></figure>
-<p>注意，之所以我没有在之前的例子进行修改，是因为<code>func perform(_ aSelector: Selector, with anArgument: Any?, afterDelay delay: TimeInterval, inModes modes: [RunLoopMode])</code>的<code>anArgument</code>参数类型为<code>Any?</code>，编译器没有进行自动转换，这种情况只能显式的声明<code>@convention(block)</code>。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><hr>
-<ol>
-<li><a href="https://developer.apple.com/library/content/documentation/Swift/Conceptual/BuildingCocoaApps/InteractingWithObjective-CAPIs.html" target="_blank" rel="external">https://developer.apple.com/library/content/documentation/Swift/Conceptual/BuildingCocoaApps/InteractingWithObjective-CAPIs.html</a></li>
-</ol>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2018/04/21/iOS知识小集之为什么objc-msgSend-是用汇编实现的/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="钟武">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.JPG">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="钟武的技术博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/21/iOS知识小集之为什么objc-msgSend-是用汇编实现的/" itemprop="url">iOS知识小集之为什么objc_msgSend()是用汇编实现的</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-21T23:07:30+08:00">
-                2018-04-21
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/iOS开发-其它/" itemprop="url" rel="index">
-                    <span itemprop="name">iOS开发-其它</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/04/21/iOS知识小集之为什么objc-msgSend-是用汇编实现的/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/04/21/iOS知识小集之为什么objc-msgSend-是用汇编实现的/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="消息发送"><a href="#消息发送" class="headerlink" title="消息发送"></a>消息发送</h2><hr>
-<p>在使用<code>Objective-C</code>调用方法时，我们将其称之为消息发送，这与我们用的<code>C</code>、<code>C++</code>等调用函数的说法不一样，原因就是<code>Objective-C</code>调用方法时，并不是简单的会在编译时得到函数指针，调用时直接使用该函数指针调用就行（<code>C++</code>有虚函数，包含一个<code>v-table</code>，可以实现简单的多态），而是会在调用的时候，运行时的去查找函数实现，比如，当我们发送<code>[objc foo]</code>时，编译器会将其转化为<code>objc_msgSend(objc, @selector(foo))</code>(注意，不一定都是转化为<code>objc_msgSend</code>，根据发送对象和返回类型，可转化为<code>objc_msgSendSuper</code>,<code>objc_msgSendSuper_stret</code>等)，<code>objc_msgSend</code>方法负责查找函数实现并调用返回结果，我们知道，<code>Objc Runtime</code>是<a href="https://github.com/zhongwuzw/objc4-cn" target="_blank" rel="external">开源</a>的，所以我们可以看一下源代码<code>objc_msgSend</code>的实现逻辑。</p>
-<h2 id="objc-msgSend-使用汇编实现"><a href="#objc-msgSend-使用汇编实现" class="headerlink" title="objc_msgSend()使用汇编实现"></a>objc_msgSend()使用汇编实现</h2><hr>
-<p>源码可参见<a href="https://github.com/zhongwuzw/objc4-cn/blob/087a6fd60e3cad2934163b26aa484640d6ff9467/runtime/Messengers.subproj/objc-msg-arm64.s#L286" target="_blank" rel="external">objc_msgSend源码</a>，我们发现，竟然不是用<code>C</code>实现的，而是使用的汇编语言，总结来说，原因有二：</p>
-<ol>
-<li>我们无法定义一个<code>C</code>函数，可以有可变的参数(可变参数是可以实现的，参考<code>printf</code>函数)并且可以调用任意的<code>C</code>函数指针，因为函数指针类型是在是无穷无尽的，根本就无法预先全部定义出来。
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2018/04/21/iOS知识小集之为什么objc-msgSend-是用汇编实现的/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1185,7 +1210,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">43</span>
+                  <span class="site-state-item-count">45</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1196,7 +1221,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-count">15</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -1207,7 +1232,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">42</span>
+                  <span class="site-state-item-count">44</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -1312,7 +1337,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; 2016 &mdash; <span itemprop="copyrightYear">2018</span>
+        <div class="copyright">&copy; 2016 &mdash; <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

@@ -89,18 +89,18 @@
 <meta property="og:site_name" content="钟武的技术博客">
 <meta property="og:description" content="理论 Mach-OMach-O相关术语Mach-O为Mach Object文件格式的缩写，它是一种用于可执行文件，目标代码，动态库，内核存储的文件格式。它包括多种文件类型：  Executable(可执行文件)：App的主二进制文件 Dylib：动态库（如DSO、DLL) Bundle：不能被链接的动态库，只能通过dlopen()，用于Mac OS。  Image：可以是可执行文件、动态库或者bu">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-02%20%E4%B8%8B%E5%8D%8810.24.03.png">
-<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-02%20%E4%B8%8B%E5%8D%8810.41.36.png">
-<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-04%20%E4%B8%8A%E5%8D%8811.50.25.png">
-<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-04%20%E4%B8%8B%E5%8D%8811.18.15.png">
-<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-04%20%E4%B8%8B%E5%8D%8811.51.10.png">
-<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-04%20%E4%B8%8B%E5%8D%8811.59.02.png">
-<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-05%20%E4%B8%8B%E5%8D%886.24.44.png">
-<meta property="og:updated_time" content="2018-09-03T03:16:49.706Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/zhongwuzw.github.io.resource/master/images/blog/start_up_optimize_1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/zhongwuzw.github.io.resource/master/images/blog/start_up_optimize_2.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/zhongwuzw.github.io.resource/master/images/blog/start_up_optimize_3.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/zhongwuzw.github.io.resource/master/images/blog/start_up_optimize_4.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/zhongwuzw.github.io.resource/master/images/blog/start_up_optimize_5.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/zhongwuzw.github.io.resource/master/images/blog/start_up_optimize_6.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/zhongwuzw.github.io.resource/master/images/blog/start_up_optimize_7.png">
+<meta property="og:updated_time" content="2018-12-31T08:15:06.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="WWDC-Session406-优化App启动时间">
 <meta name="twitter:description" content="理论 Mach-OMach-O相关术语Mach-O为Mach Object文件格式的缩写，它是一种用于可执行文件，目标代码，动态库，内核存储的文件格式。它包括多种文件类型：  Executable(可执行文件)：App的主二进制文件 Dylib：动态库（如DSO、DLL) Bundle：不能被链接的动态库，只能通过dlopen()，用于Mac OS。  Image：可以是可执行文件、动态库或者bu">
-<meta name="twitter:image" content="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-02%20%E4%B8%8B%E5%8D%8810.24.03.png">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/zhongwuzw/zhongwuzw.github.io.resource/master/images/blog/start_up_optimize_1.png">
 
 
 
@@ -438,14 +438,14 @@
 <li><code>Bundle</code>：不能被链接的动态库，只能通过<code>dlopen()</code>，用于<code>Mac OS</code>。</li>
 </ul>
 <p><code>Image</code>：可以是可执行文件、动态库或者<code>bundle</code>。<br><code>Framework</code>：动态库，包含资源和头文件。</p>
-<h4 id="Mach-O-Image文件"><a href="#Mach-O-Image文件" class="headerlink" title="Mach-O Image文件"></a>Mach-O Image文件</h4><p>一个<code>Mach-O</code>文件由3部分组成：<code>Header</code>、<code>Load commands</code>、<code>Raw segment data</code>。<code>Header</code>描述了文件的目标架构等信息，如x86-64,PPC；<code>Load commands</code>列出了文件的逻辑结构及文件在虚拟内存中的布局;<code>Raw segment data</code>包含了在<code>Load commands</code>中指出的<code>segment</code>(<code>段</code>)。在<code>Mach-O</code>文件中，我们把<code>Header</code>、<code>Load commands</code>放在了<code>__TEXT</code> <code>segment</code>(<code>段</code>)的开头，即第一个<code>segment</code>(<code>段</code>)的开头。每一个<code>段</code>由多个<code>page</code>(<code>页</code>)组成，<code>段</code>的大小为<code>页</code>大小的整数倍。如下图，<code>TEXT段</code>占3<code>页</code>，<code>DATA</code>、<code>LINKEDIT</code>分别占1<code>页</code>。<code>页</code>的大小取决于硬件，在<code>arm64</code>下，<code>页</code>大小为16K，其它则为4K。<br><img src="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-02%20%E4%B8%8B%E5%8D%8810.24.03.png" alt=""></p>
-<p>我们还可以从<code>section</code>(节)的角度来理解<code>段</code>,编译器对<code>section</code>是透明的，<code>section</code>仅仅是一个<code>段</code>的子区间，它没有任何的大小约束，但是<code>section</code>之间不会产生重叠。<br><img src="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-02%20%E4%B8%8B%E5%8D%8810.41.36.png" alt=""></p>
+<h4 id="Mach-O-Image文件"><a href="#Mach-O-Image文件" class="headerlink" title="Mach-O Image文件"></a>Mach-O Image文件</h4><p>一个<code>Mach-O</code>文件由3部分组成：<code>Header</code>、<code>Load commands</code>、<code>Raw segment data</code>。<code>Header</code>描述了文件的目标架构等信息，如x86-64,PPC；<code>Load commands</code>列出了文件的逻辑结构及文件在虚拟内存中的布局;<code>Raw segment data</code>包含了在<code>Load commands</code>中指出的<code>segment</code>(<code>段</code>)。在<code>Mach-O</code>文件中，我们把<code>Header</code>、<code>Load commands</code>放在了<code>__TEXT</code> <code>segment</code>(<code>段</code>)的开头，即第一个<code>segment</code>(<code>段</code>)的开头。每一个<code>段</code>由多个<code>page</code>(<code>页</code>)组成，<code>段</code>的大小为<code>页</code>大小的整数倍。如下图，<code>TEXT段</code>占3<code>页</code>，<code>DATA</code>、<code>LINKEDIT</code>分别占1<code>页</code>。<code>页</code>的大小取决于硬件，在<code>arm64</code>下，<code>页</code>大小为16K，其它则为4K。<br><img src="https://raw.githubusercontent.com/zhongwuzw/zhongwuzw.github.io.resource/master/images/blog/start_up_optimize_1.png" alt=""></p>
+<p>我们还可以从<code>section</code>(节)的角度来理解<code>段</code>,编译器对<code>section</code>是透明的，<code>section</code>仅仅是一个<code>段</code>的子区间，它没有任何的大小约束，但是<code>section</code>之间不会产生重叠。<br><img src="https://raw.githubusercontent.com/zhongwuzw/zhongwuzw.github.io.resource/master/images/blog/start_up_optimize_2.png" alt=""></p>
 <p>事实上，每一个二进制文件都包含<code>TEXT</code>、<code>DATA</code>、<code>LINKEDIT</code>这3个通用的<code>段</code>，<code>TEXT</code>位于文件的开始，它包括<code>Mach header</code>，机器指令，代码以及只读常量如C字符串，<code>DATA段</code>是可读写的，其包括所有的全局变量，静态变量等。<code>LINKEDIT</code>包含加载程序的<code>meta data</code>(元数据)，如符号，字符串，重定向表条目，供动态链接器使用。</p>
 <a id="more"></a>
-<h4 id="Mach-O-Universal-Files"><a href="#Mach-O-Universal-Files" class="headerlink" title="Mach-O Universal Files"></a>Mach-O Universal Files</h4><p>当我们在编译iOS应用时，会针对不同的设备架构编译出不同的Mach-O文件，如下图，产生64位（arm64）、32位（如armv7s)两种架构的<code>Mach-O</code>文件，之后将这两个文件合并成一个文件，这个文件就叫<code>Mach-O universal file</code>。该文件包含一个<code>Fat header</code>，包含所有架构的列表，且对应在文件中的偏移量。<code>header</code>占1<code>页</code>空间，下文，将会讲述为什么需要占1<code>页</code>空间，以及涉及到的虚拟内存的知识。<br><img src="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-04%20%E4%B8%8A%E5%8D%8811.50.25.png" alt=""></p>
+<h4 id="Mach-O-Universal-Files"><a href="#Mach-O-Universal-Files" class="headerlink" title="Mach-O Universal Files"></a>Mach-O Universal Files</h4><p>当我们在编译iOS应用时，会针对不同的设备架构编译出不同的Mach-O文件，如下图，产生64位（arm64）、32位（如armv7s)两种架构的<code>Mach-O</code>文件，之后将这两个文件合并成一个文件，这个文件就叫<code>Mach-O universal file</code>。该文件包含一个<code>Fat header</code>，包含所有架构的列表，且对应在文件中的偏移量。<code>header</code>占1<code>页</code>空间，下文，将会讲述为什么需要占1<code>页</code>空间，以及涉及到的虚拟内存的知识。<br><img src="https://raw.githubusercontent.com/zhongwuzw/zhongwuzw.github.io.resource/master/images/blog/start_up_optimize_3.png" alt=""></p>
 <h3 id="虚拟内存"><a href="#虚拟内存" class="headerlink" title="虚拟内存"></a>虚拟内存</h3><p>每一个进程都是一个逻辑地址空间，逻辑地址会被映射到<code>RAM</code>的物理页中，当然，这个映射并不是一对一的，逻辑地址不需要在一开始就映射到物理内存，多个逻辑地址也可以映射到相同的物理RAM。<br>如果逻辑地址没有映射到物理RAM，当访问该逻辑地址时，会产生缺页中断，这时，内核会暂停执行该线程，去处理缺页中断；当多个进程，不同的逻辑地址，被映射到相同的物理页时，这些进程就可以共享相同的bit（位），做到进程间共享。<br>还有一个特点是文件映射，通过mmap函数，可以不用将整个文件加载到RAM中，而把文件的片段映射到进程的内存地址中，所以，在访问未映射的地址时，内核也将产生缺页中断。<br>综上，我们可以总结出，动态库或<code>Image</code>的<code>TEXT段</code>可以被映射到多个进程中，其是懒加载的（即使用<code>mmap</code>），共享的。<code>DATA段</code>是可读写的，所以采用了写时复制（COW，Copy-On-Write）的策略，当有进程对<code>DATA</code>进行写时，才真正进行复制的操作，内核会拷贝被修改页到另一个物理RAM并将映射重定向该位置，这时，该进程就拥有了该<code>页</code>的拷贝，该拷贝页被称为<code>dirty page</code>，<code>dirty page</code>包含了进程的特定信息;内核可以重新生成的<code>page</code>称为<code>clean page</code>，当需要访问该页时，可以从磁盘重新读出，显然<code>dirty page</code>代价比<code>clean page</code>大。<br>接下来，将举一个例子来讲述一下Mach-O和虚拟内存之间的映射。如示例，有一个Mach-O文件，我们将其映射到内存中，而不是将其全部读入内存，如果全部读入内存，需占用8<code>页</code>，而使用映射，其中的<code>ZeroFill</code>将不需要占用空间，原因是大多数的全局变量初始化为0，所以可以对此进行优化，将所有为零的全局变量移到末尾，且不占用磁盘空间，当第一次访问ZeroFill<code>页</code>时，直接赋空，所以，其并不需要进行读操作。dyld一开始会读<code>Mach header</code>，由于其没有映射到物理页，内核将产生缺页中断，VM会读取文件的Mach-O文件的第一页到物理页中，并设置映射，这时，dyld就能开始读取<code>Mach header</code>，读取完<code>Mach header</code>后，<code>Mach header</code>会声称有一些信息保存在<code>LINKEDIT</code>中，需要读取，这时，dyld会跳到<code>Process 1</code>的空间底部，进行<code>LINKEDIT</code>的读取，此时，由于内存中没有，内核会进行和之前读取<code>Mach header</code>时一样的操作，产生缺页中断，读取到物理内存并完成映射，处理完<code>LINKEDIT</code>后，<code>LINKEDIT</code>会告诉dyld，其需要对<code>DATA页</code>进行<code>fix-up</code>（调整）以便让该动态库可运行，此时，内核又会进行之前的操作，不过这次有一些不同，因为该动态库会对<code>DATA</code>进行修改，所以，此时会进行写时复制的操作，该<code>页</code>将变为<code>dirty page</code>，此时，内存中就存在两<code>页clean page</code>和一<code>页dirty page</code>。<br>此时，如果又有<code>Process 2</code>加载相同的动态库，此时，在<code>Process 2</code>进程中，dyld也会进行相同的步骤。<br>首先，它会进行<code>Mach header</code>的读取，由于该<code>页</code>已经在RAM中了，所以内核只是简单的将其映射重定向到该<code>页</code>，不需要进行<code>IO</code>，<code>LINKEDIT</code>的读取也是如此，此时到了<code>DATA页</code>，内核会查询RAM中是否存在该<code>DATA页</code>，且是<code>clean page</code>，如果找到，则重用，否则，重新进行读取操作，在该例中，<code>DATA页</code>是<code>dirty page</code>，所以需要再申请一个新的物理<code>页</code>来进行映射，<code>Process 2</code>需修改<code>DATA页</code>，所以<code>DATA页</code>同样标识为<code>dirty page</code>。<br>最后，由于<code>LINKEDIT页</code>只有在dyld进行处理时需要，所以，一旦dyld完成处理，这些<code>LINKEDIT页</code>占用的空间就可以被收回。这样，这个例子，最终我们仅仅拥有2个<code>dirty page</code>，1个<code>clean</code>，共享的<code>page</code>（<code>LINKEDIT页</code>空间被收回）。</p>
-<p><img src="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-04%20%E4%B8%8B%E5%8D%8811.18.15.png" alt=""></p>
-<h3 id="exec-函数-main-被调用之前做了什么"><a href="#exec-函数-main-被调用之前做了什么" class="headerlink" title="exec()函数 - [main()被调用之前做了什么]"></a>exec()函数 - [main()被调用之前做了什么]</h3><p><code>exec</code>是一个系统调用，内核会清理地址空间，将需要运行的可执行文件映射到空间中，且是一个随机地址，接下来，从该地址到0x000000，将被标记为不可读、写和可执行，该区域的大小将不小于4KB（对于32位进程）或4GB（对于64位进程）。<br><img src="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-04%20%E4%B8%8B%E5%8D%8811.51.10.png" alt=""><br>现代程序中，我们经常会使用共享库，如Unix中so，所以，当内核完成进程的映射后，将会把dyld映射到另一个随机的地址，并让dyld来完成进程的启动。<br><img src="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-04%20%E4%B8%8B%E5%8D%8811.59.02.png" alt=""><br>此时，dyld运行在进程中，并负责加载依赖的所有动态库，准备好并运行。<br>在整个dyld处理的过程中，需要如下图所示的几步，首先，dyld加载所有依赖的动态库（通过读取主可执行文件的<code>header</code>来获得依赖库列表），在加载时，存在某个动态库依赖其他动态库的情况，这个过程是递归执行的。通常，进程会加载100到400个动态库，不过我们几乎不用考虑性能的问题，因为这些库很多都是系统库，内核已经提前加载缓存了。<br><img src="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-05-05%20%E4%B8%8B%E5%8D%886.24.44.png" alt=""><br>接下来是<code>rebasing</code>和<code>binding</code>，两者的区别为<code>rebasing</code>是当指针指向自己的<code>image</code>而做出调整（调整起来很简单，加一个offset就可以），<code>binding</code>是指针指向其他的<code>image</code>而做出调整。调整都是在<code>DATA页</code>中进行。<br>有人会问，为什么会需要进行调整呢，主要考虑的因素是安全，不能直接修改指令，所以当一个动态库需要调用其它的动态库时，需要在其中加一个间接层，在<code>DATA段</code>中来创建一个指针指向调用的地址，这就涉及到指针的调整，dyld就负责这些操作。<br>Objective-C的类结构指针、方法指针等，也都是通过<code>rebasing</code>或<code>binding</code>来进行调整，由于Objective-C是动态语言，我们可以通过字符串来创建一个类实例，所以<code>Objective-C Runtime</code>需要维护一个包括所有类名的映射。<br>使用过C++的开发者应该知道，C++存在Fragile基类的问题，Objective-C则没有这个问题，因为在加载时，dyld会动态调整所有实例变量的偏移。<br>处理完前面的操作，如果有C++，这个时候dyld会调用初始化器；如果有Objective-C，类别会被添加到方法列表中，且会调用<code>+load</code>方法，当然，我们已经不推荐使用它了，而是使用<code>+initialize</code>方法。<br>最终，我们才调用<code>main()</code>。</p>
+<p><img src="https://raw.githubusercontent.com/zhongwuzw/zhongwuzw.github.io.resource/master/images/blog/start_up_optimize_4.png" alt=""></p>
+<h3 id="exec-函数-main-被调用之前做了什么"><a href="#exec-函数-main-被调用之前做了什么" class="headerlink" title="exec()函数 - [main()被调用之前做了什么]"></a>exec()函数 - [main()被调用之前做了什么]</h3><p><code>exec</code>是一个系统调用，内核会清理地址空间，将需要运行的可执行文件映射到空间中，且是一个随机地址，接下来，从该地址到0x000000，将被标记为不可读、写和可执行，该区域的大小将不小于4KB（对于32位进程）或4GB（对于64位进程）。<br><img src="https://raw.githubusercontent.com/zhongwuzw/zhongwuzw.github.io.resource/master/images/blog/start_up_optimize_5.png" alt=""><br>现代程序中，我们经常会使用共享库，如Unix中so，所以，当内核完成进程的映射后，将会把dyld映射到另一个随机的地址，并让dyld来完成进程的启动。<br><img src="https://raw.githubusercontent.com/zhongwuzw/zhongwuzw.github.io.resource/master/images/blog/start_up_optimize_6.png" alt=""><br>此时，dyld运行在进程中，并负责加载依赖的所有动态库，准备好并运行。<br>在整个dyld处理的过程中，需要如下图所示的几步，首先，dyld加载所有依赖的动态库（通过读取主可执行文件的<code>header</code>来获得依赖库列表），在加载时，存在某个动态库依赖其他动态库的情况，这个过程是递归执行的。通常，进程会加载100到400个动态库，不过我们几乎不用考虑性能的问题，因为这些库很多都是系统库，内核已经提前加载缓存了。<br><img src="https://raw.githubusercontent.com/zhongwuzw/zhongwuzw.github.io.resource/master/images/blog/start_up_optimize_7.png" alt=""><br>接下来是<code>rebasing</code>和<code>binding</code>，两者的区别为<code>rebasing</code>是当指针指向自己的<code>image</code>而做出调整（调整起来很简单，加一个offset就可以），<code>binding</code>是指针指向其他的<code>image</code>而做出调整。调整都是在<code>DATA页</code>中进行。<br>有人会问，为什么会需要进行调整呢，主要考虑的因素是安全，不能直接修改指令，所以当一个动态库需要调用其它的动态库时，需要在其中加一个间接层，在<code>DATA段</code>中来创建一个指针指向调用的地址，这就涉及到指针的调整，dyld就负责这些操作。<br>Objective-C的类结构指针、方法指针等，也都是通过<code>rebasing</code>或<code>binding</code>来进行调整，由于Objective-C是动态语言，我们可以通过字符串来创建一个类实例，所以<code>Objective-C Runtime</code>需要维护一个包括所有类名的映射。<br>使用过C++的开发者应该知道，C++存在Fragile基类的问题，Objective-C则没有这个问题，因为在加载时，dyld会动态调整所有实例变量的偏移。<br>处理完前面的操作，如果有C++，这个时候dyld会调用初始化器；如果有Objective-C，类别会被添加到方法列表中，且会调用<code>+load</code>方法，当然，我们已经不推荐使用它了，而是使用<code>+initialize</code>方法。<br>最终，我们才调用<code>main()</code>。</p>
 <h2 id="将理论应用到实际"><a href="#将理论应用到实际" class="headerlink" title="将理论应用到实际"></a>将理论应用到实际</h2><hr>
 <ul>
 <li>通过设置环境变量<code>DYLD_PRINT_STATISTICS</code>，可以打印出dyld加载相关信息，包括每部分消耗的时间。</li>
@@ -628,7 +628,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">43</span>
+                  <span class="site-state-item-count">45</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -639,7 +639,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-count">15</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -650,7 +650,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">42</span>
+                  <span class="site-state-item-count">44</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -771,7 +771,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; 2016 &mdash; <span itemprop="copyrightYear">2018</span>
+        <div class="copyright">&copy; 2016 &mdash; <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

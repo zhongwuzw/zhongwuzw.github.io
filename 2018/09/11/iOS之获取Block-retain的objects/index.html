@@ -90,7 +90,7 @@
 <meta property="og:description" content="Block管理Objective-C对象实例的原理 Block的实现结构体见如下图所示，Block对于捕获的Objective-C对象实例，会在Block实现的结构体中创建一个变量指向Objective-C对象实例，当Block将要释放时，会调用dispose_helper函数，该函数会调用所有需要进行内存管理的所捕获的对象，如Block、__block变量、__attribute__((NSOb">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/zhongwuzw.github.io.resource/master/images/blog/Block.png">
-<meta property="og:updated_time" content="2018-09-11T10:25:30.421Z">
+<meta property="og:updated_time" content="2018-09-11T10:25:30.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS之获取Block retain的objects">
 <meta name="twitter:description" content="Block管理Objective-C对象实例的原理 Block的实现结构体见如下图所示，Block对于捕获的Objective-C对象实例，会在Block实现的结构体中创建一个变量指向Objective-C对象实例，当Block将要释放时，会调用dispose_helper函数，该函数会调用所有需要进行内存管理的所捕获的对象，如Block、__block变量、__attribute__((NSOb">
@@ -513,6 +513,10 @@
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2020/09/24/Flutter-Dart垃圾回收/" rel="prev" title="Flutter Dart垃圾回收">
+                Flutter Dart垃圾回收 <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -601,7 +605,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">43</span>
+                  <span class="site-state-item-count">45</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -612,7 +616,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-count">15</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -623,7 +627,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">42</span>
+                  <span class="site-state-item-count">44</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -744,7 +748,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; 2016 &mdash; <span itemprop="copyrightYear">2018</span>
+        <div class="copyright">&copy; 2016 &mdash; <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

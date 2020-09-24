@@ -89,7 +89,7 @@
 <meta property="og:site_name" content="钟武的技术博客">
 <meta property="og:description" content="RxSwift的sentMessage、methodInvoked方法 RxSwift是Rx的Swift版本，用来实现函数式、响应式编程。 具体RxSwift的很多用法不做介绍，接下来，只讨论sentMessage、methodInvoked这两个方法，其作用是返回一个Observable&amp;lt;[Any]，可以作为观察者监控NSObject子类的某个selector，当执行该selector时，">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-07-27T15:29:24.000Z">
+<meta property="og:updated_time" content="2018-11-23T13:22:44.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="RxSwift之sentMessage、methodInvoked失效问题解决">
 <meta name="twitter:description" content="RxSwift的sentMessage、methodInvoked方法 RxSwift是Rx的Swift版本，用来实现函数式、响应式编程。 具体RxSwift的很多用法不做介绍，接下来，只讨论sentMessage、methodInvoked这两个方法，其作用是返回一个Observable&amp;lt;[Any]，可以作为观察者监控NSObject子类的某个selector，当执行该selector时，">
@@ -426,10 +426,10 @@
 <p><a href="https://github.com/ReactiveX/RxSwift" target="_blank" rel="external">RxSwift</a>是<a href="https://github.com/Reactive-Extensions/Rx.NET" target="_blank" rel="external">Rx</a>的<code>Swift</code>版本，用来实现函数式、响应式编程。</p>
 <p>具体<code>RxSwift</code>的很多用法不做介绍，接下来，只讨论<code>sentMessage</code>、<code>methodInvoked</code>这两个方法，其作用是返回一个<code>Observable&lt;[Any]</code>，可以作为观察者监控<code>NSObject</code>子类的某个<code>selector</code>，当执行该<code>selector</code>时，将在执行前、后分别执行注册了该<code>selector</code>的<code>sentMessage</code>、<code>methodInvoked</code>方法。</p>
 <h2 id="sentMessage、methodInvoked实现原理"><a href="#sentMessage、methodInvoked实现原理" class="headerlink" title="sentMessage、methodInvoked实现原理"></a><code>sentMessage</code>、<code>methodInvoked</code>实现原理</h2><hr>
-<p><code>sentMessage</code>、<code>methodInvoked</code>只针对某个实例起作用，其实现首先借鉴了<code>KVO</code>的实现方法，通过创建监听的对象的子类，然后重写方法的实现来实现。<code>sentMessage</code>、<code>methodInvoked</code>实现分两个版本，基础版、优化版。基础版通过<code>Swizzle</code> <code>forwardInvocation:</code>、<code>respondsToSelector:</code>、<code>methodSignatureForSelector:</code>等函数，将所有需要观察的<code>selector</code>调用时进入<code>forwardInvocation:</code>流程，从而进行拦截，以实现通知；优化版则在基础班的基础上通过<code>Type Encoding</code>来做一个缓存优化，避免每次调用都进入转发的过程。</p>
+<p><code>sentMessage</code>、<code>methodInvoked</code>只针对某个实例起作用，其实现首先借鉴了<code>KVO</code>的实现方法，通过创建监听的对象的子类，然后重写方法的实现来实现。<code>sentMessage</code>、<code>methodInvoked</code>实现分两个版本，基础版、优化版。基础版通过<code>Swizzle</code> <code>forwardInvocation:</code>、<code>respondsToSelector:</code>、<code>methodSignatureForSelector:</code>等函数，将所有需要观察的<code>selector</code>调用时进入<code>forwardInvocation:</code>流程，从而进行拦截，以实现通知；优化版则在基础版之上通过<code>Type Encoding</code>来做一个缓存优化，避免每次调用都进入转发的过程。</p>
 <a id="more"></a>
 <h2 id="sentMessage、methodInvoked遇到的问题"><a href="#sentMessage、methodInvoked遇到的问题" class="headerlink" title="sentMessage、methodInvoked遇到的问题"></a><code>sentMessage</code>、<code>methodInvoked</code>遇到的问题</h2><hr>
-<p>在使用<code>sentMessage</code>、<code>methodInvoked</code>方法时，发现一个问题，当观察<code>iOS``Framework</code>提供的方法时，可以正常运行，但是当观察自己创建的类（<code>NSObject</code>的子类）的实例的方法时，却始终无法运行，查看整个运行机制，<code>Class</code>、<code>IMP</code>都被正确替换，但是调用方法时，却始终截取不到，这下才意识到，难道是被编译器优化掉了？导致没有走<code>Objective-C</code>的动态派发？<br>遂翻看<code>Apple</code>的<a href="https://developer.apple.com/library/content/documentation/Swift/Conceptual/BuildingCocoaApps/" target="_blank" rel="external">Using Swift with Cocoa and Objective-C</a>，有一段话是这么说的：</p>
+<p>在使用<code>sentMessage</code>、<code>methodInvoked</code>方法时，发现一个问题，当观察<code>iOS</code> <code>Framework</code>提供的方法时，可以正常运行，但是当观察自己创建的类（<code>NSObject</code>的子类）的实例的方法时，却始终无法运行，查看整个运行机制，<code>Class</code>、<code>IMP</code>都被正确替换，但是调用方法时，却始终截取不到，这下才意识到，难道是被编译器优化掉了？导致没有走<code>Objective-C</code>的动态派发？<br>遂翻看<code>Apple</code>的<a href="https://developer.apple.com/library/content/documentation/Swift/Conceptual/BuildingCocoaApps/" target="_blank" rel="external">Using Swift with Cocoa and Objective-C</a>，有一段话是这么说的：</p>
 <blockquote>
 <p>“When Swift APIs are imported by the Objective-C runtime, there are no guarantees of dynamic dispatch for properties, methods, subscripts, or initializers. The Swift compiler may still devirtualize or inline member access to optimize the performance of your code, bypassing the Objective-C runtime.</p>
 <p>You can use the dynamic modifier to require that access to members be dynamically dispatched through the Objective-C runtime. Requiring dynamic dispatch is rarely necessary. However, it is necessary when using APIs like key–value observing or the method_exchangeImplementations function in the Objective-C runtime, which dynamically replace the implementation of a method at runtime. If the Swift compiler inlined the implementation of the method or devirtualized access to it, the new implementation would not be used.”</p>
@@ -607,7 +607,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">43</span>
+                  <span class="site-state-item-count">45</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -618,7 +618,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-count">15</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -629,7 +629,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">42</span>
+                  <span class="site-state-item-count">44</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -750,7 +750,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; 2016 &mdash; <span itemprop="copyrightYear">2018</span>
+        <div class="copyright">&copy; 2016 &mdash; <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

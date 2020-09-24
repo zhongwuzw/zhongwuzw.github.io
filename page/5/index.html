@@ -317,6 +317,328 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2016/12/22/iOS设置shadow-带来的离屏渲染/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="钟武">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.JPG">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="钟武的技术博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2016/12/22/iOS设置shadow-带来的离屏渲染/" itemprop="url">iOS设置shadow*带来的离屏渲染</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-12-22T15:23:11+08:00">
+                2016-12-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS开发-UI/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发-UI</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/12/22/iOS设置shadow-带来的离屏渲染/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/12/22/iOS设置shadow-带来的离屏渲染/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><hr>
+<p>在项目中，当我们想要设置<code>View</code>的阴影效果时，可以通过<code>shadow*</code>相关方法实现，如：</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">self.layer.<span class="keyword">shadowOffset </span>= CGSizeMake(<span class="number">4</span>, -<span class="number">2</span>)<span class="comment">;</span></div><div class="line">self.layer.<span class="keyword">shadowOpacity </span>= <span class="number">0</span>.<span class="number">5</span><span class="comment">;</span></div><div class="line">self.layer.<span class="keyword">shadowColor </span>= [[UIColor <span class="keyword">blackColor] </span>colorWithAlphaComponent:<span class="number">0</span>.<span class="number">5</span>].CGColor<span class="comment">;</span></div></pre></td></tr></table></figure>
+<p>实现效果如下：<br><img src="http://oc54pu02q.bkt.clouddn.com/shadow.png" width="500" height="" alt="" align="center"></p>
+<p>如上实现方式，有些情况下，你并不会发现有什么问题，但是一旦将其用在如<code>UITableViewCell</code>、<code>UICollectionViewCell</code>等时，你会发现，滑动时会导致大量掉帧的情况，其主要原因为，<code>shadow*</code>方法的使用将导致<code>Core Animation</code>进行离屏渲染，为了确定这一点，可以通过<code>Instruments</code>工具，选择<code>Core Animation</code>模板，选择开启<code>Color Offscreen-Rendered Yellow</code> <code>Debug</code>选项，当我们滑动<code>CollectionView</code>时，其帧率如下，产生了大量掉帧的情况，且正如我们所料，使用<code>shadow*</code>方法的视图被标黄，既使用了离屏渲染。</p>
+<p><img src="http://oc54pu02q.bkt.clouddn.com/bad-frame.png" width="500" height="" alt="" align="center"></p>
+<p>帧率情况如上，可以看到丢帧率很高。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/12/22/iOS设置shadow-带来的离屏渲染/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2016/12/14/源码分析之Alamofire/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="钟武">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.JPG">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="钟武的技术博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2016/12/14/源码分析之Alamofire/" itemprop="url">源码分析之Alamofire</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-12-14T17:26:46+08:00">
+                2016-12-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS开发-网络/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发-网络</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/12/14/源码分析之Alamofire/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/12/14/源码分析之Alamofire/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h2 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h2><hr>
+<p><code>Alamofire</code>是对<code>URLSession</code>的封装，针对普通请求，上传、下载等操作，提供对应的<code>Request</code>，其对象关系如下：</p>
+<p> <img src="http://oc54pu02q.bkt.clouddn.com/25E6C99A-FDF4-4314-A41A-03E746BBA401.png" width="500" height="254" alt="" align="center"></p>
+<p>每一个<code>Request</code>关联一个<code>TaskDelegate</code>，<code>TaskDelegate</code>用来处理<code>URLSessionTask</code>使用过程中的网络回调，<code>TaskDelegate</code>有一个<code>queue</code>成员，用来执行<code>task</code>完成后的回调处理，<code>completionHandler</code>默认会在主线程回调。<code>Alamofire</code>有一个<code>SessionDelegate</code>，对<code>Session</code>的所有网络回调做处理，并调用每一个<code>task</code>的<code>TaskDelegate</code>，正因为<code>SessionDelegate</code>只有一个实例，所以会涉及到线程安全的问题，对某些关键属性需要做竟态处理，如管理<code>Request</code>的字典。委托处理流程如下图所示：</p>
+<p> <img src="http://oc54pu02q.bkt.clouddn.com/05A842ED-9D20-47AA-8609-282B95A36E7B.png" width="500" height="254" alt="" align="center"></p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/12/14/源码分析之Alamofire/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2016/12/11/Swift之类型引用/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -795,339 +1117,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2016/11/12/NSURLSession之使用keep-alive长连接/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="钟武">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.JPG">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="钟武的技术博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/11/12/NSURLSession之使用keep-alive长连接/" itemprop="url">NSURLSession之使用Keep-Alive长连接</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-11-12T22:13:57+08:00">
-                2016-11-12
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/iOS开发-网络/" itemprop="url" rel="index">
-                    <span itemprop="name">iOS开发-网络</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2016/11/12/NSURLSession之使用keep-alive长连接/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/11/12/NSURLSession之使用keep-alive长连接/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="HTTP-Keep-Alive"><a href="#HTTP-Keep-Alive" class="headerlink" title="HTTP Keep-Alive"></a>HTTP Keep-Alive</h2><hr>
-<p><code>HTTP</code>的<code>Keep-Alive</code>，是<code>HTTP 1.1</code>默认的功能（<code>HTTP 1.0</code>可以在请求头中设置<code>Keep-Alive</code>来显式开启），其表示持久连接，以前我们所使用的<code>HTTP</code>请求，当发出请求并接收完响应后，将关闭<code>TCP</code>连接，所以，如果我们短时间内进行大量的<code>HTTP</code>请求的话，会导致过多的<code>TCP</code>连接建立、关闭消耗.</p>
-<h2 id="HTTP-Keep-Alive-vs-TCP-KeepAlive"><a href="#HTTP-Keep-Alive-vs-TCP-KeepAlive" class="headerlink" title="HTTP Keep-Alive vs TCP KeepAlive"></a>HTTP Keep-Alive vs TCP KeepAlive</h2><hr>
-<p>注意，我们目前说的都是<code>HTTP</code>的<code>Keep-Alive</code>，其实，<code>TCP</code>也有<code>KeepAlive</code>的概念，它解决的主要问题是，当连接建立后，如果没有数据传输，或者隔一段时间才发送一次数据时，如何来确定<code>Client</code>是否在线，连接是否需要保持，<code>TCP</code>解决方法为，当超过一段时间后，<code>TCP</code>会自动发送一个数据为空的报文给<code>Client</code>，如果对方回应了，则连接继续保持，否则，在重试多次无果后将关闭连接。</p>
-<h2 id="Pipeline"><a href="#Pipeline" class="headerlink" title="Pipeline"></a>Pipeline</h2><hr>
-<p><code>HTTP 1.1</code>引入了<code>Pipeline</code>,其基于<code>Keep-Alive</code>，既利用一个连接做多次请求，当<code>Client</code>提交多个请求时，不需要等第一个请求的响应接收完就能发起第二个请求，既实现类似于流水作业的功能。目前主流服务器都支持<code>Keep-Alive</code>和<code>Pipeline</code>。</p>
-<h2 id="使用NSURLSession开启Keep-Alive、Pipeline"><a href="#使用NSURLSession开启Keep-Alive、Pipeline" class="headerlink" title="使用NSURLSession开启Keep-Alive、Pipeline"></a>使用NSURLSession开启Keep-Alive、Pipeline</h2><hr>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2016/11/12/NSURLSession之使用keep-alive长连接/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2016/11/02/Hadoop问题总结/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="钟武">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.JPG">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="钟武的技术博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/11/02/Hadoop问题总结/" itemprop="url">Hadoop相关总结</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-11-02T15:57:22+08:00">
-                2016-11-02
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Hadoop/" itemprop="url" rel="index">
-                    <span itemprop="name">Hadoop</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2016/11/02/Hadoop问题总结/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/11/02/Hadoop问题总结/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><hr>
-<ol>
-<li><p>命令行执行<code>Job</code>任务时，出现如下问题，原因为<code>MacOS</code>系统的文件系统大小写不敏感，导致在<code>unjar</code>包时报错，有命名冲突。</p>
- <figure class="highlight stylus"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">Exception <span class="keyword">in</span> thread <span class="string">"main"</span> java<span class="selector-class">.io</span><span class="selector-class">.IOException</span>: Mkdirs failed to create /var/folders/zz/zyxvpxvq6csfxvn_n0000000000000/T/hadoop-unjar3745345762036287746/license</div><div class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.hadoop</span><span class="selector-class">.util</span><span class="selector-class">.RunJar</span><span class="selector-class">.ensureDirectory</span>(RunJar<span class="selector-class">.java</span>:<span class="number">128</span>)</div><div class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.hadoop</span><span class="selector-class">.util</span><span class="selector-class">.RunJar</span><span class="selector-class">.unJar</span>(RunJar<span class="selector-class">.java</span>:<span class="number">104</span>)</div><div class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.hadoop</span><span class="selector-class">.util</span><span class="selector-class">.RunJar</span><span class="selector-class">.unJar</span>(RunJar<span class="selector-class">.java</span>:<span class="number">81</span>)</div><div class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.hadoop</span><span class="selector-class">.util</span><span class="selector-class">.RunJar</span><span class="selector-class">.run</span>(RunJar<span class="selector-class">.java</span>:<span class="number">209</span>)</div><div class="line">	at org<span class="selector-class">.apache</span><span class="selector-class">.hadoop</span><span class="selector-class">.util</span><span class="selector-class">.RunJar</span><span class="selector-class">.main</span>(RunJar<span class="selector-class">.java</span>:<span class="number">136</span>)</div></pre></td></tr></table></figure>
-<p> 解决方法为执行如下命令，删除<code>jar</code>文件中的这两个文件。</p>
- <figure class="highlight stata"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">zip</span> -<span class="keyword">d</span> Documents/<span class="keyword">Test</span>.jar LICENSE</div><div class="line"><span class="keyword">zip</span> -<span class="keyword">d</span> Documents/<span class="keyword">Test</span>.jar META-<span class="keyword">INF</span>/LICENSE</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<ol>
-<li>使用<code>Eclipse</code>导出可供<code>Hadoop</code>执行的<code>jar</code>包时，导出的类型应选择<code>Runnable JAR file</code>。</li>
-</ol>
-<ol>
-<li><p>在集群上搭建<code>Hadoop</code>时，一切正常，为了<code>Debug</code>在本机搭建，使用<code>Pseudo-Distributed Mode</code>模式时，<code>node</code>的状态变为<code>unhealthy</code>，可以采取比较trick的方法来解决，既在<code>yarn-site.xml</code>中添加属性来扩大健康范围，如下：</p>
- <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">    <span class="php"><span class="meta">&lt;?</span>xml version=<span class="string">"1.0"</span><span class="meta">?&gt;</span></span></div><div class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span>    </div><div class="line">  <span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">     <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.nodemanager.disk-health-checker.min-healthy-disks<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">     <span class="tag">&lt;<span class="name">value</span>&gt;</span>0.0<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">     <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.nodemanager.disk-health-checker.max-disk-utilization-per-disk-percentage<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">     <span class="tag">&lt;<span class="name">value</span>&gt;</span>100.0<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></div></pre></td></tr></table></figure>
-</li>
-</ol>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2016/11/02/Hadoop问题总结/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1181,7 +1170,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">43</span>
+                  <span class="site-state-item-count">45</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1192,7 +1181,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-count">15</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -1203,7 +1192,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">42</span>
+                  <span class="site-state-item-count">44</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -1308,7 +1297,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; 2016 &mdash; <span itemprop="copyrightYear">2018</span>
+        <div class="copyright">&copy; 2016 &mdash; <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
