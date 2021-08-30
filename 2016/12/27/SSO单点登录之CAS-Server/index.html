@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css" integrity="sha256-2H3fkXt6FEmrReK448mDVGKb3WW2ZZw35gI7vqHOE4Y=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"zhongwuzw.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.7.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="Prerequisites  CAS Server 3.5.x.，下文以$CAS-SERVER表示。 CAS Client 3.3.x.，下文以$CAS-CLIENT表示。 Tomcat 7.x，下文以$CAS_TOMCAT_HOME表示。 GateIn-3.8.1.Final-tomcat-7，下文以$GATEIN_HOME表示。   最近公司需要对之前的多个Web应用系统进行整合，希望用户在登">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SSO单点登录之CAS-Server">
+<meta property="og:url" content="https://zhongwuzw.github.io/2016/12/27/SSO%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%E4%B9%8BCAS-Server/index.html">
+<meta property="og:site_name" content="钟武的技术博客">
+<meta property="og:description" content="Prerequisites  CAS Server 3.5.x.，下文以$CAS-SERVER表示。 CAS Client 3.3.x.，下文以$CAS-CLIENT表示。 Tomcat 7.x，下文以$CAS_TOMCAT_HOME表示。 GateIn-3.8.1.Final-tomcat-7，下文以$GATEIN_HOME表示。   最近公司需要对之前的多个Web应用系统进行整合，希望用户在登">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/cas_flow_diagram.png">
+<meta property="article:published_time" content="2016-12-27T10:15:15.000Z">
+<meta property="article:modified_time" content="2017-06-15T02:02:24.000Z">
+<meta property="article:author" content="钟武">
+<meta property="article:tag" content="SSO">
+<meta property="article:tag" content="CAS">
+<meta property="article:tag" content="Portal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://oc54pu02q.bkt.clouddn.com/cas_flow_diagram.png">
+
+
+<link rel="canonical" href="https://zhongwuzw.github.io/2016/12/27/SSO%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%E4%B9%8BCAS-Server/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://zhongwuzw.github.io/2016/12/27/SSO%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%E4%B9%8BCAS-Server/","path":"2016/12/27/SSO单点登录之CAS-Server/","title":"SSO单点登录之CAS-Server"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>SSO单点登录之CAS-Server | 钟武的技术博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">钟武的技术博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+        <li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Prerequisites"><span class="nav-number">1.</span> <span class="nav-text">Prerequisites</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CAS%E4%BB%8B%E7%BB%8D"><span class="nav-number">2.</span> <span class="nav-text">CAS介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CAS-%E7%B3%BB%E7%BB%9F%E7%BB%84%E6%88%90"><span class="nav-number">2.1.</span> <span class="nav-text">CAS 系统组成</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#CAS-Server"><span class="nav-number">2.1.1.</span> <span class="nav-text">CAS Server</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CAS-Clients"><span class="nav-number">2.1.2.</span> <span class="nav-text">CAS Clients</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CAS%E5%8D%8F%E8%AE%AE%E6%B5%81%E7%A8%8B"><span class="nav-number">2.2.</span> <span class="nav-text">CAS协议流程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GateIn-Portal%E9%9B%86%E6%88%90CAS-Server"><span class="nav-number">3.</span> <span class="nav-text">GateIn Portal集成CAS Server</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%83%A8%E7%BD%B2CAS"><span class="nav-number">3.1.</span> <span class="nav-text">部署CAS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%83%A8%E7%BD%B2GateIn-Portal"><span class="nav-number">3.2.</span> <span class="nav-text">部署GateIn Portal</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9portal%E9%A1%B9%E7%9B%AE%E6%A0%B9%E8%B7%AF%E5%BE%84"><span class="nav-number">4.</span> <span class="nav-text">修改portal项目根路径</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E7%82%B9"><span class="nav-number">4.1.</span> <span class="nav-text">注意点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">钟武</p>
+  <div class="site-description" itemprop="description">Keep thinking, keep coding!!!</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">45</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/zhongwuzw" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;zhongwuzw" rel="noopener" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:zhongwuzw@qq.com" title="E-Mail → mailto:zhongwuzw@qq.com" rel="noopener" target="_blank"><i class="envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://stackoverflow.com/zhongwuzw" title="StackOverflow → https:&#x2F;&#x2F;stackoverflow.com&#x2F;zhongwuzw" rel="noopener" target="_blank"><i class="stack-overflow fa-fw"></i>StackOverflow</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://weibo.com/zhongwuzw" title="微博 → http:&#x2F;&#x2F;weibo.com&#x2F;zhongwuzw" rel="noopener" target="_blank"><i class="weibo fa-fw"></i>微博</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.douban.com/people/zhongwu/" title="豆瓣 → https:&#x2F;&#x2F;www.douban.com&#x2F;people&#x2F;zhongwu&#x2F;" rel="noopener" target="_blank"><i class="share-alt fa-fw"></i>豆瓣</a>
+      </span>
+  </div>
+
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2016/12/27/SSO%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%E4%B9%8BCAS-Server/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="钟武">
+      <meta itemprop="description" content="Keep thinking, keep coding!!!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="钟武的技术博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SSO单点登录之CAS-Server
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2016-12-27 18:15:15" itemprop="dateCreated datePublished" datetime="2016-12-27T18:15:15+08:00">2016-12-27</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2017-06-15 10:02:24" itemprop="dateModified" datetime="2017-06-15T10:02:24+08:00">2017-06-15</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Web%E5%BC%80%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">Web开发</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="Prerequisites"><a href="#Prerequisites" class="headerlink" title="Prerequisites"></a>Prerequisites</h2><hr>
+<ul>
+<li><code>CAS Server 3.5.x.</code>，下文以<code>$CAS-SERVER</code>表示。</li>
+<li><code>CAS Client 3.3.x.</code>，下文以<code>$CAS-CLIENT</code>表示。</li>
+<li><code>Tomcat 7.x</code>，下文以<code>$CAS_TOMCAT_HOME</code>表示。</li>
+<li><code>GateIn-3.8.1.Final-tomcat-7</code>，下文以<code>$GATEIN_HOME</code>表示。</li>
+</ul>
+<blockquote>
+<p>最近公司需要对之前的多个Web应用系统进行整合，希望用户在登录某个应用系统时，能直接访问其他的Web应用系统，且不需要再次登录。既我们经常说的单点登录，最后，我选择了<a target="_blank" rel="noopener" href="https://www.apereo.org/projects/cas/download-cas"><code>CAS</code></a>，并将其整合进了<a target="_blank" rel="noopener" href="http://gatein.jboss.org/">GateIn portal</a>。接下来，将整理一下原理和整合步骤。<br>所有项目代码示例可在<a target="_blank" rel="noopener" href="https://github.com/CAS-GateInPortal">github</a>上下载。</p>
+</blockquote>
+<h2 id="CAS介绍"><a href="#CAS介绍" class="headerlink" title="CAS介绍"></a>CAS介绍</h2><hr>
+<p><a target="_blank" rel="noopener" href="https://www.apereo.org/projects/cas/download-cas"><code>CAS</code></a>（Central Authentication Service）是<code>Yale</code>大学发起的一个开源项目，旨在为<code>Web</code>应用系统提供一种可靠的单点登录。单点登录，既在多个应用系统中，用户只需登录一次就可以访问所有相互信任的应用系统。<code>CAS Client</code>支持非常多的客户端，包括<code>JAVA、PHP、Ruby</code>等。</p>
+<p>接下来，接介绍一下<code>CAS</code>系统。</p>
+<h3 id="CAS-系统组成"><a href="#CAS-系统组成" class="headerlink" title="CAS 系统组成"></a>CAS 系统组成</h3><hr>
+<p><code>CAS</code>系统架构由两部分组成，<code>CAS Server</code>、<code>CAS Clients</code>，两者可以通过多种协议进行通信。</p>
+<span id="more"></span>
+
+<h4 id="CAS-Server"><a href="#CAS-Server" class="headerlink" title="CAS Server"></a>CAS Server</h4><hr>
+<p><code>CAS Server</code>是一个构建在<code>Spring Framework</code>上的<code>Java servlet</code>，通过分配和诊断<code>tickets</code>，负责认证用户以及授权。</p>
+<h4 id="CAS-Clients"><a href="#CAS-Clients" class="headerlink" title="CAS Clients"></a>CAS Clients</h4><hr>
+<p><code>CAS Clients</code>负责对用户的认证工作，<code>CAS Clients</code>负责处理对客户端受保护资源的访问请求，需要登录时，重定向到<code>CAS Server</code>。</p>
+<p><code>CAS Clients</code>与受保护的客户端应用部署在一起，以<code>Filter</code>方式保护受保护的资源。</p>
+<h3 id="CAS协议流程"><a href="#CAS协议流程" class="headerlink" title="CAS协议流程"></a>CAS协议流程</h3><hr>
+<p>CAS协议流程如下图所示，展示了用户同时访问多个应用系统的流程。多个应用系统能实现单点登录的基本流程为，当用户首次访问需要登录才能访问的页面时，会自动重定向到<code>CAS Server</code>的登陆页面，成功认证完后，会在<code>CAS Server</code>的域中设置<code>CASTGC</code>的<code>Cookie</code>，最终登陆完成后，服务器会创建一个<code>session</code>会话，用于之后与应用系统的交互。当用户同时再登陆另外一个应用系统时，同样会跟之前一样，重定向到<code>CAS Server</code>的登陆页面，区别是此时已经有了<code>CAS Server</code>域中的<code>CASTGC</code>，重定向时会附带该<code>Cookie</code>，<code>CAS Server</code>验证之后返回一个<code>ticket</code>，之后浏览器重新请求原访问页面，并附带<code>ticket</code>参数，<code>CAS Server</code>诊断有效后，返回原应用系统的重定向，且设置该域的<code>session Cookie</code>，浏览器最后请求原页面，并附带<code>session Cookei</code>，应用系统诊断后返回请求内容。</p>
+<p>需要注意的是，当成功登陆完某个系统后，如果继续再访问该系统的其他资源页面，是不需要再次与<code>CAS Server</code>进行交互的，应用系统将根据<code>session</code>直接进行诊断。</p>
+<p><img src="http://oc54pu02q.bkt.clouddn.com/cas_flow_diagram.png"></p>
+<h2 id="GateIn-Portal集成CAS-Server"><a href="#GateIn-Portal集成CAS-Server" class="headerlink" title="GateIn Portal集成CAS Server"></a>GateIn Portal集成CAS Server</h2><hr>
+<h3 id="部署CAS"><a href="#部署CAS" class="headerlink" title="部署CAS"></a>部署CAS</h3><hr>
+<ol>
+<li>打开<code>$CAS_TOMCAT_HOME/webapps/$CAS-SERVER/WEB-INF/deployerConfigContext.xml</code>，替换：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean class=&quot;org.jasig.cas.authentication.handler.support.SimpleTestUsernamePasswordAuthenticationHandler&quot; /&gt;</span><br></pre></td></tr></table></figure>
+为如下：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean class=&quot;org.gatein.sso.cas.plugin.AuthenticationPlugin&quot;&gt;</span><br><span class="line">	   &lt;property name=&quot;gateInProtocol&quot;&gt;&lt;value&gt;http&lt;/value&gt;&lt;/property&gt;</span><br><span class="line">	   &lt;property name=&quot;gateInHost&quot;&gt;&lt;value&gt;localhost&lt;/value&gt;&lt;/property&gt;</span><br><span class="line">	   &lt;property name=&quot;gateInPort&quot;&gt;&lt;value&gt;8080&lt;/value&gt;&lt;/property&gt;</span><br><span class="line">	   &lt;property name=&quot;gateInContext&quot;&gt;&lt;value&gt;portal&lt;/value&gt;&lt;/property&gt;</span><br><span class="line">	   &lt;property name=&quot;httpMethod&quot;&gt;&lt;value&gt;POST&lt;/value&gt;&lt;/property&gt;</span><br><span class="line">&lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+ 如上所示，用来配置<code>GateIn Portal</code>的服务地址。</li>
+<li>下载<code>GateIn SSO package</code>，<a target="_blank" rel="noopener" href="https://repository.jboss.org/nexus/content/groups/public/org/gatein/sso/sso-packaging/1.4.1.Final/sso-packaging-1.4.1.Final.zip">下载地址</a>，解压后，将其<code>cas/plugin/WEB-INF/lib</code>下的<code>jar</code>包拷贝到<code>$CAS_TOMCAT_HOME/webapps/$CAS-SERVER/WEB-INF/lib</code>目录。</li>
+<li>默认，登出用户时<code>CAS Server</code>会展示一个<code>CAS</code>提供的登出页面，然后跳转回<code>Portal</code>页，如果想要保留原有<code>Portal</code>的登出，打开<code>$CAS_TOMCAT_HOME/webapps/$CAS-SERVER/WEB-INF/cas-servlet.xml</code>，添加<code>followServiceRedirects=&quot;true&quot;</code>参数：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"> &lt;bean id=&quot;logoutController&quot;  class=&quot;org.jasig.cas.web.LogoutController&quot;</span><br><span class="line">p:centralAuthenticationService-ref=&quot;centralAuthenticationService&quot;</span><br><span class="line">p:logoutView=&quot;casLogoutView&quot;</span><br><span class="line">p:warnCookieGenerator-ref=&quot;warnCookieGenerator&quot;</span><br><span class="line">p:ticketGrantingTicketCookieGenerator-ref=&quot;ticketGrantingTicketCookieGenerator&quot;</span><br><span class="line">p:followServiceRedirects=&quot;true&quot;/&gt;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="部署GateIn-Portal"><a href="#部署GateIn-Portal" class="headerlink" title="部署GateIn Portal"></a>部署GateIn Portal</h3><hr>
+<ol>
+<li><p>为了能让<code>Portal</code>使用<code>CAS Server</code>提供的单点登陆系统，首先配置<code>Portal</code>的<code>SSO</code>参数，在<code>$GATEIN_HOME/gatein/conf/configuration.properties</code>文件中，修改和添加如下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">gatein.sso.enabled=true</span><br><span class="line">gatein.sso.callback.enabled=$&#123;gatein.sso.enabled&#125;</span><br><span class="line">gatein.sso.login.module.enabled=$&#123;gatein.sso.enabled&#125;</span><br><span class="line">gatein.sso.login.module.class=org.gatein.sso.agent.login.SSOLoginModule</span><br><span class="line">gatein.sso.server.url=http://localhost:8086/cas-server</span><br><span class="line">gatein.sso.portal.url=http://localhost:8080</span><br><span class="line">gatein.sso.filter.logout.class=org.gatein.sso.agent.filter.CASLogoutFilter</span><br><span class="line">gatein.sso.filter.logout.url=$&#123;gatein.sso.server.url&#125;/logout</span><br><span class="line">gatein.sso.filter.login.sso.url=$&#123;gatein.sso.server.url&#125;/login?service=$&#123;gatein.sso.portal.url&#125;/@@portal.container.name@@/initiatessologin</span><br></pre></td></tr></table></figure>
+<p> 如上，为配置<code>CAS Server</code>的服务器信息等。</p>
+</li>
+<li><p>如果需要改变账户系统的存储方式， 比如改为<code>MySQL</code>数据库，还需要在<code>$GATEIN_HOME/gatein/conf/configuration.properties</code>文件中修改成如下所示，同时，下载<code>mysql-connect-java.jar``jar</code>包，放入<code>$GATEIN_HOME/lib</code>目录下。</p>
+ <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">gatein.idm.datasource.name=jdbcidm</span><br><span class="line">gatein.idm.datasource.driver=com.mysql.jdbc.Driver</span><br><span class="line">gatein.idm.datasource.url=jdbc:mysql://localhost:3306/jdbcidm_$&#123;name&#125;</span><br><span class="line">gatein.idm.datasource.username=root</span><br><span class="line">gatein.idm.datasource.password=123</span><br></pre></td></tr></table></figure>
+<p> 在<code>$GATEIN_HOME/conf/server.xml</code>的<code>&lt;GlobalNamingResources&gt;&lt;/GlobalNamingResources&gt;</code>节点中声明绑定的数据源，添加如下，字段含义可参考<a target="_blank" rel="noopener" href="https://www.exoplatform.com/docs/public/index.jsp?topic=/PLF35/ADM.Configuration.Connect_To_A_Production_Database.html">该文</a>，注意，数据库名必须为<code>jdbcidm_portal</code>，且需要提前手动创建，无法自动创建，但是<code>GateIn Portal</code>会自动创建用户相关表：</p>
+ <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;Resource auth=&quot;Container&quot; driverClassName=&quot;com.mysql.jdbc.Driver&quot; logAbandoned=&quot;true&quot; maxActive=&quot;20&quot; maxIdle=&quot;10&quot; maxWait=&quot;10000&quot; minEvictableIdleTimeMillis=&quot;60000&quot; name=&quot;exo-idm_portal&quot; password=&quot;123&quot; removeAbandoned=&quot;true&quot; removeAbandonedTimeout=&quot;10&quot; type=&quot;javax.sql.DataSource&quot; url=&quot;jdbc:mysql://localhost:3306/jdbcidm_portal&quot; username=&quot;root&quot;/&gt;</span><br></pre></td></tr></table></figure>
+<p> 在<code>GateIn Portal</code>与<code>CAS</code>整合后，账户系统将由<code>GateIn Portal</code>接管，也就是说，如果<code>GateIn Portal</code>服务没有开启，则<code>CAS Server</code>将无法进行认证。</p>
+</li>
+<li><p>在<code>$GATEIN_HOME/conf/server.xml</code>的<code>Host</code>元素下添加<code>ServletAccessValve</code>，如：</p>
+ <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;Host name=&quot;localhost&quot; appBase=&quot;webapps&quot;</span><br><span class="line">  unpackWARs=&quot;true&quot; autoDeploy=&quot;true&quot;&gt;</span><br><span class="line"> </span><br><span class="line">  &lt;Valve className=&quot;org.gatein.sso.agent.tomcat.ServletAccessValve&quot; /&gt;</span><br><span class="line"> </span><br><span class="line">  &lt;!-- SingleSignOn valve, share authentication between web applications</span><br><span class="line">  ...</span><br></pre></td></tr></table></figure>
+<p> 其目的是开启<code>SSO</code>组件，将其加入<code>Catalina</code>容器的请求处理管道中，这样，<code>SSO</code>组件将有机会处理每一个<code>Request</code>请求。</p>
+</li>
+</ol>
+<h2 id="修改portal项目根路径"><a href="#修改portal项目根路径" class="headerlink" title="修改portal项目根路径"></a>修改portal项目根路径</h2><hr>
+<p><code>GateIn portal</code>项目的默认网址格式为：<code>&#123;ip&#125;:&#123;port&#125;/portal/*</code>，如果我们想把根路径的<code>portal</code>改成其他的，如<code>ots-portal</code>，并不能简单的像其他<code>Tomcat``webapp</code>一样，直接修改目录名即可，因为<code>portal</code>有多个应用依赖，且<code>portal</code>关键字还作为容器名等在整个生命周期中起作用，最终经过大量分析测试，实现了更名，接下来，将总结修改的配置文件：</p>
+<ul>
+<li><code>$GATEIN_HOME/conf/jaas.conf</code>：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">  gatein-domain &#123;</span><br><span class="line">  org.exoplatform.web.login.FilterDisabledLoginModule required</span><br><span class="line">    portalContainerName=ots-portal</span><br><span class="line">    realmName=gatein-domain;</span><br><span class="line">  org.gatein.security.oauth.jaas.OAuthLoginModule required</span><br><span class="line">    portalContainerName=ots-portal</span><br><span class="line">    realmName=gatein-domain;</span><br><span class="line">  org.gatein.sso.integration.SSODelegateLoginModule required</span><br><span class="line">    enabled=&quot;#&#123;gatein.sso.login.module.enabled&#125;&quot;</span><br><span class="line">    delegateClassName=&quot;#&#123;gatein.sso.login.module.class&#125;&quot;</span><br><span class="line">    portalContainerName=ots-portal</span><br><span class="line">    realmName=gatein-domain</span><br><span class="line">    password-stacking=useFirstPass;</span><br><span class="line">  org.exoplatform.services.security.j2ee.TomcatLoginModule required</span><br><span class="line">    portalContainerName=ots-portal</span><br><span class="line">    realmName=gatein-domain;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+<li><code>$GATEIN_HOME/gatein/conf/configuration.xml</code>：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&lt;object-param&gt;</span><br><span class="line">  &lt;name&gt;portal&lt;/name&gt;</span><br><span class="line">      &lt;object type=&quot;org.exoplatform.container.definition.PortalContainerDefinition&quot;&gt;</span><br><span class="line">          &lt;!-- The name of the portal container --&gt;</span><br><span class="line">          &lt;field name=&quot;name&quot;&gt;</span><br><span class="line">          &lt;string&gt;ots-portal&lt;/string&gt;</span><br><span class="line">          &lt;/field&gt;</span><br><span class="line">          &lt;!-- The name of the context name of the rest web application --&gt;</span><br><span class="line">          &lt;field name=&quot;restContextName&quot;&gt;</span><br><span class="line">          &lt;string&gt;rest&lt;/string&gt;</span><br><span class="line">          &lt;/field&gt;</span><br><span class="line">          &lt;!-- The name of the realm --&gt;</span><br><span class="line">          &lt;field name=&quot;realmName&quot;&gt;</span><br><span class="line">          &lt;string&gt;gatein-domain&lt;/string&gt;</span><br><span class="line">      &lt;/field&gt;</span><br><span class="line">  &lt;/object&gt;</span><br><span class="line">&lt;/object-param&gt;</span><br></pre></td></tr></table></figure></li>
+<li><code>$GATEIN_HOME/webapps/ots-portal/WEB-INF/web.xml</code>：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;display-name&gt;ots-portal&lt;/display-name&gt;</span><br><span class="line">&lt;context-param&gt;</span><br><span class="line">  &lt;param-name&gt;org.exoplatform.frameworks.jcr.command.web.fckeditor.digitalAssetsWorkspace&lt;/param-name&gt;</span><br><span class="line">  &lt;param-value&gt;ots-portal&lt;/param-value&gt;</span><br><span class="line">&lt;/context-param&gt;</span><br></pre></td></tr></table></figure></li>
+<li><code>$GATEIN_HOME/webapps/ROOT/index.jsp</code>：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;%</span><br><span class="line">response.setStatus(response.SC_MOVED_TEMPORARILY);</span><br><span class="line">response.setHeader(&quot;Location&quot;, &quot;/ots-portal&quot;);</span><br><span class="line">%&gt;</span><br></pre></td></tr></table></figure></li>
+<li>最后，当然同样需要将<code>portal</code>目录名改为<code>ots-portal</code>。</li>
+</ul>
+<p>如上修改之后，就可以通过网址<code>&#123;ip&#125;:&#123;port&#125;/ots-portal/*</code>来进行访问了。</p>
+<h3 id="注意点"><a href="#注意点" class="headerlink" title="注意点"></a>注意点</h3><hr>
+<p>更改根目录之后，其认证相关信息存储的库名将由<code>jdbcidm_portal</code>变为<code>jdbcidm_ots-portal</code>。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><hr>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.ibm.com/developerworks/cn/opensource/os-cn-cas/">https://www.ibm.com/developerworks/cn/opensource/os-cn-cas/</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.exoplatform.com/docs/public/index.jsp?topic=/PLF35/ADM.Configuration.Connect_To_A_Production_Database.html">https://www.exoplatform.com/docs/public/index.jsp?topic=%2FPLF35%2FADM.Configuration.Connect_To_A_Production_Database.html</a></li>
+<li><a target="_blank" rel="noopener" href="https://repository.jboss.org/nexus/content/groups/public/org/gatein/sso/sso-packaging/1.4.1.Final/sso-packaging-1.4.1.Final.zip">https://repository.jboss.org/nexus/content/groups/public/org/gatein/sso/sso-packaging/1.4.1.Final/sso-packaging-1.4.1.Final.zip</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.cnblogs.com/vhua/p/cas_1.html">http://www.cnblogs.com/vhua/p/cas_1.html</a></li>
+<li><a target="_blank" rel="noopener" href="https://developer.jboss.org/wiki/ChangeGateInContextPath">https://developer.jboss.org/wiki/ChangeGateInContextPath</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/SSO/" rel="tag"># SSO</a>
+              <a href="/tags/CAS/" rel="tag"># CAS</a>
+              <a href="/tags/Portal/" rel="tag"># Portal</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2016/12/22/iOS%E8%AE%BE%E7%BD%AEshadow-%E5%B8%A6%E6%9D%A5%E7%9A%84%E7%A6%BB%E5%B1%8F%E6%B8%B2%E6%9F%93/" rel="prev" title="iOS设置shadow*带来的离屏渲染">
+                  <i class="fa fa-chevron-left"></i> iOS设置shadow*带来的离屏渲染
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2017/01/19/Objective-C%E4%B9%8BperformSelector%E7%BC%96%E8%AF%91%E5%99%A8%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2%E8%AD%A6%E5%91%8A/" rel="next" title="Objective-C之performSelector编译器内存泄露警告">
+                  Objective-C之performSelector编译器内存泄露警告 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2016 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">钟武</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css" integrity="sha256-2H3fkXt6FEmrReK448mDVGKb3WW2ZZw35gI7vqHOE4Y=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"zhongwuzw.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.7.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="前言 在Flutter开发中，对于一些简单的数据传递，我们可以使用Widget constructor直接传递进去，但是当某个后代Widget依赖上层的祖先Widget或者多个Widget同时依赖祖先Widget的情形时，直接传递的方式就会暴露出很多的问题：需要连续传递很难维护以及依赖的祖先Widget数据改变时，所有子Widget都需要rebuild。 Flutter提供了另外一个机制来解决这个">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Flutter InheritedWidget实现原理">
+<meta property="og:url" content="https://zhongwuzw.github.io/2020/09/24/Flutter-InheritedWidget%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/index.html">
+<meta property="og:site_name" content="钟武的技术博客">
+<meta property="og:description" content="前言 在Flutter开发中，对于一些简单的数据传递，我们可以使用Widget constructor直接传递进去，但是当某个后代Widget依赖上层的祖先Widget或者多个Widget同时依赖祖先Widget的情形时，直接传递的方式就会暴露出很多的问题：需要连续传递很难维护以及依赖的祖先Widget数据改变时，所有子Widget都需要rebuild。 Flutter提供了另外一个机制来解决这个">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://zhongwuzw.github.io/images/flutter_inheritedWidget.png">
+<meta property="article:published_time" content="2020-09-24T02:50:54.000Z">
+<meta property="article:modified_time" content="2020-09-24T02:55:42.000Z">
+<meta property="article:author" content="钟武">
+<meta property="article:tag" content="Flutter">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhongwuzw.github.io/images/flutter_inheritedWidget.png">
+
+
+<link rel="canonical" href="https://zhongwuzw.github.io/2020/09/24/Flutter-InheritedWidget%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://zhongwuzw.github.io/2020/09/24/Flutter-InheritedWidget%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/","path":"2020/09/24/Flutter-InheritedWidget实现原理/","title":"Flutter InheritedWidget实现原理"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Flutter InheritedWidget实现原理 | 钟武的技术博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">钟武的技术博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+        <li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E7%BB%86%E8%8A%82"><span class="nav-number">2.</span> <span class="nav-text">实现细节</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">钟武</p>
+  <div class="site-description" itemprop="description">Keep thinking, keep coding!!!</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">45</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/zhongwuzw" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;zhongwuzw" rel="noopener" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:zhongwuzw@qq.com" title="E-Mail → mailto:zhongwuzw@qq.com" rel="noopener" target="_blank"><i class="envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://stackoverflow.com/zhongwuzw" title="StackOverflow → https:&#x2F;&#x2F;stackoverflow.com&#x2F;zhongwuzw" rel="noopener" target="_blank"><i class="stack-overflow fa-fw"></i>StackOverflow</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://weibo.com/zhongwuzw" title="微博 → http:&#x2F;&#x2F;weibo.com&#x2F;zhongwuzw" rel="noopener" target="_blank"><i class="weibo fa-fw"></i>微博</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.douban.com/people/zhongwu/" title="豆瓣 → https:&#x2F;&#x2F;www.douban.com&#x2F;people&#x2F;zhongwu&#x2F;" rel="noopener" target="_blank"><i class="share-alt fa-fw"></i>豆瓣</a>
+      </span>
+  </div>
+
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2020/09/24/Flutter-InheritedWidget%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="钟武">
+      <meta itemprop="description" content="Keep thinking, keep coding!!!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="钟武的技术博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Flutter InheritedWidget实现原理
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2020-09-24 10:50:54 / 修改时间：10:55:42" itemprop="dateCreated datePublished" datetime="2020-09-24T10:50:54+08:00">2020-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Flutter/" itemprop="url" rel="index"><span itemprop="name">Flutter</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><hr>
+<p>在Flutter开发中，对于一些简单的数据传递，我们可以使用Widget constructor直接传递进去，但是当某个后代Widget依赖上层的祖先Widget或者多个Widget同时依赖祖先Widget的情形时，直接传递的方式就会暴露出很多的问题：需要连续传递很难维护以及依赖的祖先Widget数据改变时，所有子Widget都需要rebuild。</p>
+<p>Flutter提供了另外一个机制来解决这个问题，InheritedWidget，当InheritedWidget数据发生变化时，只通知依赖其数据变化的Widgets，接下来将按步骤分析实现细节。（ <a target="_blank" rel="noopener" href="https://github.com/rrousselGit/provider?spm=ata.13261165.0.0.36547ede70zxv7">Provider</a>也是基于InheritedWidget进行的封装）</p>
+<p><img src="/images/flutter_inheritedWidget.png"></p>
+<h2 id="实现细节"><a href="#实现细节" class="headerlink" title="实现细节"></a>实现细节</h2><hr>
+<p>我们通过一个小demo来展示使用方法，假设数据Color需要被后代Widget访问，且当Color变化，后代Widget能监听到变化。步骤比较简单，先子类InheritedWidget，如下代码示例，FrogColor定义了一个名为of的静态方法，该方法由后代Widget进行调用，调用时将后代Widget的Element作为context传入。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">class FrogColor extends InheritedWidget &#123;</span><br><span class="line">  const FrogColor(&#123;</span><br><span class="line">    Key key,</span><br><span class="line">    @required this.color,</span><br><span class="line">    @required Widget child,</span><br><span class="line">  &#125;) : assert(color != null),</span><br><span class="line">       assert(child != null),</span><br><span class="line">       super(key: key, child: child);</span><br><span class="line"></span><br><span class="line">  final Color color;</span><br><span class="line"></span><br><span class="line">  static FrogColor of(BuildContext context) &#123;</span><br><span class="line">    return context.dependOnInheritedWidgetOfExactType&lt;FrogColor&gt;();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  @override</span><br><span class="line">  bool updateShouldNotify(FrogColor old) =&gt; color != old.color;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们看下of静态方法的实现，实际调用的是后代Widget对应Element的 dependOnInheritedWidgetOfExactType，该方法首先会去_inheritedWidgets里找是否有需要的InheritedWidget，如果找到，返回找到的InheritedWidget，并将自己作为依赖注册到InheritedWidget里，这样InheritedWidget就能知道哪些Widget依赖它，如果InheritedWidget发生了变化，会通知依赖方。_inheritedWidgets会在InheritedWidget mount的时候从父Element获取当前所有的InheritedWidgets，并且把自己也加到里边，也就是说，所有的Element都有一个Map来收集当前祖先所有的InheritedWidget。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">@override</span><br><span class="line">T dependOnInheritedWidgetOfExactType&lt;T extends InheritedWidget&gt;(&#123;Object aspect&#125;) &#123;</span><br><span class="line">  assert(_debugCheckStateIsActiveForAncestorLookup());</span><br><span class="line">  final InheritedElement ancestor = _inheritedWidgets == null ? null : _inheritedWidgets[T];</span><br><span class="line">  if (ancestor != null) &#123;</span><br><span class="line">    assert(ancestor is InheritedElement);</span><br><span class="line">    return dependOnInheritedElement(ancestor, aspect: aspect) as T;</span><br><span class="line">  &#125;</span><br><span class="line">  _hadUnsatisfiedDependencies = true;</span><br><span class="line">  return null;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>重新回到FrogColor类，另一个方法updateShouldNotify，当FrogColor widget rebuild时，FrogColor的Element会通过updated方法来判断是否需要通知所有依赖它的后代Widgets，super.updated(oldWidget)用来通知所有的dependencies 依赖方。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">@override</span><br><span class="line">void updated(InheritedWidget oldWidget) &#123;</span><br><span class="line">  if (widget.updateShouldNotify(oldWidget))</span><br><span class="line">    super.updated(oldWidget);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当需要通知依赖方的时候，调用依赖Widget对应Element的didChangeDependencies方法，Element将自己标记为dirty，并加到BuildOwner的dirty列表中，当下一帧绘制时，会重新build Widget。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">@mustCallSuper</span><br><span class="line">void didChangeDependencies() &#123;</span><br><span class="line">  assert(_active); // otherwise markNeedsBuild is a no-op</span><br><span class="line">  assert(_debugCheckOwnerBuildTargetExists(&#x27;didChangeDependencies&#x27;));</span><br><span class="line">  markNeedsBuild();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><hr>
+<p>综上，我们可以看到，InheritedWidget不仅能解决多层传递带来的业务复杂度，也能非常高效的进行rebuild操作。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Flutter/" rel="tag"># Flutter</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/09/24/Flutter-Dart%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/" rel="prev" title="Flutter Dart垃圾回收">
+                  <i class="fa fa-chevron-left"></i> Flutter Dart垃圾回收
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2016 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">钟武</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

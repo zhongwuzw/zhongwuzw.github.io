@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css" integrity="sha256-2H3fkXt6FEmrReK448mDVGKb3WW2ZZw35gI7vqHOE4Y=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"zhongwuzw.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.7.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="前言 iOS中，我们经常使用GCD来进行并发操作，我们并不需要关心线程的管理，Dispatch Queue会自动帮我们处理线程的创建和释放，在极大的简化并发操作的同时，某些情况下，Dispatch Queue的滥用可能会导致应用挂起，如向并发队列中添加阻塞的Block，阻塞的Block会导致系统创建更多的线程来处理任务，而GCD线程池的最大线程数为64个，所以一旦达到最大值，应用将挂起。接下来，我">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GCD队列管理之YYDispatchQueuePool">
+<meta property="og:url" content="https://zhongwuzw.github.io/2017/06/05/GCD%E9%98%9F%E5%88%97%E7%AE%A1%E7%90%86%E4%B9%8BYYDispatchQueuePool/index.html">
+<meta property="og:site_name" content="钟武的技术博客">
+<meta property="og:description" content="前言 iOS中，我们经常使用GCD来进行并发操作，我们并不需要关心线程的管理，Dispatch Queue会自动帮我们处理线程的创建和释放，在极大的简化并发操作的同时，某些情况下，Dispatch Queue的滥用可能会导致应用挂起，如向并发队列中添加阻塞的Block，阻塞的Block会导致系统创建更多的线程来处理任务，而GCD线程池的最大线程数为64个，所以一旦达到最大值，应用将挂起。接下来，我">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-06-05%20%E4%B8%8B%E5%8D%8811.28.12.png">
+<meta property="article:published_time" content="2017-06-05T13:33:44.000Z">
+<meta property="article:modified_time" content="2018-11-23T13:38:17.000Z">
+<meta property="article:author" content="钟武">
+<meta property="article:tag" content="iOS">
+<meta property="article:tag" content="Objective-C">
+<meta property="article:tag" content="GCD">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-06-05%20%E4%B8%8B%E5%8D%8811.28.12.png">
+
+
+<link rel="canonical" href="https://zhongwuzw.github.io/2017/06/05/GCD%E9%98%9F%E5%88%97%E7%AE%A1%E7%90%86%E4%B9%8BYYDispatchQueuePool/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://zhongwuzw.github.io/2017/06/05/GCD%E9%98%9F%E5%88%97%E7%AE%A1%E7%90%86%E4%B9%8BYYDispatchQueuePool/","path":"2017/06/05/GCD队列管理之YYDispatchQueuePool/","title":"GCD队列管理之YYDispatchQueuePool"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>GCD队列管理之YYDispatchQueuePool | 钟武的技术博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">钟武的技术博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+        <li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#YYDispatchQueue"><span class="nav-number">2.</span> <span class="nav-text">YYDispatchQueue</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NSOperationQueue"><span class="nav-number">3.</span> <span class="nav-text">NSOperationQueue</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Dispatch-Semaphores"><span class="nav-number">4.</span> <span class="nav-text">Dispatch Semaphores</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%99%84%E5%BD%95"><span class="nav-number">5.</span> <span class="nav-text">附录</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">钟武</p>
+  <div class="site-description" itemprop="description">Keep thinking, keep coding!!!</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">45</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/zhongwuzw" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;zhongwuzw" rel="noopener" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:zhongwuzw@qq.com" title="E-Mail → mailto:zhongwuzw@qq.com" rel="noopener" target="_blank"><i class="envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://stackoverflow.com/zhongwuzw" title="StackOverflow → https:&#x2F;&#x2F;stackoverflow.com&#x2F;zhongwuzw" rel="noopener" target="_blank"><i class="stack-overflow fa-fw"></i>StackOverflow</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://weibo.com/zhongwuzw" title="微博 → http:&#x2F;&#x2F;weibo.com&#x2F;zhongwuzw" rel="noopener" target="_blank"><i class="weibo fa-fw"></i>微博</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.douban.com/people/zhongwu/" title="豆瓣 → https:&#x2F;&#x2F;www.douban.com&#x2F;people&#x2F;zhongwu&#x2F;" rel="noopener" target="_blank"><i class="share-alt fa-fw"></i>豆瓣</a>
+      </span>
+  </div>
+
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2017/06/05/GCD%E9%98%9F%E5%88%97%E7%AE%A1%E7%90%86%E4%B9%8BYYDispatchQueuePool/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="钟武">
+      <meta itemprop="description" content="Keep thinking, keep coding!!!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="钟武的技术博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          GCD队列管理之YYDispatchQueuePool
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2017-06-05 21:33:44" itemprop="dateCreated datePublished" datetime="2017-06-05T21:33:44+08:00">2017-06-05</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2018-11-23 21:38:17" itemprop="dateModified" datetime="2018-11-23T21:38:17+08:00">2018-11-23</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/iOS%E5%BC%80%E5%8F%91-%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">iOS开发-项目</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><hr>
+<p><code>iOS</code>中，我们经常使用<code>GCD</code>来进行并发操作，我们并不需要关心线程的管理，<code>Dispatch Queue</code>会自动帮我们处理线程的创建和释放，在极大的简化并发操作的同时，某些情况下，<code>Dispatch Queue</code>的滥用可能会导致应用挂起，如向并发队列中添加阻塞的<code>Block</code>，阻塞的<code>Block</code>会导致系统创建更多的线程来处理任务，而<code>GCD</code>线程池的最大线程数为64个，所以一旦达到最大值，应用将挂起。<br>接下来，我将列出一些解决方案，来更好的使用<code>Dispatch Queue</code>。</p>
+<h2 id="YYDispatchQueue"><a href="#YYDispatchQueue" class="headerlink" title="YYDispatchQueue"></a>YYDispatchQueue</h2><hr>
+<p><a target="_blank" rel="noopener" href="https://github.com/ibireme/YYDispatchQueuePool">YYDispatchQueue</a>的主要思想是使用串行队列来替换并发队列，可以为指定的<code>NSQualityOfService</code>创建一个队列池，由<code>YYDispatchQueuePool</code>对象来进行管理，每一种<code>NSQualityOfService</code>最多可以创建32个串行队列，通过<code>- (dispatch_queue_t)queue;</code>方法来获取可用队列，其采用<code>Round Robin</code>轮询算法。</p>
+<p><img src="http://oc54pu02q.bkt.clouddn.com/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202017-06-05%20%E4%B8%8B%E5%8D%8811.28.12.png"></p>
+<p>除了可以创建队列池来管理并发外，还可以通过<code>C</code>的全局函数（<code>dispatch_queue_t YYDispatchQueueGetForQOS(NSQualityOfService qos)</code>）来获取特定的<code>NSQualityOfService</code>串行队列，队列由全局的队列池来管理，每一种<code>NSQualityOfService</code>的串行队列数与核数相同，这样可以尽可能的减少线程之间的上下文切换。</p>
+<span id="more"></span>
+
+<p><code>YYDispatchQueuePool</code>对象使用<code>YYDispatchContext</code> <code>struct</code>来管理队列池，代码目前还存在内存泄露的问题，因为<code>struct</code>是在堆上分配的内存，最后使用<code>YYDispatchContextRelease</code>释放<code>context</code>时只释放了结构体成员的内存空间，而没有释放结构体自己申请的空间，解决方法如下注释，加上<code>free(context)</code>即可。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">typedef struct &#123;</span><br><span class="line">    const char *name;</span><br><span class="line">    void **queues;</span><br><span class="line">    uint32_t queueCount;</span><br><span class="line">    int32_t counter;</span><br><span class="line">&#125; YYDispatchContext;</span><br><span class="line"></span><br><span class="line">static void YYDispatchContextRelease(YYDispatchContext *context) &#123;</span><br><span class="line">    if (!context) return;</span><br><span class="line">    if (context-&gt;queues) &#123;</span><br><span class="line">        for (NSUInteger i = 0; i &lt; context-&gt;queueCount; i++) &#123;</span><br><span class="line">            void *queuePointer = context-&gt;queues[i];</span><br><span class="line">            dispatch_queue_t queue = (__bridge_transfer dispatch_queue_t)(queuePointer);</span><br><span class="line">            const char *name = dispatch_queue_get_label(queue);</span><br><span class="line">            if (name) strlen(name); // avoid compiler warning</span><br><span class="line">            queue = nil;</span><br><span class="line">        &#125;</span><br><span class="line">        free(context-&gt;queues);</span><br><span class="line">        context-&gt;queues = NULL;</span><br><span class="line">    &#125;</span><br><span class="line">    if (context-&gt;name) free((void *)context-&gt;name);</span><br><span class="line">    //内存泄露，需添加  free(context);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="NSOperationQueue"><a href="#NSOperationQueue" class="headerlink" title="NSOperationQueue"></a>NSOperationQueue</h2><hr>
+<p>使用<code>NSOperationQueue</code>，设置<code>maxConcurrentOperationCount</code>来控制并发量。</p>
+<h2 id="Dispatch-Semaphores"><a href="#Dispatch-Semaphores" class="headerlink" title="Dispatch Semaphores"></a>Dispatch Semaphores</h2><hr>
+<p>使用<code>Dispatch Queue</code>时，可以用信号量来控制并发的数量，<code>GCD</code>提供信号量的支持，<code>dispatch_semaphore_t</code>用来表示信号量。在往队列添加任务之前，可以使用<code>dispatch_semaphore_wait</code>来获取信号量，成功获取后即可往队列中添加任务，当任务完成时，使用<code>dispatch_semaphore_signal</code>来释放信号量。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">// 示例代码需要封装一下，不要直接在主线程或次级线程中直接调用dispatch_semaphore_wait，可能会引发UI挂起</span><br><span class="line">...</span><br><span class="line">dispatch_semaphore_t concurrencyLimitingSemaphore = dispatch_semaphore_create(limit);</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">dispatch_semaphore_wait(concurrencyLimitingSemaphore, DISPATCH_TIME_FOREVER);</span><br><span class="line">dispatch_async(someConcurrentQueue, ^&#123;</span><br><span class="line">    /* work goes here */</span><br><span class="line">    dispatch_semaphore_signal(concurrencyLimitingSemaphore);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><hr>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/7213845/number-of-threads-created-by-gcd">https://stackoverflow.com/questions/7213845/number-of-threads-created-by-gcd</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/ibireme/YYDispatchQueuePool">https://github.com/ibireme/YYDispatchQueuePool</a></li>
+<li><a target="_blank" rel="noopener" href="https://developer.apple.com/library/content/documentation/General/Conceptual/ConcurrencyProgrammingGuide/OperationQueues/OperationQueues.html#//apple_ref/doc/uid/TP40008091-CH102-SW24">https://developer.apple.com/library/content/documentation/General/Conceptual/ConcurrencyProgrammingGuide/OperationQueues/OperationQueues.html#//apple_ref/doc/uid/TP40008091-CH102-SW24</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/iOS/" rel="tag"># iOS</a>
+              <a href="/tags/Objective-C/" rel="tag"># Objective-C</a>
+              <a href="/tags/GCD/" rel="tag"># GCD</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2017/05/26/iOS%E6%B5%8F%E8%A7%88%E5%99%A8-WebBrowser/" rel="prev" title="iOS浏览器-WebBrowser">
+                  <i class="fa fa-chevron-left"></i> iOS浏览器-WebBrowser
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2017/06/17/Swift%E4%B9%8BWeak%E5%BC%95%E7%94%A8/" rel="next" title="Swift3之Weak引用">
+                  Swift3之Weak引用 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2016 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">钟武</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css" integrity="sha256-2H3fkXt6FEmrReK448mDVGKb3WW2ZZw35gI7vqHOE4Y=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"zhongwuzw.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.7.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="当我们从Obj-C转到Swift时，会发现Swift提供的数据结构大量使用值语义，如Array、Dictionary等，今天，我们将实现Array的基本功能，来理解值语义以及写时复制。 值和引用语义 在实现之前，我们来简单讨论一下值语义和引用语义的区别。当我们使用Obj-C及大多数其他面向对象语言开发时，经常会使用对象指针或引用，而这就是常说的引用语义，我们可以赋值一个对象实例的引用给一个变量：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="实现Swift的Array">
+<meta property="og:url" content="https://zhongwuzw.github.io/2017/09/01/%E5%AE%9E%E7%8E%B0Swift%E7%9A%84Array/index.html">
+<meta property="og:site_name" content="钟武的技术博客">
+<meta property="og:description" content="当我们从Obj-C转到Swift时，会发现Swift提供的数据结构大量使用值语义，如Array、Dictionary等，今天，我们将实现Array的基本功能，来理解值语义以及写时复制。 值和引用语义 在实现之前，我们来简单讨论一下值语义和引用语义的区别。当我们使用Obj-C及大多数其他面向对象语言开发时，经常会使用对象指针或引用，而这就是常说的引用语义，我们可以赋值一个对象实例的引用给一个变量：">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2017-09-01T02:16:46.000Z">
+<meta property="article:modified_time" content="2017-09-03T15:06:54.000Z">
+<meta property="article:author" content="钟武">
+<meta property="article:tag" content="iOS">
+<meta property="article:tag" content="Swift">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://zhongwuzw.github.io/2017/09/01/%E5%AE%9E%E7%8E%B0Swift%E7%9A%84Array/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://zhongwuzw.github.io/2017/09/01/%E5%AE%9E%E7%8E%B0Swift%E7%9A%84Array/","path":"2017/09/01/实现Swift的Array/","title":"实现Swift的Array"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>实现Swift的Array | 钟武的技术博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">钟武的技术博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+        <li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%80%BC%E5%92%8C%E5%BC%95%E7%94%A8%E8%AF%AD%E4%B9%89"><span class="nav-number">1.</span> <span class="nav-text">值和引用语义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E5%80%BC%E8%AF%AD%E4%B9%89"><span class="nav-number">2.</span> <span class="nav-text">实现值语义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#isKnownUniquelyReferenced"><span class="nav-number">3.</span> <span class="nav-text">isKnownUniquelyReferenced</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ArrayImpl"><span class="nav-number">4.</span> <span class="nav-text">ArrayImpl</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Array"><span class="nav-number">5.</span> <span class="nav-text">Array</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BA%90%E4%BB%A3%E7%A0%81%E5%8F%8A%E6%B5%8B%E8%AF%95%E4%BB%A3%E7%A0%81"><span class="nav-number">6.</span> <span class="nav-text">源代码及测试代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">7.</span> <span class="nav-text">参考</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">钟武</p>
+  <div class="site-description" itemprop="description">Keep thinking, keep coding!!!</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">45</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/zhongwuzw" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;zhongwuzw" rel="noopener" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:zhongwuzw@qq.com" title="E-Mail → mailto:zhongwuzw@qq.com" rel="noopener" target="_blank"><i class="envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://stackoverflow.com/zhongwuzw" title="StackOverflow → https:&#x2F;&#x2F;stackoverflow.com&#x2F;zhongwuzw" rel="noopener" target="_blank"><i class="stack-overflow fa-fw"></i>StackOverflow</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://weibo.com/zhongwuzw" title="微博 → http:&#x2F;&#x2F;weibo.com&#x2F;zhongwuzw" rel="noopener" target="_blank"><i class="weibo fa-fw"></i>微博</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.douban.com/people/zhongwu/" title="豆瓣 → https:&#x2F;&#x2F;www.douban.com&#x2F;people&#x2F;zhongwu&#x2F;" rel="noopener" target="_blank"><i class="share-alt fa-fw"></i>豆瓣</a>
+      </span>
+  </div>
+
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2017/09/01/%E5%AE%9E%E7%8E%B0Swift%E7%9A%84Array/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="钟武">
+      <meta itemprop="description" content="Keep thinking, keep coding!!!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="钟武的技术博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          实现Swift的Array
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2017-09-01 10:16:46" itemprop="dateCreated datePublished" datetime="2017-09-01T10:16:46+08:00">2017-09-01</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2017-09-03 23:06:54" itemprop="dateModified" datetime="2017-09-03T23:06:54+08:00">2017-09-03</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/iOS%E5%BC%80%E5%8F%91-%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">iOS开发-语言</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>当我们从<code>Obj-C</code>转到<code>Swift</code>时，会发现<code>Swift</code>提供的数据结构大量使用值语义，如<code>Array</code>、<code>Dictionary</code>等，今天，我们将实现<code>Array</code>的基本功能，来理解值语义以及写时复制。</p>
+<h2 id="值和引用语义"><a href="#值和引用语义" class="headerlink" title="值和引用语义"></a>值和引用语义</h2><hr>
+<p>在实现之前，我们来简单讨论一下值语义和引用语义的区别。当我们使用<code>Obj-C</code>及大多数其他面向对象语言开发时，经常会使用对象指针或引用，而这就是常说的引用语义，我们可以赋值一个对象实例的引用给一个变量：</p>
+<p><code>MyClass *a = ...;</code></p>
+<p>接着，可以将该变量赋值给另一个变量：</p>
+<p><code>MyClass *b = a;</code></p>
+<p>此时，<code>a</code>和<code>b</code>将指向同一个对象，如果指向的对象是可变的，当我们修改对象的内容时，两者对其都可见。</p>
+<p>值语义相对比较简单，我们使用的如<code>int</code>、<code>struct</code>等都是值语义，声明为值语义的变量，其直接指向真正的值，而不是值的指针。所以当我们进行赋值时，将得到值的拷贝，如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">int a = 42;</span><br><span class="line">int b = a;</span><br><span class="line">b++;</span><br></pre></td></tr></table></figure>
+
+<p>此时，<code>b</code>的值为<code>43</code>，而<code>a</code>依然为<code>42</code>。</p>
+<p>在<code>Swift</code>中，<code>class</code>类型仍然是引用语义，<code>struct</code>则为值语义，所以，如果对<code>class</code>类型进行赋值时，将得到一个指向同一个实例的引用，对实例对象内容的修改将对所有的引用可见；使用<code>struct</code>时，则不会，每个变量之间都是独立的。</p>
+<p>对于使用过<code>Obj-C</code>开发过的人来说，转到<code>Swift</code>使用其提供的数组和字典时，可能会不习惯，因为<code>Swift</code>中两者已经变成了值语义，如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var a = [1, 2, 3]</span><br><span class="line">var b = a</span><br><span class="line">b.append(4)</span><br></pre></td></tr></table></figure>
+
+<p>对于大多数语言，如上代码的结果一般都是<code>a</code>和<code>b</code>都指向同一个数组<code>[1, 2, 3, 4]</code>。而在<code>Swift</code>中，<code>a</code>指向<code>[1, 2, 3]</code>，<code>b</code>则指向<code>[1, 2, 3, 4]</code>。</p>
+<h2 id="实现值语义"><a href="#实现值语义" class="headerlink" title="实现值语义"></a>实现值语义</h2><hr>
+<p>如果对象包含固定数量的数据，那么实现就比较简单：我们直接将数据放到<code>struct</code>中即可。比如想要一个2D <code>Point</code>类型且满足值语义，可以创建一个<code>struct</code>包含<code>x``y</code>的值：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">struct Point &#123;</span><br><span class="line">    var x: Int</span><br><span class="line">    var y: Int</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<p>固定数量实现起来比较简单，但是我们使用的<code>Array</code>，它的个数不定，我们不可能直接把所有数组元素放到<code>struct</code>中，所以，我们需要创建一个指针，用来指向数组元素的内存：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">struct Array&lt;T&gt; &#123;</span><br><span class="line">    var ptr: UnsafeMutablePointer&lt;T&gt;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>不过，有这还不够，我们还需要针对<code>struct</code>的赋值和销毁做一些操作；当<code>struct</code>被赋值时，需要对新的<code>struct</code>的<code>ptr</code>元素赋值，这时候需要将原<code>struct</code>的<code>ptr</code>指向的所有元素拷贝到一组新的内存块中，并将新的<code>struct</code>的<code>ptr</code>指向新的第一个元素的地址。当<code>struct</code>销毁时，其指针指向的元素占用的内存同样需要被释放。而这两个需求，<code>Swift</code>的<code>struct</code>并没有提供自定义方法可以实现。</p>
+<p>由于<code>class</code>有<code>deinit</code>方法，所以析构功能可以通过<code>class</code>来实现，指针指向的内容可以在<code>deinit</code>中进行处理，但是<code>class</code>又不是值语义的，不过我们依然可以解决，既外封装<code>struct</code>，使用<code>struct</code>作为外部接口进行数组的使用，如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">class ArrayImpl&lt;T&gt; &#123;</span><br><span class="line">    var ptr: UnsafeMutablePointer&lt;T&gt;</span><br><span class="line"></span><br><span class="line">    deinit &#123;</span><br><span class="line">        ptr.destroy(...)</span><br><span class="line">        ptr.dealloc(...)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">struct Array&lt;T&gt; &#123;</span><br><span class="line">    var impl: ArrayImpl&lt;T&gt;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接下来，在<code>Array&lt;T&gt;</code>中添加一个接口，其内部则调用<code>ArrayImpl</code>的实现。</p>
+<p>如上，尽管使用了<code>struct</code>，但是我们还并没有实现值语义，如果拷贝一个<code>struct</code>，新的<code>struct</code>依然指向相同的<code>ArrayImpl</code>，而我们又没法自定义<code>struct</code>的赋值操作，所以也没法拷贝。不过，我们可以从另一个角度去解决这个问题，我们可以思考一下，真正需要在什么时候进行拷贝的操作呢，答案就是做修改操作时，俗称的<code>COW</code>，既只有当进行修改操作时，才进行真正的拷贝。</p>
+<p>比如，实现<code>append</code>方法来对<code>ArrayImpl</code>的拷贝添加一个元素（假设<code>ArrayImpl</code>已经实现了<code>copy</code>方法）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mutating func append(value: T) &#123;</span><br><span class="line">    impl = impl.copy()</span><br><span class="line">    impl.append(value)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样，就实现了<code>Array</code>的值语义，尽管<code>a``b</code>赋值后依然指向相同的数据，但是只要修改其中的一个，就会进行拷贝操作，以保持数据的独立性。</p>
+<p>如上的<code>append</code>方法，虽然实现了功能，但是效率太差，如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">var a: [Int] = []</span><br><span class="line">for i in 0..&lt;1000 &#123;</span><br><span class="line">    a.append(i)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在每一次进行迭代时，指向的数据都会进行拷贝的操作，然后立即销毁之前的存储内存，那么我们如何处理这种情况呢？</p>
+<h2 id="isKnownUniquelyReferenced"><a href="#isKnownUniquelyReferenced" class="headerlink" title="isKnownUniquelyReferenced"></a>isKnownUniquelyReferenced</h2><hr>
+<p>该<code>API</code>返回一个布尔值，表明某个对象是否只有一个单独的强引用指向它。</p>
+<p>有了这个<code>API</code>，我们就可以修改一下<code>append</code>方法，只在必要的时候进行拷贝：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mutating func append(_ value: T) &#123;</span><br><span class="line">    // isKnownUniquelyReferenced并不是线程安全的哦</span><br><span class="line">    if !isKnownUniquelyReferenced(&amp;impl) &#123;</span><br><span class="line">        impl = impl.copy()</span><br><span class="line">    &#125;</span><br><span class="line">    impl.append(obj: value)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="ArrayImpl"><a href="#ArrayImpl" class="headerlink" title="ArrayImpl"></a>ArrayImpl</h2><hr>
+<p>接下来，我们将开始实现<code>ArrayImpl</code>。数组包含3个属性：数据指针、数组中元素的个数，以及当前分配的内存可存放的总个数。数据指针和数组元素个数这两个值是必须的，不过我们应当预先分配一定量的空闲内存区域，以避免过多的<code>reallocation</code>操作。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">class ArrayImpl&lt;T&gt; &#123;</span><br><span class="line">    var space: Int</span><br><span class="line">    var count: Int</span><br><span class="line">    var ptr: UnsafeMutablePointer&lt;T&gt;！</span><br></pre></td></tr></table></figure>
+
+<p>接下来，实现<code>init</code>方法，<code>init</code>方法获取两个参数，<code>count</code>、<code>ptr</code>，拷贝指针的内容到新的对象。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">init(count: Int = 0, ptr: UnsafeMutablePointer&lt;T&gt;? = nil) &#123;</span><br><span class="line">    self.count = count</span><br><span class="line">    self.space = count</span><br><span class="line">    </span><br><span class="line">    self.ptr = UnsafeMutablePointer&lt;T&gt;.allocate(capacity: count)</span><br><span class="line">    </span><br><span class="line">    guard let ptr = ptr else &#123;</span><br><span class="line">        return</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    self.ptr.initialize(from: ptr, count: count)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接下来，实现<code>append</code>方法，首先检查是否需要重新分配内存，如果没有多余的空间，则需要一块新的内存：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">func append(obj: T) &#123;</span><br><span class="line">    if space == count &#123;</span><br></pre></td></tr></table></figure>
+
+<p>首次分配内存时，分配容量初始为<code>space</code>的2倍，且最小容量设置为16.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">let newSpace = max(space * 2, 16)</span><br><span class="line">let newPtr = UnsafeMutablePointer&lt;T&gt;.allocate(capacity: newSpace)</span><br></pre></td></tr></table></figure>
+
+<p>接着将数据从原位置拷贝到新的指针所在的内存。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">newPtr.moveInitialize(from: ptr, count: count)</span><br></pre></td></tr></table></figure>
+
+<p>拷贝完成之后，就可以释放原来的内存了：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ptr.deallocate(capacity: count)</span><br><span class="line">ptr = newPtr</span><br><span class="line">space = newSpace</span><br></pre></td></tr></table></figure>
+
+<p>现在，已经有足够的空间来存放新的元素，我们将其拷贝到当前所有元素中最后一个元素后面内存区域并将<code>count</code>自增1：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(ptr + count).initialize(to: obj)</span><br><span class="line">count += 1</span><br></pre></td></tr></table></figure>
+
+<p><code>remove</code>操作也很简单，因为不需要重新分配内存。首先，清理待移除元素所在的内存：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">func remove(at index: Int) &#123;</span><br><span class="line">    (ptr + index).deinitialize()</span><br></pre></td></tr></table></figure>
+
+<p><code>moveInitialize</code>方法可以使所有剩余的元素移动到指定的内存区域：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(ptr + index).moveInitialize(from: ptr + index + 1, count: count - index - 1)</span><br></pre></td></tr></table></figure>
+
+<p>然后将<code>count</code>减一来表明已经移除一个元素:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">count -= 1</span><br></pre></td></tr></table></figure>
+
+<p>当然，我们也需要实现<code>copy</code>方法，以实现必要的拷贝操作（真正执行拷贝操作是在<code>init</code>方法中）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">func copy() -&gt; ArrayImpl&lt;T&gt; &#123;</span><br><span class="line">    return ArrayImpl&lt;T&gt;(count: count, ptr: ptr)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最后，别忘了释放内存，我们可以在<code>deinit</code>中进行内存的释放操作：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">deinit &#123;</span><br><span class="line">    ptr.deinitialize(count: count)</span><br><span class="line">    ptr.deallocate(capacity: space)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样，<code>ArrayImpl</code>基本方法已经完成，接下来就是实现<code>Array</code>的<code>struct</code>的接口方法，其主要是调用<code>ArrayImpl</code>的实现。</p>
+<h2 id="Array"><a href="#Array" class="headerlink" title="Array"></a>Array</h2><hr>
+<p>接下来，实现<code>Array</code>的一些接口方法，由于比较简单，直接上代码，代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">private mutating func ensureUnique() &#123;</span><br><span class="line">    if !isKnownUniquelyReferenced(&amp;impl) &#123;</span><br><span class="line">        impl = impl.copy()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">    </span><br><span class="line">mutating func append(_ value: T) &#123;</span><br><span class="line">    ensureUnique()</span><br><span class="line">    impl.append(obj: value)</span><br><span class="line">&#125;</span><br><span class="line">    </span><br><span class="line">mutating func remove(at index: Int) &#123;</span><br><span class="line">    ensureUnique()</span><br><span class="line">    impl.remove(at: index)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最后，我们还要加上两个功能，下标访问以及<code>for...in</code>迭代，下标可以通过实现<code>subscript(index: Int)</code>方法，<code>for...in</code>迭代可以通过实现<code>Collection</code>协议的方法，具体如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">    var count: Int &#123;</span><br><span class="line">    return impl.count</span><br><span class="line">&#125;</span><br><span class="line">    </span><br><span class="line">subscript(index: Int) -&gt; T &#123;</span><br><span class="line">    get &#123;</span><br><span class="line">        return impl.ptr[index]</span><br><span class="line">    &#125;</span><br><span class="line">    mutating set &#123;</span><br><span class="line">        ensureUnique()</span><br><span class="line">        impl.ptr[index] = newValue</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">    </span><br><span class="line">var description: String &#123;</span><br><span class="line">    var str = &quot;&quot;</span><br><span class="line">    for value in self &#123;</span><br><span class="line">        if !str.isEmpty &#123;</span><br><span class="line">            str += &quot;, &quot;</span><br><span class="line">        &#125;</span><br><span class="line">        str += String(describing: value)</span><br><span class="line">    &#125;</span><br><span class="line">    return &quot;(\(impl.ptr): &quot; + str + &quot;)&quot;</span><br><span class="line">&#125;</span><br><span class="line">    </span><br><span class="line">typealias Index = Int</span><br><span class="line">    </span><br><span class="line">var startIndex: Index &#123;</span><br><span class="line">    return 0</span><br><span class="line">&#125;</span><br><span class="line">    </span><br><span class="line">var endIndex: Index &#123;</span><br><span class="line">    return count</span><br><span class="line">&#125;</span><br><span class="line">    </span><br><span class="line">func index(after i: Int) -&gt; Int &#123;</span><br><span class="line">    return i + 1</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="源代码及测试代码"><a href="#源代码及测试代码" class="headerlink" title="源代码及测试代码"></a>源代码及测试代码</h2><hr>
+<p>所有实现已上传<code>Github</code>：<a target="_blank" rel="noopener" href="https://gist.github.com/zhongwuzw/2b194c9fb2e4aaaca04cedb79bf207f1">https://gist.github.com/zhongwuzw/2b194c9fb2e4aaaca04cedb79bf207f1</a></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><hr>
+<p><a target="_blank" rel="noopener" href="https://www.mikeash.com/pyblog/friday-qa-2015-04-17-lets-build-swiftarray.html">https://www.mikeash.com/pyblog/friday-qa-2015-04-17-lets-build-swiftarray.html</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/iOS/" rel="tag"># iOS</a>
+              <a href="/tags/Swift/" rel="tag"># Swift</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2017/07/27/RxSwift%E4%B9%8BsentMessage%E3%80%81methodInvoked%E5%A4%B1%E6%95%88%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/" rel="prev" title="RxSwift之sentMessage、methodInvoked失效问题解决">
+                  <i class="fa fa-chevron-left"></i> RxSwift之sentMessage、methodInvoked失效问题解决
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2017/09/21/%E8%81%8A%E8%81%8Adealloc/" rel="next" title="聊聊dealloc">
+                  聊聊dealloc <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2016 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">钟武</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css" integrity="sha256-2H3fkXt6FEmrReK448mDVGKb3WW2ZZw35gI7vqHOE4Y=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"zhongwuzw.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.7.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="iOS中，Hit-Testing主要用于决定哪个视图来首先处理Touch事件，确定完后，就会依据响应者链来进行事件的处理。接下来，我们将分析Hit-Testing的工作流程。  由于不确定的原因，Hit-Testing测试会被执行多次，导致单个视图的-(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event方法会被调用多次，由于是幂等">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS事件处理之Hit-Testing">
+<meta property="og:url" content="https://zhongwuzw.github.io/2016/09/12/iOS%E4%BA%8B%E4%BB%B6%E5%A4%84%E7%90%86%E4%B9%8BHit-Testing/index.html">
+<meta property="og:site_name" content="钟武的技术博客">
+<meta property="og:description" content="iOS中，Hit-Testing主要用于决定哪个视图来首先处理Touch事件，确定完后，就会依据响应者链来进行事件的处理。接下来，我们将分析Hit-Testing的工作流程。  由于不确定的原因，Hit-Testing测试会被执行多次，导致单个视图的-(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event方法会被调用多次，由于是幂等">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/hit-test-view-hierarchy.png">
+<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/hit-test-depth-first-traversal.png">
+<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/hit-test-flowchart.png">
+<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/hit-test-increase-touch-area.png">
+<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/hit-test-pass-touches-to-subviews.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/zhongwuzw.github.io.resource/master/images/default-delivery-path.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/zhongwuzw/zhongwuzw.github.io.resource/master/images/sequence-of-messages-for-touches.png">
+<meta property="article:published_time" content="2016-09-12T04:25:12.000Z">
+<meta property="article:modified_time" content="2018-01-04T16:09:21.000Z">
+<meta property="article:author" content="钟武">
+<meta property="article:tag" content="iOS开发-UI">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://oc54pu02q.bkt.clouddn.com/hit-test-view-hierarchy.png">
+
+
+<link rel="canonical" href="https://zhongwuzw.github.io/2016/09/12/iOS%E4%BA%8B%E4%BB%B6%E5%A4%84%E7%90%86%E4%B9%8BHit-Testing/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://zhongwuzw.github.io/2016/09/12/iOS%E4%BA%8B%E4%BB%B6%E5%A4%84%E7%90%86%E4%B9%8BHit-Testing/","path":"2016/09/12/iOS事件处理之Hit-Testing/","title":"iOS事件处理之Hit-Testing"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>iOS事件处理之Hit-Testing | 钟武的技术博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">钟武的技术博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+        <li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E8%BD%BDhitTest-withEvent-%E7%A4%BA%E4%BE%8B"><span class="nav-number">1.</span> <span class="nav-text">重载hitTest:withEvent:示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A2%9E%E5%8A%A0%E8%A7%86%E5%9B%BE%E7%9A%84touch%E5%8C%BA%E5%9F%9F"><span class="nav-number">1.1.</span> <span class="nav-text">增加视图的touch区域</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%86touch%E4%BA%8B%E4%BB%B6%E4%BC%A0%E5%88%B0%E5%85%B6%E4%B8%8B%E9%9D%A2%E7%9A%84%E8%A7%86%E5%9B%BE%EF%BC%8C%E6%97%A2%E9%80%8F%E4%BC%A0"><span class="nav-number">1.2.</span> <span class="nav-text">将touch事件传到其下面的视图，既透传</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%86touch%E4%BA%8B%E4%BB%B6%E4%BC%A0%E7%BB%99%E5%AD%90%E8%A7%86%E5%9B%BE"><span class="nav-number">1.3.</span> <span class="nav-text">将touch事件传给子视图</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%83%E6%95%B4Touches%E4%BC%A0%E9%80%92%E8%B7%AF%E7%BA%BF"><span class="nav-number">2.</span> <span class="nav-text">调整Touches传递路线</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%8B%E5%8A%BF%E8%AF%86%E5%88%AB%E5%99%A8%E5%B0%86%E4%BC%98%E5%85%88%E8%AF%86%E5%88%ABTouch"><span class="nav-number">2.1.</span> <span class="nav-text">手势识别器将优先识别Touch</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">钟武</p>
+  <div class="site-description" itemprop="description">Keep thinking, keep coding!!!</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">45</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/zhongwuzw" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;zhongwuzw" rel="noopener" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:zhongwuzw@qq.com" title="E-Mail → mailto:zhongwuzw@qq.com" rel="noopener" target="_blank"><i class="envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://stackoverflow.com/zhongwuzw" title="StackOverflow → https:&#x2F;&#x2F;stackoverflow.com&#x2F;zhongwuzw" rel="noopener" target="_blank"><i class="stack-overflow fa-fw"></i>StackOverflow</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://weibo.com/zhongwuzw" title="微博 → http:&#x2F;&#x2F;weibo.com&#x2F;zhongwuzw" rel="noopener" target="_blank"><i class="weibo fa-fw"></i>微博</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.douban.com/people/zhongwu/" title="豆瓣 → https:&#x2F;&#x2F;www.douban.com&#x2F;people&#x2F;zhongwu&#x2F;" rel="noopener" target="_blank"><i class="share-alt fa-fw"></i>豆瓣</a>
+      </span>
+  </div>
+
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2016/09/12/iOS%E4%BA%8B%E4%BB%B6%E5%A4%84%E7%90%86%E4%B9%8BHit-Testing/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="钟武">
+      <meta itemprop="description" content="Keep thinking, keep coding!!!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="钟武的技术博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          iOS事件处理之Hit-Testing
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2016-09-12 12:25:12" itemprop="dateCreated datePublished" datetime="2016-09-12T12:25:12+08:00">2016-09-12</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2018-01-05 00:09:21" itemprop="dateModified" datetime="2018-01-05T00:09:21+08:00">2018-01-05</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/iOS%E5%BC%80%E5%8F%91-UI/" itemprop="url" rel="index"><span itemprop="name">iOS开发-UI</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <hr>
+<p>iOS中，Hit-Testing主要用于决定哪个视图来首先处理Touch事件，确定完后，就会依据响应者链来进行事件的处理。接下来，我们将分析Hit-Testing的工作流程。</p>
+<blockquote>
+<p>由于不确定的原因，Hit-Testing测试会被执行多次，导致单个视图的<code>-(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event</code>方法会被调用多次，由于是幂等的，所以结果不影响。</p>
+</blockquote>
+<p>Hit-Testing使用的搜索算法为<em><strong>逆前序深度遍历</strong></em>（逆前序遍历先访问根节点，然后进行从其索引最大的子视图到最小的子视图的遍历，既从右至左进行遍历）。当touch事件的points发生在多个视图的重叠部分时，根据算法将得到最右子树中的最深视图，而该视图就是位于界面最前端的视图。</p>
+<p>下图展示了一个视图层级树以及对应在屏幕上的显示结果，树的分支顺序安排反应了子视图数组的顺序，比如<code>View A</code>的索引小于<code>View B</code>。<br><img src="http://oc54pu02q.bkt.clouddn.com/hit-test-view-hierarchy.png"></p>
+ <span id="more"></span>
+
+<p>由上图，<code>View A.2</code>和<code>View B.1</code>两个视图重叠了，但是因为<code>View B</code>和<code>View A</code>是兄弟视图，且<code>View B</code>的索引大于<code>View A</code>，因此，当用户的touch事件发生在<code>View A.2</code>和<code>View B.1</code>重叠的部分时，Hit-Testing将返回<code>View B.1</code>。</p>
+<p>通过应用逆前序深度遍历算法，当找到第一个最深的后代视图满足后就会停止遍历。<br><img src="http://oc54pu02q.bkt.clouddn.com/hit-test-depth-first-traversal.png"></p>
+<p>遍历算法是以向<code>UIWindow</code>发送<code>hitTest:withEvent</code>消息开始的，<code>UIWindow</code>是视图层级的根视图，<code>hitTest:withEvent</code>方法返回的值即是包含触摸点最前端的视图。<br>下图展示了Hit-Testing的逻辑：<br><img src="http://oc54pu02q.bkt.clouddn.com/hit-test-flowchart.png"><br>如下代码展示了原生<code>hitTest:withEvent:</code>方法可能的实现：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event &#123;</span><br><span class="line">    if (!self.isUserInteractionEnabled || self.isHidden || self.alpha &lt;= 0.01) &#123;</span><br><span class="line">        return nil;</span><br><span class="line">    &#125;</span><br><span class="line">    if ([self pointInside:point withEvent:event]) &#123;</span><br><span class="line">        for (UIView *subview in [self.subviews reverseObjectEnumerator]) &#123;</span><br><span class="line">            CGPoint convertedPoint = [subview convertPoint:point fromView:self];</span><br><span class="line">            UIView *hitTestView = [subview hitTest:convertedPoint withEvent:event];</span><br><span class="line">            if (hitTestView) &#123;</span><br><span class="line">                return hitTestView;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return self;</span><br><span class="line">    &#125;</span><br><span class="line">    return nil;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>hitTest:withEvent</code>方法首先检测视图是否允许接收touch事件，当如下条件满足时，既允许接收事件：</p>
+<ul>
+<li>视图没被隐藏：<br>  <code>self.hidden == NO</code></li>
+<li>视图允许用户交互：<br>  <code>self.userInteractionEnabled = YES</code></li>
+<li>视图的alpha值大于0.01：<br>  <code>self.alpha &gt; 0.01</code></li>
+<li>touch事件的触摸点在视图的bounds内：<br>  <code>pointInside:withEvent: == YES</code></li>
+</ul>
+<p>当视图允许接收touch事件后，该方法将对其<code>subviews</code>子视图数组的每个视图，以逆序的方式，发送<code>hitTest:withEvent:</code>消息，直到返回非<code>nil</code>的值。当其子视图都返回<code>nil</code>或者没有子视图时，则返回视图本身。<br>如果视图不被允许接收touch事件，那么方法会返回<code>nil</code>，且不需要对视图的子树进行遍历。</p>
+<h2 id="重载hitTest-withEvent-示例"><a href="#重载hitTest-withEvent-示例" class="headerlink" title="重载hitTest:withEvent:示例"></a>重载<code>hitTest:withEvent:</code>示例</h2><p>当默认的搜索算法不满足要求时，可以重载<code>hitTest:withEvent:</code>来自定义。</p>
+<h3 id="增加视图的touch区域"><a href="#增加视图的touch区域" class="headerlink" title="增加视图的touch区域"></a>增加视图的touch区域</h3><p>当需要一个视图的touch区域大于它的bounds时，可以重载<code>hitTest:withEvent:</code>方法，比如，下面展示了一个20X20的视图<code>UIView</code>，该大小可能对于处理touch来说有点小，因此，可以通过重载<code>hitTest:withEvent:</code>方法来在每个方向上增加10points：<br><img src="http://oc54pu02q.bkt.clouddn.com/hit-test-increase-touch-area.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event &#123;</span><br><span class="line">    if (!self.isUserInteractionEnabled || self.isHidden || self.alpha &lt;= 0.01) &#123;</span><br><span class="line">        return nil;</span><br><span class="line">    &#125;</span><br><span class="line">    CGRect touchRect = CGRectInset(self.bounds, -10, -10);</span><br><span class="line">    if (CGRectContainsPoint(touchRect, point)) &#123;</span><br><span class="line">        for (UIView *subview in [self.subviews reverseObjectEnumerator]) &#123;</span><br><span class="line">            CGPoint convertedPoint = [subview convertPoint:point fromView:self];</span><br><span class="line">            UIView *hitTestView = [subview hitTest:convertedPoint withEvent:event];</span><br><span class="line">            if (hitTestView) &#123;</span><br><span class="line">                return hitTestView;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return self;</span><br><span class="line">    &#125;</span><br><span class="line">    return nil;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>注意，该实现能正确执行的前提是，希望响应touch事件的区域必须在其父视图的bounds范围内，或者重写父视图的<code>hitTest:withEvent:</code>方法来包含能响应touch的区域。</p>
+</blockquote>
+<h3 id="将touch事件传到其下面的视图，既透传"><a href="#将touch事件传到其下面的视图，既透传" class="headerlink" title="将touch事件传到其下面的视图，既透传"></a>将touch事件传到其下面的视图，既透传</h3><p>有时我们需要一个视图忽略touch事件并把他们传到其下面的视图，比如，当touch的pints在视图的子视图时，返回子视图，否则将事件透传到下面的视图，代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event &#123;</span><br><span class="line">    UIView *hitTestView = [super hitTest:point withEvent:event];</span><br><span class="line">    if (hitTestView == self) &#123;</span><br><span class="line">        hitTestView = nil;</span><br><span class="line">    &#125;</span><br><span class="line">    return hitTestView;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="将touch事件传给子视图"><a href="#将touch事件传给子视图" class="headerlink" title="将touch事件传给子视图"></a>将touch事件传给子视图</h3><p>父视图对所有touch事件进行重定向，传到子视图中，比如，一个图片旋转功能，由一个父视图和一个<code>UIScrollView</code>组成，且设置<code>UIScrollView</code>视图的<code>pagingEnabled</code>属性为<code>YES</code>，且设置父视图的<code>clipsToBounds</code>属性为NO。<br><img src="http://oc54pu02q.bkt.clouddn.com/hit-test-pass-touches-to-subviews.png"><br>为了让<code>UIScrollView</code>不仅能够响应其bounds范围内的事件，同样也能响应其父视图的bounds内的事件，可以重载父视图的<code>hitTest:withEvent:</code>方法，代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event &#123;</span><br><span class="line">    UIView *hitTestView = [super hitTest:point withEvent:event];</span><br><span class="line">    if (hitTestView) &#123;</span><br><span class="line">        hitTestView = self.scrollView;</span><br><span class="line">    &#125;</span><br><span class="line">    return hitTestView;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="调整Touches传递路线"><a href="#调整Touches传递路线" class="headerlink" title="调整Touches传递路线"></a>调整<code>Touches</code>传递路线</h2><p>有时候我们希望视图在手势识别器识别前能够接收到<code>touch</code>事件，在找到解决方法之前，我们先来了解一下默认的行为。举一个简单的例子，当一个触摸发生时，<code>touch</code>对象将从<code>UIApplication</code>传递到<code>UIWindow</code>，然后，在将<code>touches</code>发送给发生触摸的视图（因为视图继承自<code>UIResponder</code>）本身前，<code>window</code>首先会将<code>touches</code>发送给发生触摸的视图（或其父视图）所关联的手势识别器。</p>
+<p><img src="https://raw.githubusercontent.com/zhongwuzw/zhongwuzw.github.io.resource/master/images/default-delivery-path.png"></p>
+<h3 id="手势识别器将优先识别Touch"><a href="#手势识别器将优先识别Touch" class="headerlink" title="手势识别器将优先识别Touch"></a>手势识别器将优先识别<code>Touch</code></h3><p><code>window</code>会延时将<code>touches</code>对象传递给视图，以便手势识别器能优先识别<code>touch</code>.在延时的过程中，如果手势识别器成功识别，那么<code>window</code>将不会再继续传递<code>touch</code>对象到视图，而且会取消之前已经发送给视图的<code>touch</code>对象。</p>
+<p>比如，有一个手势识别器，用来识别两个手指的触摸，识别器会将触摸转换成两个独立的<code>touch</code>对象，当触摸发生时，<code>touch</code>对象会从<code>Application</code>传到<code>window</code>，接下来的流程，可以由如下表来表示。</p>
+<p><img src="https://raw.githubusercontent.com/zhongwuzw/zhongwuzw.github.io.resource/master/images/sequence-of-messages-for-touches.png"></p>
+<ol>
+<li><code>window</code>会在<code>Began</code>阶段通过<code>UIGestureRecognizer</code>的<code>touchesBegan:withEvent:</code>方法向识别器发送两个<code>touch</code>对象，此时，手势识别器还没有成功识别，所以状态为<code>Possible</code>.<code>window</code>同时会发送相同的<code>touches</code>到识别器关联的视图。</li>
+<li><code>window</code>在<code>Moved</code>阶段通过<code>UIGestureRecognizer</code>的<code>touchesMoved:withEvent:</code>方法向识别器发送两个<code>touch</code>对象，此时，手势识别器依然还没有成功识别，状态为<code>Possible</code>,<code>window</code>同时会发送相同的<code>touches</code>到识别器关联的视图。</li>
+<li><code>window</code>在<code>Ended</code>阶段通过<code>UIGestureRecognizer</code>的<code>touchesEnded:withEvent:</code>方法向识别器发送一个<code>touch</code>对象，此时该<code>touch</code>对象还没有生成足够的信息提供给识别器，但是<code>window</code>将不会再向识别器关联的视图发送<code>touch</code>对象。</li>
+<li><code>window</code>在<code>Ended</code>阶段发送另一个<code>touch</code>对象，手势识别器现在已经成功识别了触摸，所以其状态变为<code>Recognized</code>,在<code>action</code>消息（即识别器创建时的@selector方法）发送之前，视图会调用自己的<code>touchesCancelled:withEvent: </code>(注意，是视图本身的方法，不是<code>UIGestureRecognizer</code>的)方法来使之前在<code>Began</code>和<code>Moved</code>阶段发送的<code>touch</code>对象失效，<code>Ended</code>阶段的<code>touches</code>将被取消。</li>
+</ol>
+<p>现在，我们假设手势识别器在如上的最后一步没有成功识别，那么识别器会将其状态设为<code>UIGestureRecognizerStateFailed</code>，然后，<code>window</code>会在<code>Ended</code>状态向视图发送两个<code>touch</code>对象，并调用视图的<code>touchesEnded:withEvent: </code>消息。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/iOS%E5%BC%80%E5%8F%91-UI/" rel="tag"># iOS开发-UI</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2016/09/11/iOS%E8%B6%8A%E7%8B%B1%E7%9B%B8%E5%85%B3%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/" rel="prev" title="iOS越狱相关基础知识">
+                  <i class="fa fa-chevron-left"></i> iOS越狱相关基础知识
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2016/09/18/Nginx%E7%9A%84%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/" rel="next" title="Nginx的架构设计">
+                  Nginx的架构设计 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2016 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">钟武</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

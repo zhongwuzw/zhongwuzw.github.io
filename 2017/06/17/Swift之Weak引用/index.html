@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css" integrity="sha256-2H3fkXt6FEmrReK448mDVGKb3WW2ZZw35gI7vqHOE4Y=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"zhongwuzw.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.7.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="由于不同的Swift版本引用计数实现会有不同，该文讨论的引用计数原理都基于Swift3  弱引用 做iOS开发时经常会遇到循环引用，如果处理不当会导致内存泄露，我们通常会使用weak reference弱引用来解决该问题，因为弱引用不会retain对象，当对象引用计数变为0时，弱引用指针将会被赋nil。 实现过程 通常如果实现弱引用，可以让每一个对象维护所有指向该对象的一个弱引用列表，当一个弱引">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Swift3之Weak引用">
+<meta property="og:url" content="https://zhongwuzw.github.io/2017/06/17/Swift%E4%B9%8BWeak%E5%BC%95%E7%94%A8/index.html">
+<meta property="og:site_name" content="钟武的技术博客">
+<meta property="og:description" content="由于不同的Swift版本引用计数实现会有不同，该文讨论的引用计数原理都基于Swift3  弱引用 做iOS开发时经常会遇到循环引用，如果处理不当会导致内存泄露，我们通常会使用weak reference弱引用来解决该问题，因为弱引用不会retain对象，当对象引用计数变为0时，弱引用指针将会被赋nil。 实现过程 通常如果实现弱引用，可以让每一个对象维护所有指向该对象的一个弱引用列表，当一个弱引">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2017-06-17T13:33:22.000Z">
+<meta property="article:modified_time" content="2017-06-19T16:06:19.000Z">
+<meta property="article:author" content="钟武">
+<meta property="article:tag" content="iOS">
+<meta property="article:tag" content="Swift">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://zhongwuzw.github.io/2017/06/17/Swift%E4%B9%8BWeak%E5%BC%95%E7%94%A8/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://zhongwuzw.github.io/2017/06/17/Swift%E4%B9%8BWeak%E5%BC%95%E7%94%A8/","path":"2017/06/17/Swift之Weak引用/","title":"Swift3之Weak引用"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Swift3之Weak引用 | 钟武的技术博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">钟武的技术博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+        <li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%B1%E5%BC%95%E7%94%A8"><span class="nav-number">1.</span> <span class="nav-text">弱引用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E8%BF%87%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">实现过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E6%88%98"><span class="nav-number">3.</span> <span class="nav-text">实战</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Swift%E4%BB%A3%E7%A0%81"><span class="nav-number">4.</span> <span class="nav-text">Swift代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%99%84%E5%BD%95"><span class="nav-number">6.</span> <span class="nav-text">附录</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">钟武</p>
+  <div class="site-description" itemprop="description">Keep thinking, keep coding!!!</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">45</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/zhongwuzw" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;zhongwuzw" rel="noopener" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:zhongwuzw@qq.com" title="E-Mail → mailto:zhongwuzw@qq.com" rel="noopener" target="_blank"><i class="envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://stackoverflow.com/zhongwuzw" title="StackOverflow → https:&#x2F;&#x2F;stackoverflow.com&#x2F;zhongwuzw" rel="noopener" target="_blank"><i class="stack-overflow fa-fw"></i>StackOverflow</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://weibo.com/zhongwuzw" title="微博 → http:&#x2F;&#x2F;weibo.com&#x2F;zhongwuzw" rel="noopener" target="_blank"><i class="weibo fa-fw"></i>微博</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.douban.com/people/zhongwu/" title="豆瓣 → https:&#x2F;&#x2F;www.douban.com&#x2F;people&#x2F;zhongwu&#x2F;" rel="noopener" target="_blank"><i class="share-alt fa-fw"></i>豆瓣</a>
+      </span>
+  </div>
+
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2017/06/17/Swift%E4%B9%8BWeak%E5%BC%95%E7%94%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="钟武">
+      <meta itemprop="description" content="Keep thinking, keep coding!!!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="钟武的技术博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Swift3之Weak引用
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2017-06-17 21:33:22" itemprop="dateCreated datePublished" datetime="2017-06-17T21:33:22+08:00">2017-06-17</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2017-06-20 00:06:19" itemprop="dateModified" datetime="2017-06-20T00:06:19+08:00">2017-06-20</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/iOS%E5%BC%80%E5%8F%91-%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">iOS开发-语言</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <blockquote>
+<p>由于不同的<code>Swift</code>版本引用计数实现会有不同，该文讨论的引用计数原理都基于<code>Swift3</code></p>
+</blockquote>
+<h2 id="弱引用"><a href="#弱引用" class="headerlink" title="弱引用"></a>弱引用</h2><hr>
+<p>做<code>iOS</code>开发时经常会遇到循环引用，如果处理不当会导致内存泄露，我们通常会使用<code>weak reference</code>弱引用来解决该问题，因为弱引用不会<code>retain</code>对象，当对象引用计数变为0时，弱引用指针将会被赋<code>nil</code>。</p>
+<h2 id="实现过程"><a href="#实现过程" class="headerlink" title="实现过程"></a>实现过程</h2><hr>
+<p>通常如果实现弱引用，可以让每一个对象维护所有指向该对象的一个弱引用列表，当一个弱引用指向一个对象时，该引用被添加进列表，当弱引用重新赋值或生命期结束，则将其从列表中移除，当一个对象<code>dealloced</code>后，列表中的所有引用会被赋<code>nil</code>。在多线程环境中，需要对获得弱引用和释放对象的操作进行同步，以避免竞态条件，既当一个线程在释放最后一个强引用对象的同时，另一个线程正尝试加载该对象的弱引用。</p>
+<p><code>Objective-C</code>实现的过程为，每一个弱引用是一个指向目标对象的指针，编译器会使用<code>helper</code>函数，来避免直接读写指针，确保读取弱引用对象时不会返回正在被释放的对象指针。</p>
+<h2 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h2><hr>
+<p>接下来，我们将创建几个方法来观察弱引用的过程。<br>首先我们想要能够<code>dump</code>出一个对象的内存，如下方法将获取一块内存，将其分成指针大小的块，再将其内容转成16进制，以便于观察：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">// Swift version: Swift3</span><br><span class="line"></span><br><span class="line">func contents(ptr: UnsafeRawPointer, _ length: Int) -&gt; String &#123;</span><br><span class="line">    let wordPtr = ptr.assumingMemoryBound(to: UInt.self)</span><br><span class="line">    </span><br><span class="line">    let words = length / MemoryLayout&lt;UInt&gt;.size</span><br><span class="line">    let wordChars = MemoryLayout&lt;UInt&gt;.size * 2</span><br><span class="line">    </span><br><span class="line">    let buffer = UnsafeBufferPointer&lt;UInt&gt;(start: wordPtr, count: words)</span><br><span class="line">    let wordStrings = buffer.map(&#123; word -&gt; String in</span><br><span class="line">        var wordString = String(word, radix: 16)</span><br><span class="line">        while wordString.characters.count &lt; wordChars &#123;</span><br><span class="line">            wordString = &quot;0&quot; + wordString</span><br><span class="line">        &#125;</span><br><span class="line">        return wordString</span><br><span class="line">    &#125;)</span><br><span class="line">    return wordStrings.joined(separator: &quot; &quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<p>接下来，我们将创建一个<code>dumper</code>函数来打印一个对象实例的内容，参数为一个对象实例，函数返回一个闭包。在函数内部，会创建一个<code>UnsafeRawPointer</code>指针来指向对象，这样能确保不会进行引用计数的操作，且当对象被释放后，我们仍可以<code>dump</code>出指针所指向内存的内容。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">// Swift version: Swift3</span><br><span class="line"></span><br><span class="line">func dumperFunc(_ obj: AnyObject) -&gt; ((Void) -&gt; String) &#123;</span><br><span class="line">    let objString = String(describing: obj)</span><br><span class="line">    let ptr = unsafeBitCast(obj, to: UnsafeRawPointer.self)</span><br><span class="line">    let length = class_getInstanceSize(type(of: obj))</span><br><span class="line">    return &#123;</span><br><span class="line">        let bytes = contents(ptr: ptr, length)</span><br><span class="line">        return &quot;\(objString) \(ptr): \(bytes)&quot;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如下有一个类，它有一个弱引用的属性<code>target</code>，同时，创建两个<code>dummy</code>属性，当<code>dump</code>内存内容时可以更清晰的识别：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">class WeakReferer &#123;</span><br><span class="line">        var dummy1 = 0x1234321012343210</span><br><span class="line">        weak var target: WeakTarget?</span><br><span class="line">        var dummy2: UInt = 0xabcdefabcdefabcd</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>接下来，创建一个该对象的实例，并<code>dump</code>出内存的内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">let referer = WeakReferer()</span><br><span class="line">let refererDump = dumperFunc(referer)</span><br><span class="line">print(refererDump())</span><br></pre></td></tr></table></figure>
+
+<p>结果为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SwiftLearn.WeakReferer 0x000060000004eb50: 000000010ebb0c50 0000000200000004 1234321012343210 0000000000000000 abcdefabcdefabcd</span><br></pre></td></tr></table></figure>
+
+<p>我们可以看到，<code>dummy1</code>位于第4块，<code>dummy2</code>位于第6块，弱引用位于他们中间，正如我们期待的，其内容为0.</p>
+<p>现在我们给它赋一个值看看，我将通过一个<code>do</code>块来控制<code>target</code>的生命周期：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// 因为target是NSObject对象，所以需要改一下WeakReferer的target属性的类型</span><br><span class="line"></span><br><span class="line">do &#123;</span><br><span class="line">        let target = NSObject()</span><br><span class="line">        referer.target = target</span><br><span class="line">        print(target)</span><br><span class="line">        print(refererDump())</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>打印结果为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;NSObject: 0x7fda6a21c6a0&gt;</span><br><span class="line">    WeakReferer 0x00007fda6a000ad0: 00000001050a44a0 0000000200000004 1234321012343210 00007fda6a21c6a0 abcdefabcdefabcd</span><br></pre></td></tr></table></figure>
+
+<p>正如我们所看到的，<code>target</code>对象的指针直接存放在弱引用中。接下来，我们在<code>do</code>块结束之后再打印一下看看<code>target</code>释放后的情况：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">print(refererDump())</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">WeakReferer 0x00007ffe32300060: 000000010cfb44a0 0000000200000004 1234321012343210 0000000000000000 abcdefabcdefabcd</span><br></pre></td></tr></table></figure>
+
+<p>被赋值为了<code>nil</code>.</p>
+<p>接下来，我们再测试一下将<code>target</code>赋值为一个纯<code>Swift</code>对象，看是不是和<code>Objective-C</code>的<code>NSObject</code>一样，如下为纯<code>Swift``target</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">class WeakTarget &#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>再试一下，看看结果怎样：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">let referer = WeakReferer()</span><br><span class="line">let refererDump = dumperFunc(referer)</span><br><span class="line">print(refererDump())</span><br><span class="line">do &#123;</span><br><span class="line">  let target = WeakTarget()</span><br><span class="line">  referer.target = target</span><br><span class="line">  print(refererDump())</span><br><span class="line">&#125;</span><br><span class="line">print(refererDump())</span><br></pre></td></tr></table></figure>
+
+<p><code>target</code>开始为<code>nil</code>，然后赋给它一个值：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SwiftLearn.WeakReferer 0x00006000002423a0: 000000010538bc50 0000000200000004 1234321012343210 0000000000000000 abcdefabcdefabcd</span><br><span class="line">SwiftLearn.WeakReferer 0x00006000002423a0: 000000010538bc50 0000000200000004 1234321012343210 000060800002a9c2 abcdefabcdefabcd</span><br></pre></td></tr></table></figure>
+
+<p>接下来，当<code>target</code>离开作用域，我们看看弱引用是否被赋<code>nil</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SwiftLearn.WeakReferer 0x00006000002423a0: 000000010538bc50 0000000200000004 1234321012343210 000060800002a9c2 abcdefabcdefabcd</span><br></pre></td></tr></table></figure>
+
+<p>咦，怎么没被赋<code>nil</code>，难道是<code>target</code>没有被释放，产生了内存泄露？我们给<code>target</code>对象加上析构函数看看：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">class WeakTarget &#123;</span><br><span class="line">        deinit &#123; print(&quot;WeakTarget deinit&quot;) &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行之前的代码，看看结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">SwiftLearn.WeakReferer 0x00006000002423a0: 000000010538bc50 0000000200000004 1234321012343210 0000000000000000 abcdefabcdefabcd</span><br><span class="line">SwiftLearn.WeakReferer 0x00006000002423a0: 000000010538bc50 0000000200000004 1234321012343210 000060800002a9c2 abcdefabcdefabcd</span><br><span class="line">WeakTarget deinit</span><br><span class="line">SwiftLearn.WeakReferer 0x00006000002423a0: 000000010538bc50 0000000200000004 1234321012343210 000060800002a9c2 abcdefabcdefabcd</span><br></pre></td></tr></table></figure>
+
+<p>析构函数被调用了，但是弱引用并没有被赋<code>nil</code>，这跟我们印象中的<code>weak</code>运行过程有出入，我们接着访问一下该值，看是否会产生<code>crash</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">let referer = WeakReferer()</span><br><span class="line">    let refererDump = dumperFunc(referer)</span><br><span class="line">    print(refererDump())</span><br><span class="line">    do &#123;</span><br><span class="line">        let target = WeakTarget()</span><br><span class="line">        referer.target = target</span><br><span class="line">        print(refererDump())</span><br><span class="line">    &#125;</span><br><span class="line">    print(refererDump())</span><br><span class="line">    print(referer.target)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">WeakReferer 0x00007ff7aa20d060: 00000001047a04a0 0000000200000004 1234321012343210 0000000000000000 abcdefabcdefabcd</span><br><span class="line">WeakReferer 0x00007ff7aa20d060: 00000001047a04a0 0000000200000004 1234321012343210 00007ff7aa2157f0 abcdefabcdefabcd</span><br><span class="line">WeakTarget deinit</span><br><span class="line">WeakReferer 0x00007ff7aa20d060: 00000001047a04a0 0000000200000004 1234321012343210 00007ff7aa2157f0 abcdefabcdefabcd</span><br><span class="line">nil</span><br></pre></td></tr></table></figure>
+
+<p>并没有产生<code>crash</code>，打印结果为<code>nil</code>。<br>让我们再仔细的分析一下，首先我们先给<code>WeakTarget</code>对象加上一个<code>dummy</code>属性，<code>dump</code>的时候能更方便的查看内存内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">class WeakTarget &#123;</span><br><span class="line">        var dummy = 0x0123456789abcdef</span><br><span class="line"></span><br><span class="line">        deinit &#123;</span><br><span class="line">            print(&quot;Weak target deinit&quot;)</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接下来，我们将使用新的代码执行相同的过程并<code>dump</code>出每一步的对象内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">let referer = WeakReferer()</span><br><span class="line">let refererDump = dumperFunc(referer)</span><br><span class="line">print(refererDump())</span><br><span class="line">let targetDump: (Void) -&gt; String</span><br><span class="line">do &#123;</span><br><span class="line">  let target = WeakTarget()</span><br><span class="line">  targetDump = dumperFunc(target)</span><br><span class="line">  print(targetDump())</span><br><span class="line">  </span><br><span class="line">  referer.target = target</span><br><span class="line">  </span><br><span class="line">  print(refererDump())</span><br><span class="line">  print(targetDump())</span><br><span class="line">&#125;</span><br><span class="line">print(refererDump())</span><br><span class="line">print(targetDump())</span><br><span class="line">print(referer.target)</span><br><span class="line">print(refererDump())</span><br><span class="line">print(targetDump())</span><br></pre></td></tr></table></figure>
+
+<p>我们一个一个看一下输出的内容。一开始，<code>target</code>属性为<code>nil</code>:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SwiftLearn.WeakReferer 0x0000608000243450: 000000010cec4c58 0000000200000004 1234321012343210 0000000000000000 abcdefabcdefabcd</span><br></pre></td></tr></table></figure>
+
+<p>给<code>target</code>属性设置一个对象实例，<code>target</code>对象实例的内容为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SwiftLearn.WeakTarget 0x00006080000357e0: 000000010cec4d48 0000000200000004 0123456789abcdef</span><br></pre></td></tr></table></figure>
+
+<p>将对象实例赋给<code>target</code>属性，我们能够看到<code>weak</code>属性已经被赋值了，赋的值为<code>target</code>对象地址+2字节，既对于<code>weak</code>指针，它并不直接指向对象的地址，而是指向对象的<code>side table</code>（下文会讲到<code>side table</code>的概念），<code>unowned``strong</code>引用会直接指向对象：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SwiftLearn.WeakReferer 0x0000608000243450: 000000010cec4c58 0000000200000004 1234321012343210 00006080000357e2 abcdefabcdefabcd</span><br></pre></td></tr></table></figure>
+
+<p><code>target</code>对象的内容块中有一个字段自增了2：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SwiftLearn.WeakTarget 0x00006080000357e0: 000000010cec4d48 0000000400000004 0123456789abcdef</span><br></pre></td></tr></table></figure>
+
+<p><code>target</code>被析构：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">WeakTarget deinit</span><br></pre></td></tr></table></figure>
+
+<p>我们看到引用的对象依然保持着<code>target</code>的指针：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SwiftLearn.WeakReferer 0x0000608000243450: 000000010cec4c58 0000000200000004 1234321012343210 00006080000357e2 abcdefabcdefabcd</span><br></pre></td></tr></table></figure>
+
+<p>看上去好像<code>target</code>依然还存活着，我们看到<code>target</code>对象的有一个字段减了2：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SwiftLearn.WeakTarget 0x00006080000357e0: 000000010cec4d48 0000000200000002 0123456789abcdef</span><br></pre></td></tr></table></figure>
+
+<p>访问一下<code>target</code>属性，此时会产生<code>nil</code>，尽管内容中的指针并没有被赋<code>nil</code>:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nil</span><br></pre></td></tr></table></figure>
+
+<p>我们再打印一下<code>referer</code>对象的内容，发现访问完<code>target</code>属性后，<code>target</code>字段被修改了，赋为了<code>nil</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SwiftLearn.WeakReferer 0x0000608000243450: 000000010cec4c58 0000000200000004 1234321012343210 0000000000000000 abcdefabcdefabcd</span><br></pre></td></tr></table></figure>
+
+<p><code>target</code>对象现在完全被清除了：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SwiftLearn.WeakTarget 0x00006080000357e0: 000000010cec3370 0000000200000008 000000010cebe200</span><br></pre></td></tr></table></figure>
+
+<p>从上面的运行过程，我们发现某些字段会被增/减，我们进行一些测试，来看一下有没有规律：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">let target = WeakTarget()</span><br><span class="line">let targetDump = dumperFunc(target)</span><br><span class="line">do &#123;</span><br><span class="line">  print(targetDump())</span><br><span class="line">  weak var a = target</span><br><span class="line">  print(targetDump())</span><br><span class="line">  weak var b = target</span><br><span class="line">  print(targetDump())</span><br><span class="line">  weak var c = target</span><br><span class="line">  print(targetDump())</span><br><span class="line">  weak var d = target</span><br><span class="line">  print(targetDump())</span><br><span class="line">  weak var e = target</span><br><span class="line">  print(targetDump())</span><br><span class="line">  </span><br><span class="line">  var f = target</span><br><span class="line">  print(targetDump())</span><br><span class="line">  var g = target</span><br><span class="line">  print(targetDump())</span><br><span class="line">  var h = target</span><br><span class="line">  print(targetDump())</span><br><span class="line">  var i = target</span><br><span class="line">  print(targetDump())</span><br><span class="line">  var j = target</span><br><span class="line">  print(targetDump())</span><br><span class="line">  var k = target</span><br><span class="line">  print(targetDump())</span><br><span class="line">&#125;</span><br><span class="line">print(targetDump())</span><br></pre></td></tr></table></figure>
+
+<p>打印结果为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">SwiftLearn.WeakTarget 0x00006080000395a0: 000000010e8aad40 0000000200000004 0123456789abcdef</span><br><span class="line">SwiftLearn.WeakTarget 0x00006080000395a0: 000000010e8aad40 0000000400000004 0123456789abcdef</span><br><span class="line">SwiftLearn.WeakTarget 0x00006080000395a0: 000000010e8aad40 0000000600000004 0123456789abcdef</span><br><span class="line">SwiftLearn.WeakTarget 0x00006080000395a0: 000000010e8aad40 0000000800000004 0123456789abcdef</span><br><span class="line">SwiftLearn.WeakTarget 0x00006080000395a0: 000000010e8aad40 0000000a00000004 0123456789abcdef</span><br><span class="line">SwiftLearn.WeakTarget 0x00006080000395a0: 000000010e8aad40 0000000c00000004 0123456789abcdef</span><br><span class="line">SwiftLearn.WeakTarget 0x00006080000395a0: 000000010e8aad40 0000000c00000008 0123456789abcdef</span><br><span class="line">SwiftLearn.WeakTarget 0x00006080000395a0: 000000010e8aad40 0000000c0000000c 0123456789abcdef</span><br><span class="line">SwiftLearn.WeakTarget 0x00006080000395a0: 000000010e8aad40 0000000c00000010 0123456789abcdef</span><br><span class="line">SwiftLearn.WeakTarget 0x00006080000395a0: 000000010e8aad40 0000000c00000014 0123456789abcdef</span><br><span class="line">SwiftLearn.WeakTarget 0x00006080000395a0: 000000010e8aad40 0000000c00000018 0123456789abcdef</span><br><span class="line">SwiftLearn.WeakTarget 0x00006080000395a0: 000000010e8aad40 0000000c0000001c 0123456789abcdef</span><br><span class="line">SwiftLearn.WeakTarget 0x00006080000395a0: 000000010e8aad40 0000000200000004 0123456789abcdef</span><br><span class="line">WeakTarget deinit</span><br></pre></td></tr></table></figure>
+
+<p>从结果，我们能够看到，对于每一个<code>weak</code>引用，第2个块中的第一个数会自增2；而每一个<code>strong</code>引用，第二个数会自增4.</p>
+<p>总结一下：</p>
+<ul>
+<li>弱指针看起来就是普通的指针。</li>
+<li>当一个弱引用对象的<code>deinit</code>执行后，对象并没有被释放，且弱引用指针也没有被赋<code>nil</code>。</li>
+<li>当弱引用执行完<code>deinit</code>后，访问弱引用对象，则对象指针会被赋<code>nil</code>,且目标对象被释放。</li>
+<li>弱引用对象对于每一个弱引用会包含一个引用计数（<code>unowned</code>计数和<code>weak</code>计数为同一个），且与强引用计数分开统计。 </li>
+</ul>
+<h2 id="Swift代码"><a href="#Swift代码" class="headerlink" title="Swift代码"></a>Swift代码</h2><hr>
+<p>接下来，我们看一下<code>Swift</code>实现的源代码。<br><code>Swift</code>标准库表示一个在堆上的对象的结构体为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">/// The Swift3 heap-object header.</span><br><span class="line">struct HeapObject &#123;</span><br><span class="line">  /// This is always a valid pointer to a metadata object.</span><br><span class="line">  HeapMetadata const *metadata;</span><br><span class="line"></span><br><span class="line">  SWIFT_HEAPOBJECT_NON_OBJC_MEMBERS;</span><br><span class="line">  // FIXME: allocate two words of metadata on 32-bit platforms</span><br><span class="line"></span><br><span class="line">#ifdef __cplusplus</span><br><span class="line">  HeapObject() = default;</span><br><span class="line"></span><br><span class="line">  // Initialize a HeapObject header as appropriate for a newly-allocated object.</span><br><span class="line">  constexpr HeapObject(HeapMetadata const *newMetadata) </span><br><span class="line">    : metadata(newMetadata)</span><br><span class="line">    , refCounts(InlineRefCounts::Initialized)</span><br><span class="line">  &#123; &#125;</span><br><span class="line">#endif</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><code>Swift</code>的<code>metadata</code>字段等同于<code>Objective-C</code>的<code>isa</code>字段，事实上，他们是兼容的。接着，使用了一个宏来定义字段，该字段用来管理引用计数：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">///Swift默认为InlineRefCounts，当有弱引用指向该对象时，InlineRefCounts会变为SideTableRefCounts</span><br><span class="line"></span><br><span class="line">#define SWIFT_HEAPOBJECT_NON_OBJC_MEMBERS       \</span><br><span class="line">  InlineRefCounts refCounts</span><br></pre></td></tr></table></figure>
+
+<p>Swift增加引用计数的方法如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">// Increment the reference count.</span><br><span class="line">void increment(uint32_t inc = 1) &#123;</span><br><span class="line">  auto oldbits = refCounts.load(SWIFT_MEMORY_ORDER_CONSUME);</span><br><span class="line">  RefCountBits newbits;</span><br><span class="line">  do &#123;</span><br><span class="line">    newbits = oldbits;</span><br><span class="line">    bool fast = newbits.incrementStrongExtraRefCount(inc);</span><br><span class="line">    if (!fast)</span><br><span class="line">      return incrementSlow(oldbits, inc);</span><br><span class="line">  &#125; while (!refCounts.compare_exchange_weak(oldbits, newbits,</span><br><span class="line">                                            std::memory_order_relaxed));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>由于引用计数的管理有两种类型<code>InlineRefCounts</code>、<code>SideTableRefCounts</code>，当对象只包含<code>strong</code>或<code>unowned</code>引用时，使用<code>InlineRefCounts</code>进行计数管理，如果对象拥有了<code>weak</code>引用，则会使用<code>SideTableRefCounts</code>来管理计数。所以如上增加引用计数的函数，会考虑两种情况，<code>fast</code>对应<code>InlineRefCounts</code>，<code>slow</code>对应<br><code>SideTableRefCounts</code>，为了避免竞态条件，使用了<code>compare_exchange_weak</code>来进行赋值。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">HeapObject &#123;</span><br><span class="line">  isa</span><br><span class="line">  InlineRefCounts &#123;</span><br><span class="line">    atomic&lt;InlineRefCountBits&gt; &#123;</span><br><span class="line">      strong RC + unowned RC + flags</span><br><span class="line">      OR</span><br><span class="line">      HeapObjectSideTableEntry*</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">HeapObjectSideTableEntry &#123;</span><br><span class="line">  SideTableRefCounts &#123;</span><br><span class="line">    object pointer</span><br><span class="line">    atomic&lt;SideTableRefCountBits&gt; &#123;</span><br><span class="line">      strong RC + unowned RC + weak RC + flags</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;   </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接下来，看一下<code>weak</code>引用自减计数的函数操作过程，函数内调用<code>decrementWeakShouldCleanUp</code>来进行位数的操作，其返回一个<code>bool</code>值，既当<code>weak</code>、<code>strong </code>、<code>unowned</code>计数都变为0时，<code>bool</code>值返回<code>true</code>，说明可以收回内存了，既调用<code>delete</code>释放内存。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">void decrementWeak() &#123;</span><br><span class="line">  // FIXME: assertions</span><br><span class="line">  // FIXME: optimize barriers</span><br><span class="line">  bool cleanup = refCounts.decrementWeakShouldCleanUp();</span><br><span class="line">  if (!cleanup)</span><br><span class="line">    return;</span><br><span class="line"></span><br><span class="line">  // Weak ref count is now zero. Delete the side table entry.</span><br><span class="line">  // FREED -&gt; DEAD</span><br><span class="line">  assert(refCounts.getUnownedCount() == 0);</span><br><span class="line">  delete this;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>此时，我们应该就比较清楚了，即使<code>strong</code>或<code>unowned</code>的计数为0，如果还存在<code>weak</code>弱引用，<br>那么对象也不会被释放。</p>
+<p>接下来，我们可以看一下加载弱引用的过程，<code>Swift</code>通过<code>HeapObject *swift::swift_weakTakeStrong(WeakReference *ref)</code>函数来实现，该函数通过间接调用，最终调用<code>nativeTakeStrongFromBits</code>函数，该函数内部首先会调用<code>getNativeOrNull</code>方法，该方法会从对象的<code>side table</code>中查询对象的计数，当没有<code>strong</code>引用时，说明该对象已经处于<code>DEINITING</code>状态，函数会返回<code>nullptr</code>，否则将调用<code>tryRetain</code>函数来尝试<code>strong</code>对象。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">HeapObject *nativeTakeStrongFromBits(WeakReferenceBits bits) &#123;</span><br><span class="line">  auto side = bits.getNativeOrNull();</span><br><span class="line">  if (side) &#123;</span><br><span class="line">    side-&gt;decrementWeak();</span><br><span class="line">    return side-&gt;tryRetain();</span><br><span class="line">  &#125; else &#123;</span><br><span class="line">    return nullptr;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当对象实例的<code>deinit()</code>方法被调用时，内部会调用<code>swift_deallocObject</code>函数，而它会通过调用<code>canBeFreedNow</code>函数来判断是否需要释放内存，既满足没有<code>side table</code>，<code>unowned</code>引用为1，<code>strong</code>引用计数为0。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">bool canBeFreedNow() const &#123;</span><br><span class="line">auto bits = refCounts.load(SWIFT_MEMORY_ORDER_CONSUME);</span><br><span class="line">return (!bits.hasSideTable() &amp;&amp;</span><br><span class="line">          bits.getIsDeiniting() &amp;&amp;</span><br><span class="line">          bits.getStrongExtraRefCount() == 0 &amp;&amp;</span><br><span class="line">          bits.getUnownedRefCount() == 1);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>综上，如果还存在<code>weak</code><br>弱引用，那么肯定还有<code>side table</code>表，即使没有<code>strong</code>引用，也不会被释放。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><hr>
+<ol>
+<li>弱引用指向对象实例的<code>side table</code>地址。</li>
+<li>与<code>Objective-C</code>管理引用计数的方式不同，<code>Swift</code>的弱引用计数与<code>strong</code>计数一起管理。</li>
+<li><code>Swift</code>针对对象的析构和对象的释放进行了解耦，一个对象被析构后，会释放它的外部资源，但是有可能不会释放对象本身的内存。</li>
+<li>当<code>Swift</code>对象的<code>strong</code>引用计数变为0但是<code>weak</code>计数大于0时，对象会被析构但是不会被释放内存。</li>
+<li>当加载一个弱引用时，运行时会检查<code>target</code>的状态<br>，如果<code>target</code>已经是僵尸对象，那么会赋空<code>weak</code>引用，<code>weak</code>计数减一，并返回<code>nil</code>,这个过程是安全的，当<code>weak</code>引用计数变为0时，僵尸对象内存将被释放。</li>
+</ol>
+<p>最后总结一下<code>Swift</code>与<code>Objective-C</code>的区别：</p>
+<ul>
+<li><code>Swift</code>不需要维护<code>weak</code>列表，这可以简化代码和提升性能。</li>
+<li>对于<code>Swift</code>的<code>weak</code>引用，实例对象会在<code>strong</code>引用计数变为0时，内存依然保留，直到所有的<code>weak</code>引用离开作用域。不过这个影响是很小的，因为虽然对象分配的内存依然保留，但是它所有的外部资源（如<code>Array</code>、<code>Dictionary</code>属性）会在<code>strong</code>引用计数变为0时被释放。</li>
+<li>由于<code>Swift</code>的<code>weak</code>创建后，对象的引用计数管理会从<code>InlineRefCounts</code>替换为<code>SideTableRefCounts</code>，这也会带来一定的开销，所以如果可以，尽量使用<code>unowned</code>,<code>unowned</code>有点类似于<code>Objective-C</code>的<code>__unsafe_unretained</code>，如果<code>unowned</code>指向僵尸对象后再访问，会产生未定义行为。</li>
+</ul>
+<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><hr>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://github.com/apple/swift/blob/7913e9821b814956d243e4e03cfe9ddc0e325bc2/stdlib/public/SwiftShims/HeapObject.h">https://github.com/apple/swift/blob/7913e9821b814956d243e4e03cfe9ddc0e325bc2/stdlib/public/SwiftShims/HeapObject.h</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/apple/swift/blob/860252fab41392b7de3218e58f7542cb1dc1ce16/stdlib/public/runtime/WeakReference.h">https://github.com/apple/swift/blob/860252fab41392b7de3218e58f7542cb1dc1ce16/stdlib/public/runtime/WeakReference.h</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/apple/swift/blob/b7d78853112c1279fc7bc5b85853779040f13703/stdlib/public/SwiftShims/RefCount.h">https://github.com/apple/swift/blob/b7d78853112c1279fc7bc5b85853779040f13703/stdlib/public/SwiftShims/RefCount.h</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/apple/swift/blob/b7d78853112c1279fc7bc5b85853779040f13703/stdlib/public/SwiftShims/RefCount.h#L123-#L187">Swift对象生命周期状态机</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.mikeash.com/pyblog/friday-qa-2015-12-11-swift-weak-references.html">https://www.mikeash.com/pyblog/friday-qa-2015-12-11-swift-weak-references.html</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/iOS/" rel="tag"># iOS</a>
+              <a href="/tags/Swift/" rel="tag"># Swift</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2017/06/05/GCD%E9%98%9F%E5%88%97%E7%AE%A1%E7%90%86%E4%B9%8BYYDispatchQueuePool/" rel="prev" title="GCD队列管理之YYDispatchQueuePool">
+                  <i class="fa fa-chevron-left"></i> GCD队列管理之YYDispatchQueuePool
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2017/07/27/RxSwift%E4%B9%8BsentMessage%E3%80%81methodInvoked%E5%A4%B1%E6%95%88%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/" rel="next" title="RxSwift之sentMessage、methodInvoked失效问题解决">
+                  RxSwift之sentMessage、methodInvoked失效问题解决 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2016 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">钟武</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css" integrity="sha256-2H3fkXt6FEmrReK448mDVGKb3WW2ZZw35gI7vqHOE4Y=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"zhongwuzw.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.7.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="Tips  iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙盒，如果需要让自己的应用能够通过其访问，必须在应用的info.plist中添加UIFileSharingEnabled关键字，并赋值为YES，这样，就能访问其Documents目录了(注意，其它目录还是无法访问)。  使用UIWebView时，发现在首次加载网页时，加载时间异常的长，其原因是服务器需要花费一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS相关tips">
+<meta property="og:url" content="https://zhongwuzw.github.io/2016/10/10/iOS%E7%9B%B8%E5%85%B3tips/index.html">
+<meta property="og:site_name" content="钟武的技术博客">
+<meta property="og:description" content="Tips  iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙盒，如果需要让自己的应用能够通过其访问，必须在应用的info.plist中添加UIFileSharingEnabled关键字，并赋值为YES，这样，就能访问其Documents目录了(注意，其它目录还是无法访问)。  使用UIWebView时，发现在首次加载网页时，加载时间异常的长，其原因是服务器需要花费一">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2016-10-10T10:50:03.000Z">
+<meta property="article:modified_time" content="2017-11-19T14:58:52.000Z">
+<meta property="article:author" content="钟武">
+<meta property="article:tag" content="iOS">
+<meta property="article:tag" content="tips">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://zhongwuzw.github.io/2016/10/10/iOS%E7%9B%B8%E5%85%B3tips/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://zhongwuzw.github.io/2016/10/10/iOS%E7%9B%B8%E5%85%B3tips/","path":"2016/10/10/iOS相关tips/","title":"iOS相关tips"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>iOS相关tips | 钟武的技术博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">钟武的技术博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+        <li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Tips"><span class="nav-number">1.</span> <span class="nav-text">Tips</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">钟武</p>
+  <div class="site-description" itemprop="description">Keep thinking, keep coding!!!</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">45</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/zhongwuzw" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;zhongwuzw" rel="noopener" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:zhongwuzw@qq.com" title="E-Mail → mailto:zhongwuzw@qq.com" rel="noopener" target="_blank"><i class="envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://stackoverflow.com/zhongwuzw" title="StackOverflow → https:&#x2F;&#x2F;stackoverflow.com&#x2F;zhongwuzw" rel="noopener" target="_blank"><i class="stack-overflow fa-fw"></i>StackOverflow</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://weibo.com/zhongwuzw" title="微博 → http:&#x2F;&#x2F;weibo.com&#x2F;zhongwuzw" rel="noopener" target="_blank"><i class="weibo fa-fw"></i>微博</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.douban.com/people/zhongwu/" title="豆瓣 → https:&#x2F;&#x2F;www.douban.com&#x2F;people&#x2F;zhongwu&#x2F;" rel="noopener" target="_blank"><i class="share-alt fa-fw"></i>豆瓣</a>
+      </span>
+  </div>
+
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2016/10/10/iOS%E7%9B%B8%E5%85%B3tips/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="钟武">
+      <meta itemprop="description" content="Keep thinking, keep coding!!!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="钟武的技术博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          iOS相关tips
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2016-10-10 18:50:03" itemprop="dateCreated datePublished" datetime="2016-10-10T18:50:03+08:00">2016-10-10</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2017-11-19 22:58:52" itemprop="dateModified" datetime="2017-11-19T22:58:52+08:00">2017-11-19</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/iOS%E5%BC%80%E5%8F%91-%E5%85%B6%E5%AE%83/" itemprop="url" rel="index"><span itemprop="name">iOS开发-其它</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <hr>
+<h2 id="Tips"><a href="#Tips" class="headerlink" title="Tips"></a>Tips</h2><hr>
+<ul>
+<li><p>iOS8.3之后，通过iTunes、iFunBox等工具已无法直接访问应用的沙盒，如果需要让自己的应用能够通过其访问，必须在应用的<code>info.plist</code>中添加<code>UIFileSharingEnabled</code>关键字，并赋值为<code>YES</code>，这样，就能访问其<code>Documents</code>目录了(注意，其它目录还是无法访问)。</p>
+</li>
+<li><p>使用<code>UIWebView</code>时，发现在首次加载网页时，加载时间异常的长，其原因是服务器需要花费一定的时间来解析请求来自于哪个平台，比如<code>PC</code>、<code>iPhone</code>、<code>iPad</code>等，以针对不同的平台响应不同的页面布局，解决该问题的方法为客户端直接请求特定版本的页面，且设置请求的<code>UA</code>(<code>User Agent</code>)，如下代码：</p>
+  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[[NSUserDefaults standardUserDefaults] registerDefaults:@&#123;@&quot;UserAgent&quot; : @&quot;    Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/10.0 Mobile/14A300 Safari/602.1&quot;&#125;];</span><br></pre></td></tr></table></figure></li>
+<li><p>在使用<code>UIBarButtonItem</code>，并对其使用<code>UIImage</code>赋值时，iOS7之后会对<code>UIImage</code>设置<code>tintColor</code>，从而改变图片的原值色，如果需要保留图片原色，可以对<code>UIImage</code>进行如下代码设置：</p>
+  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">UIImage *image = [UIImage imageNamed:@&quot;myImage.png&quot;];</span><br><span class="line">image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];</span><br></pre></td></tr></table></figure></li>
+</ul>
+ <span id="more"></span>
+
+<ul>
+<li><p>iOS7之后，对于<code>UIViewController</code>的内容布局，默认会从屏幕顶部开始，这就会导致内容被状态栏所覆盖。<br> 如果<code>UIViewController</code>包含在<code>UINavigationController</code>下且<code>navigationBar</code>是可见的，那么可以使用如下代码来使内容布局不被状态栏覆盖：</p>
+  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">self.edgesForExtendedLayout = UIRectEdgeNone;</span><br></pre></td></tr></table></figure>
+<p>  如果<code>navigationBar</code>不可见，那么就只能调整<code>UIVew</code>的位置了，向下移20 points。</p>
+</li>
+<li><p><code>UIWebView</code>加载页面时底部出现黑条问题解决方法：设置<code>UIWebView</code>的<code>backgroundColor</code>为<code>clearColor</code>，<code>opaque</code>为<code>NO</code>即可。</p>
+</li>
+<li><p>当我们使用<a target="_blank" rel="noopener" href="https://github.com/Carthage/Carthage">Carthage</a>作为依赖管理器时，安装库时，经常会执行<code>carthage update</code>命令，此时，不同的库，可能会生成多个平台的<code>frameworks</code>，如<code>iOS</code>，<code>macOS</code>，<code>watchOS</code>，<code>tvOS</code>，所以，如果我们的项目只需要使用到<code>iOS</code>的<code>framework</code>，那么可以在执行<code>update</code>命令时加上参数，如<code>carthage update --platform iOS</code></p>
+</li>
+<li><p>当在<code>UIWebView</code>中播放<code>audio</code>时，默认在应用进入后台或锁定等情况时，<code>audio</code>会暂停。解决方法为：</p>
+<ul>
+<li>在<code>info.plist</code>中加入键值对如下：  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"> &lt;key&gt;UIBackgroundModes&lt;/key&gt;</span><br><span class="line"> &lt;array&gt;</span><br><span class="line">&lt;string&gt;audio&lt;/string&gt;</span><br><span class="line"> &lt;/array&gt;</span><br></pre></td></tr></table></figure></li>
+<li>设置<code>Audio Session</code>的类别，默认类别为<code>AVAudioSessionCategorySoloAmbient</code>,将类别设置为<code>AVAudioSessionCategoryPlayback</code>，代码如下:  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#import &lt;AVFoundation/AVFoundation.h&gt;</span><br><span class="line">#import &lt;AudioToolbox/AudioToolbox.h&gt;</span><br><span class="line">     </span><br><span class="line">AVAudioSession *audioSession = [AVAudioSession  sharedInstance];</span><br><span class="line">     </span><br><span class="line">NSError *setCategoryError = nil;</span><br><span class="line">BOOL success = [audioSession setCategory:AVAudioSessionCategoryPlayback error:&amp;setCategoryError];</span><br><span class="line">if (!success) &#123; /* handle the error condition */ &#125;</span><br><span class="line"> </span><br><span class="line">NSError *activationError = nil;</span><br><span class="line">success = [audioSession setActive:YES error:&amp;activationError];</span><br><span class="line">if (!success) &#123; /* handle the error condition */ &#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p><em>非越狱</em>下获取设备安装的所有应用：</p>
+  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Class c = NSClassFromString(@&quot;LSApplicationWorkspace&quot;);</span><br><span class="line">id s = [(id)c performSelector:NSSelectorFromString(@&quot;defaultWorkspace&quot;)];</span><br><span class="line">    </span><br><span class="line">NSArray *arr = [s performSelector:NSSelectorFromString(@&quot;allInstalledApplications&quot;)];</span><br><span class="line">    </span><br><span class="line">for (id item in arr) &#123;</span><br><span class="line">    NSLog(@&quot;%@&quot;,[item performSelector:NSSelectorFromString(@&quot;applicationIdentifier&quot;)]); </span><br><span class="line">    NSLog(@&quot;%@&quot;,[item performSelector:NSSelectorFromString(@&quot;bundleVersion&quot;)]);</span><br><span class="line">    NSLog(@&quot;%@&quot;,[item performSelector:NSSelectorFromString(@&quot;shortVersionString&quot;)]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>当使用<code>Core Foundation</code>时，当你是对象的拥有者时，需要调用<code>CFRelease</code>，这里需要注意的是，不能调用<code>CFRelease(NULL)</code>，会导致程序崩溃，所以，调用<code>CFRelease</code>前需先判断一下对象是否存在（当然，有些特定的release函数容许<code>NULL</code>参数，如<code>CGGradientRelease</code>)。</p>
+</li>
+<li><p><code>UITableViewCell</code>默认分割线会在左侧留出一定的间距，如果想调整分割线的左、右间距，可以通过调整<code>UITableView</code>的<code>separatorInset</code>属性。</p>
+</li>
+<li><p>当使用<code>WKWebView</code>的<code>WKScriptMessageHandler</code>时，<code>WKUserContentController</code>会<code>retain</code> <code>message handler</code>，所以，要注意避免循环引用。</p>
+</li>
+<li><p><code>CAAnimation</code>的<code>delegate</code>是强引用的，强引用的，强引用的。可以通过操作完成后移除动画或设置一个代理对象作为<code>delegate</code>。</p>
+</li>
+<li><p>当使用<code>UIView</code>、<code>CALayer</code>的<code>transform</code>时，会影响到<code>frame</code>属性，此时我们应该废弃掉<code>frame</code>，而是通过<code>bounds</code>和<code>position</code>、<code>center</code>来进行设置。</p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/iOS/" rel="tag"># iOS</a>
+              <a href="/tags/tips/" rel="tag"># tips</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2016/09/24/%E8%B0%83%E6%95%B4Nginx%E7%9A%84%E7%BD%91%E7%AB%99%E6%A0%B9%E7%9B%AE%E5%BD%95/" rel="prev" title="修改Nginx的网站根目录">
+                  <i class="fa fa-chevron-left"></i> 修改Nginx的网站根目录
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2016/10/13/%E4%BD%BF%E7%94%A8PyMySQL%E5%A4%84%E7%90%86%E5%A4%A7%E7%BB%93%E6%9E%9C%E9%9B%86%E7%9A%84%E6%96%B9%E6%B3%95/" rel="next" title="使用PyMySQL处理大结果集的方法">
+                  使用PyMySQL处理大结果集的方法 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2016 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">钟武</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css" integrity="sha256-2H3fkXt6FEmrReK448mDVGKb3WW2ZZw35gI7vqHOE4Y=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"zhongwuzw.github.io","root":"/","images":"/images","scheme":"Pisces","version":"8.7.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="AppDelegate解耦 说到AppDelegate，大家想必都不陌生，它作为应用(UIApplication)的委托对象，在UIApplicationMain方法中被创建，当发生应用相关事件时，提供开发者响应的机会。 12345int main(int argc, char * argv[]) &amp;#123;    @autoreleasepool &amp;#123;        return UI">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AppDelegate解耦之JSDecoupledAppDelegate">
+<meta property="og:url" content="https://zhongwuzw.github.io/2017/02/09/AppDelegate%E8%A7%A3%E8%80%A6%E4%B9%8BJSDecoupledAppDelegate/index.html">
+<meta property="og:site_name" content="钟武的技术博客">
+<meta property="og:description" content="AppDelegate解耦 说到AppDelegate，大家想必都不陌生，它作为应用(UIApplication)的委托对象，在UIApplicationMain方法中被创建，当发生应用相关事件时，提供开发者响应的机会。 12345int main(int argc, char * argv[]) &amp;#123;    @autoreleasepool &amp;#123;        return UI">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://oc54pu02q.bkt.clouddn.com/iOS_and_OSX_responder_chain_2x.png">
+<meta property="article:published_time" content="2017-02-09T06:52:34.000Z">
+<meta property="article:modified_time" content="2017-02-09T08:43:40.000Z">
+<meta property="article:author" content="钟武">
+<meta property="article:tag" content="iOS">
+<meta property="article:tag" content="源码分析">
+<meta property="article:tag" content="解耦">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://oc54pu02q.bkt.clouddn.com/iOS_and_OSX_responder_chain_2x.png">
+
+
+<link rel="canonical" href="https://zhongwuzw.github.io/2017/02/09/AppDelegate%E8%A7%A3%E8%80%A6%E4%B9%8BJSDecoupledAppDelegate/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://zhongwuzw.github.io/2017/02/09/AppDelegate%E8%A7%A3%E8%80%A6%E4%B9%8BJSDecoupledAppDelegate/","path":"2017/02/09/AppDelegate解耦之JSDecoupledAppDelegate/","title":"AppDelegate解耦之JSDecoupledAppDelegate"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>AppDelegate解耦之JSDecoupledAppDelegate | 钟武的技术博客</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">钟武的技术博客</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+        <li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#AppDelegate%E8%A7%A3%E8%80%A6"><span class="nav-number">1.</span> <span class="nav-text">AppDelegate解耦</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JSDecoupledAppDelegate"><span class="nav-number">2.</span> <span class="nav-text">JSDecoupledAppDelegate</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%88"><span class="nav-number">3.</span> <span class="nav-text">终</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">钟武</p>
+  <div class="site-description" itemprop="description">Keep thinking, keep coding!!!</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">45</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/zhongwuzw" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;zhongwuzw" rel="noopener" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:zhongwuzw@qq.com" title="E-Mail → mailto:zhongwuzw@qq.com" rel="noopener" target="_blank"><i class="envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://stackoverflow.com/zhongwuzw" title="StackOverflow → https:&#x2F;&#x2F;stackoverflow.com&#x2F;zhongwuzw" rel="noopener" target="_blank"><i class="stack-overflow fa-fw"></i>StackOverflow</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://weibo.com/zhongwuzw" title="微博 → http:&#x2F;&#x2F;weibo.com&#x2F;zhongwuzw" rel="noopener" target="_blank"><i class="weibo fa-fw"></i>微博</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.douban.com/people/zhongwu/" title="豆瓣 → https:&#x2F;&#x2F;www.douban.com&#x2F;people&#x2F;zhongwu&#x2F;" rel="noopener" target="_blank"><i class="share-alt fa-fw"></i>豆瓣</a>
+      </span>
+  </div>
+
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://zhongwuzw.github.io/2017/02/09/AppDelegate%E8%A7%A3%E8%80%A6%E4%B9%8BJSDecoupledAppDelegate/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="钟武">
+      <meta itemprop="description" content="Keep thinking, keep coding!!!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="钟武的技术博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          AppDelegate解耦之JSDecoupledAppDelegate
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2017-02-09 14:52:34 / 修改时间：16:43:40" itemprop="dateCreated datePublished" datetime="2017-02-09T14:52:34+08:00">2017-02-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/iOS%E5%BC%80%E5%8F%91-%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">iOS开发-项目</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="AppDelegate解耦"><a href="#AppDelegate解耦" class="headerlink" title="AppDelegate解耦"></a>AppDelegate解耦</h2><hr>
+<p>说到<code>AppDelegate</code>，大家想必都不陌生，它作为应用(<code>UIApplication</code>)的委托对象，在<code>UIApplicationMain</code>方法中被创建，当发生应用相关事件时，提供开发者响应的机会。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">int main(int argc, char * argv[]) &#123;</span><br><span class="line">    @autoreleasepool &#123;</span><br><span class="line">        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>AppDelegate</code>是<code>UIResponder</code>的子类，应用将<code>AppDelegate</code>加入响应链中。<code>UIApplication</code>作为响应链中的最上层，当<code>UIApplication</code>任然无法处理特定事件时，会将事件转发给<code>AppDelegate</code>来处理。</p>
+<img src="http://oc54pu02q.bkt.clouddn.com/iOS_and_OSX_responder_chain_2x.png" width = "500" height = "" alt="" align=center />
+
+<p>当然，<code>AppDelegate</code>的主要职责还是响应应用事件，它满足<code>UIApplicationDelegate</code>协议，<code>UIApplicationDelegate</code>协议包含大量的委托方法，包括处理应用状态、状态恢复、后台下载数据、通知、URL Route等很多方面，这就会导致，随着程序的开发，<code>AppDelegate</code>将变得越来越臃肿，为了解决该问题，就需要进行解耦。</p>
+<span id="more"></span>
+
+<h2 id="JSDecoupledAppDelegate"><a href="#JSDecoupledAppDelegate" class="headerlink" title="JSDecoupledAppDelegate"></a>JSDecoupledAppDelegate</h2><hr>
+<p><a target="_blank" rel="noopener" href="https://github.com/JaviSoto/JSDecoupledAppDelegate">JSDecoupledAppDelegate</a>的目的就是进行<code>AppDelegate</code>的解耦，接下来，将讲述一下实现原理。</p>
+<p>首先为了实现解耦，需要将<code>AppDelegate</code>替换为定义好的<code>JSDecoupledAppDelegate</code>类（该类为单例模式），其相当于一个<code>Proxy</code>代理类，负责管理分发到不同的协议对象。<code>JSDecoupledAppDelegate</code>将<code>UIApplicationDelegate</code>协议进行了分类拆分，生成如下的多个协议，针对每个协议，<code>JSDecoupledAppDelegate</code>都有一个满足该协议的属性，如<code>@property (strong, nonatomic, nullable) id&lt;JSApplicationStateDelegate&gt; appStateDelegate;</code>，<code>appStateDelegate</code>用来存储满足<code>JSApplicationStateDelegate</code>协议的对象，当该协议定义的方法被调用时，将转发给委托对象进行处理。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">@protocol JSApplicationStateDelegate;</span><br><span class="line">@protocol JSApplicationDefaultOrientationDelegate;</span><br><span class="line">@protocol JSApplicationBackgroundFetchDelegate;</span><br><span class="line">@protocol JSApplicationRemoteNotificationsDelegate;</span><br><span class="line">@protocol JSApplicationLocalNotificationsDelegate;</span><br><span class="line">@protocol JSApplicationStateRestorationDelegate;</span><br><span class="line">@protocol JSApplicationURLResourceOpeningDelegate;</span><br><span class="line">@protocol JSApplicationShortcutItemDelegate;</span><br><span class="line">@protocol JSApplicationHealthDelegate;</span><br><span class="line">@protocol JSApplicationProtectedDataDelegate;</span><br><span class="line">@protocol JSApplicationWatchInteractionDelegate;</span><br><span class="line">@protocol JSApplicationExtensionDelegate;</span><br><span class="line">@protocol JSApplicationActivityContinuationDelegate;</span><br></pre></td></tr></table></figure>
+
+<p>比如，我们需要处理应用状态相关事件，新建一个处理对象，满足<code>JSApplicationStateDelegate</code>协议，在对象中定义<code>+load</code>方法，将<code>JSDecoupledAppDelegate</code>的<code>appStateDelegate</code>属性赋给自己，如下所示，再在对象中实现<code>JSApplicationStateDelegate</code>方法，这样，当应用状态相关事件产生时，该对象就能收到相关事件。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">+ (void)load</span><br><span class="line">&#123;</span><br><span class="line">    [JSDecoupledAppDelegate sharedAppDelegate].appStateDelegate = [[self alloc] init];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样，就实现了<code>AppDelegate</code>的解耦，针对不同的应用事件类别，由不同的对象进行处理。</p>
+<p>有的人就好奇了，<code>JSDecoupledAppDelegate</code>是怎么实现事件分发的呢？</p>
+<p><code>JSDecoupledAppDelegate</code>重载了<code>- (BOOL)respondsToSelector:(SEL)aSelector</code>方法，为什么会选择重载这个方法呢，我们再来思考一下，平时我们实现<code>Delegate</code>委托方式时，当我们需调用委托对象的某个方法时，首先需要做的就是判断一下委托对象是否实现了该方法，即使用<code>respondsToSelector:</code>（如果不进行提前判断，当委托对象没有实现该方法时，将导致<code>Crash</code>），这也就不难解释为什么选择重载该方法了。</p>
+<p>直接show code:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">- (BOOL)respondsToSelector:(SEL)aSelector</span><br><span class="line">&#123;</span><br><span class="line">    //获取委托属性名，每个协议对应一个属性，如appStateDelegate</span><br><span class="line">    NSArray *delegateProperties = JSApplicationDelegateProperties();</span><br><span class="line"></span><br><span class="line">    // 1. 获取定义了aSelector的协议</span><br><span class="line">    __block BOOL protocolFound = NO;</span><br><span class="line">    __block BOOL delegateRespondsToSelector = NO;</span><br><span class="line"></span><br><span class="line">    [JSApplicationDelegateSubprotocols() enumerateObjectsUsingBlock:^(NSString *protocolName, NSUInteger idx, BOOL *stop) &#123;</span><br><span class="line">        //获取协议定义的方法</span><br><span class="line">        NSSet *protocolMethods = JSSelectorListInProtocol(NSProtocolFromString(protocolName));</span><br><span class="line"></span><br><span class="line">        const BOOL methodCorrespondsToThisProtocol = [protocolMethods containsObject:NSStringFromSelector(aSelector)];</span><br><span class="line"></span><br><span class="line">        if (methodCorrespondsToThisProtocol)</span><br><span class="line">        &#123;</span><br><span class="line">            protocolFound = YES;</span><br><span class="line"></span><br><span class="line">            // 2. 获取协议委托对象，如appStateDelegate属性</span><br><span class="line">            id delegateObjectForProtocol = [self valueForKey:delegateProperties[idx]];</span><br><span class="line">            </span><br><span class="line">            //判断委托对象是否实现了该方法</span><br><span class="line">            delegateRespondsToSelector = [delegateObjectForProtocol respondsToSelector:aSelector];</span><br><span class="line"></span><br><span class="line">            *stop = YES;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;];</span><br><span class="line"></span><br><span class="line">    if (protocolFound)</span><br><span class="line">    &#123;</span><br><span class="line">        // 3. 返回委托对象是否能响应该方法</span><br><span class="line">        return delegateRespondsToSelector;</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">        // 4. 如不能响应，走缺省方法处理</span><br><span class="line">        return [super respondsToSelector:aSelector];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="终"><a href="#终" class="headerlink" title="终"></a>终</h2>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/iOS/" rel="tag"># iOS</a>
+              <a href="/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" rel="tag"># 源码分析</a>
+              <a href="/tags/%E8%A7%A3%E8%80%A6/" rel="tag"># 解耦</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2017/01/19/Objective-C%E4%B9%8BperformSelector%E7%BC%96%E8%AF%91%E5%99%A8%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2%E8%AD%A6%E5%91%8A/" rel="prev" title="Objective-C之performSelector编译器内存泄露警告">
+                  <i class="fa fa-chevron-left"></i> Objective-C之performSelector编译器内存泄露警告
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2017/03/14/%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B9%8B%E4%BB%8E%E8%A3%B8%E6%9C%BA%E5%88%B0%E5%8F%AF%E7%94%A8/" rel="next" title="服务器之从裸机到可用">
+                  服务器之从裸机到可用 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2016 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">钟武</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
